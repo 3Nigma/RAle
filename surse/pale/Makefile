@@ -1,2 +1,15 @@
-all :
-	g++ main.cpp -o pale `pkg-config gtkmm-3.0 --cflags --libs`
+PROJ_NAME := pale
+
+CXX := g++
+CXXFLAGS := -g
+LDFLAGS := `pkg-config gtkmm-3.0 --cflags --libs`
+CXXOBJECTS := fereastraprincipala.o
+
+%.o : %.cpp
+	$(CXX) -c $(CXXFLAGS) $< -o $@ $(LDFLAGS)
+
+all : $(CXXOBJECTS)
+	$(CXX) $(CXXFLAGS) main.cpp $(CXXOBJECTS) -o $(PROJ_NAME) $(LDFLAGS)
+
+clean :
+	rm -f $(PROJ_NAME) $(CXXOBJECTS)
