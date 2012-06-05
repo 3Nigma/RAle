@@ -1,4 +1,8 @@
 #include "fereastraprincipala.hpp"
+#include <iostream>
+
+const Glib::ustring FereastraPrincipala::LimbajProgramator_C = "C_LANG";
+const Glib::ustring FereastraPrincipala::LimbajProgramator_ASM = "ASM_LANG";
 
 FereastraPrincipala::FereastraPrincipala()
   : mImgTuscaleLogo(Gdk::Pixbuf::create_from_file("tuscale_small_logo.png")),
@@ -18,8 +22,8 @@ FereastraPrincipala::FereastraPrincipala()
   
   // cream lista de optiuni pentru programator
   mCmbxProgrameaza.append("Hai la programare...");
-  mCmbxProgrameaza.append("C");
-  mCmbxProgrameaza.append("Assamblare");
+  mCmbxProgrameaza.append(FereastraPrincipala::LimbajProgramator_C, "... în C");
+  mCmbxProgrameaza.append(FereastraPrincipala::LimbajProgramator_ASM, "... în Asamblare");
   mCmbxProgrameaza.set_active(0);
   mCmbxProgrameaza.signal_changed().connect(sigc::mem_fun(*this, &FereastraPrincipala::laClicProgrameaza));
   
@@ -51,7 +55,15 @@ bool FereastraPrincipala::laClicLogo(GdkEventButton* event) {
 
 void FereastraPrincipala::laClicProgrameaza() {
   Gtk::TreeModel::iterator iter = mCmbxProgrameaza.get_active();
-  if(iter) {
+  if(iter && mCmbxProgrameaza.get_active_id() != "") {
+    FereastraCod *fc;
+    if(mCmbxProgrameaza.get_active_id() == FereastraPrincipala::LimbajProgramator_C)
+      fc = new FereastraCod(FereastraCod::LimbajCunoscut::C);
+    else if(mCmbxProgrameaza.get_active_id() == FereastraPrincipala::LimbajProgramator_ASM)
+      fc = new FereastraCod(FereastraCod::LimbajCunoscut::ASM);
+  
+    fc->show();
+    mCmbxProgrameaza.set_active(0);
   }
 }
 
@@ -66,8 +78,8 @@ void FereastraPrincipala::laClicIesire() {
 			       Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_NONE);
   
   msgIesire.set_title("Plecați?");
-  msgIesire.add_button("Da", DA);
-  msgIesire.add_button("Nu, mai stau...", NU);
-  if(msgIesire.run() == DA)
+  msgIesire.add_button("Da", static_cast<int>(DlgIdRaspunsIntrebare::DA));
+  msgIesire.add_button("Nu, mai stau...", static_cast<int>(DlgIdRaspunsIntrebare::NU));
+  if(msgIesire.run() == static_cast<int>(DlgIdRaspunsIntrebare::DA))
     hide();
 }

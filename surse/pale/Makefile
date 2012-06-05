@@ -1,9 +1,9 @@
 PROJ_NAME := pale
 
 CXX := g++
-CXXFLAGS := -g
-LDFLAGS := `pkg-config gtkmm-3.0 --cflags --libs`
-CXXOBJECTS := fereastraprincipala.o
+CXXFLAGS := -g -std=c++0x
+LDFLAGS := `pkg-config gtkmm-3.0 --cflags --libs` #`pkg-config gtksourceviewmm-3.0 --cflags --libs`
+CXXOBJECTS := fereastraprincipala.o fereastracod.o
 
 %.o : %.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@ $(LDFLAGS)

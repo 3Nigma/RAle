@@ -1,14 +1,19 @@
 #ifndef _FEREASTRAPRINCIPALA_HPP_
 #define _FEREASTRAPRINCIPALA_HPP_
+
 #include <gtkmm.h>
+#include "fereastracod.hpp"
 
 #ifdef _WIN_BUILD_
 #include <windows.h>
 #endif
 
 class FereastraPrincipala : public Gtk::Window {
-  enum DlgIdRaspunsIntrebare { DA = 0, NU };
 public:
+  enum class DlgIdRaspunsIntrebare { DA = 0, NU };
+  static const Glib::ustring LimbajProgramator_C;
+  static const Glib::ustring LimbajProgramator_ASM;
+
   FereastraPrincipala();
   ~FereastraPrincipala();
 
