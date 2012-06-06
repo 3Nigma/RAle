@@ -41,6 +41,7 @@ protected:
   void incarcaImaginiFormular();
   void incarcaButoaneFormular();
   void laClicExpandator();
+  void laClicIesire();
 };
 
 #endif

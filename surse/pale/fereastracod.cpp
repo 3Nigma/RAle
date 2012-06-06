@@ -75,17 +75,24 @@ void FereastraCod::incarcaButoaneFormular() {
   mSagExpandator.set_relief(Gtk::RELIEF_NONE);
   mSagExpandator.set_size_request(10, 50);
   mSagExpandator.set_vexpand(true);
+  mSagExpandator.set_tooltip_text("... ascunde/afișează acțiunile disponibile");
   mSagExpandator.signal_clicked().connect(sigc::mem_fun(*this, &FereastraCod::laClicExpandator));
 
   mBtIncarcaPeAle.set_image(mImgScrieAle);
-  
+  mBtIncarcaPeAle.set_tooltip_text("... trimite aplicația spre plăcuță");
+
   mBtSalveazaLucru.set_image(mImgSalveaza);
+  mBtSalveazaLucru.set_tooltip_text("... salvează codul curent");
   
   mBtReiaLucru.set_image(mImgReiaCod);
+  mBtReiaLucru.set_tooltip_text("... încarcă cod vechi");
 
   mBtCitesteEEPROM.set_image(mImgCitesteEEPROM);
+  mBtCitesteEEPROM.set_tooltip_text("... vizualizează memoria EEPROM a plăcuței");
 
   mBtParasesteForm.set_image(mImgParasesteForm);
+  mBtParasesteForm.set_tooltip_text("... închide această fereastră");
+  mBtParasesteForm.signal_clicked().connect(sigc::mem_fun(*this, &FereastraCod::laClicIesire));
 
   mBtBoxComplet.add(mBtIncarcaPeAle);
   mBtBoxMijloc.add(mBtSalveazaLucru);
@@ -105,4 +112,8 @@ void FereastraCod::laClicExpandator() {
     mSagExpandator.set_image(mImgExpand);
     mStareBtBox = StareBtBoxComplet::COLAPSAT;
   }
+}
+
+void FereastraCod::laClicIesire() {
+  this->hide();
 }
