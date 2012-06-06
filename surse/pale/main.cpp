@@ -8,5 +8,8 @@ int main(int argc, char *argv[]) {
   Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "rale.tuscale.ro");
   FereastraPrincipala ferPrin;
 
+  // set various app settings
+  Gtk::Settings::get_default()->property_gtk_button_images() = true;
+
   return app->run(ferPrin);
 }

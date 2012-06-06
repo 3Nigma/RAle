@@ -7,15 +7,18 @@
 class FereastraCod : public Gtk::Window {
 public:
   enum class LimbajCunoscut {C, ASM};
+  enum class StareBtBoxComplet {COLAPSAT, EXPANDAT};
 
   FereastraCod(LimbajCunoscut lc);
   ~FereastraCod();
 
 protected:
+  StareBtBoxComplet mStareBtBox;
   Gtk::TextView mSrcView;
   Gtk::Grid mCodBox;
   Gtk::Button mSagExpandator;
-  Gtk::VButtonBox mBtBox;
+  Gtk::VButtonBox mBtBoxComplet;
+  Gtk::VButtonBox mBtBoxMijloc;
   Gtk::Button mBtIncarcaPeAle;
   Gtk::Button mBtSalveazaLucru;
   Gtk::Button mBtReiaLucru;
@@ -27,6 +30,16 @@ protected:
   Gtk::Label mLblStNume;
   Glib::RefPtr<Gtk::TextBuffer> mSrcBuffer;
 
+  Gtk::Image mImgExpand;
+  Gtk::Image mImgColaps;
+  Gtk::Image mImgScrieAle;
+  Gtk::Image mImgSalveaza;
+  Gtk::Image mImgReiaCod;
+  Gtk::Image mImgCitesteEEPROM;
+  Gtk::Image mImgParasesteForm;
+
+  void incarcaImaginiFormular();
+  void incarcaButoaneFormular();
   void laClicExpandator();
 };
 

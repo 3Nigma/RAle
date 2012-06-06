@@ -5,7 +5,7 @@ const Glib::ustring FereastraPrincipala::LimbajProgramator_C = "C_LANG";
 const Glib::ustring FereastraPrincipala::LimbajProgramator_ASM = "ASM_LANG";
 
 FereastraPrincipala::FereastraPrincipala()
-  : mImgTuscaleLogo(Gdk::Pixbuf::create_from_file("tuscale_small_logo.png")),
+  : mImgTuscaleLogo(Gdk::Pixbuf::create_from_file("./media/tuscale_small_logo.png")),
     mEvBxTuscaleLogo(),
     mMainWinBox(Gtk::ORIENTATION_VERTICAL),
     mCmbxProgrameaza(), mCmbxExemple(),
