@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 #include <sqlite3.h>
 
-int 
+extern int 
 db_incarca_exemple_carte(GtkComboBoxText *widget);
 
 #endif

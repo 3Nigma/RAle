@@ -1,5 +1,10 @@
 #include <gtk/gtk.h>
 
+#include "db.h"
+#include "finfo.h"
+
+static GtkWidget *dlgInfo = NULL;
+
 static gboolean 
 imgLogo_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
 #ifdef G_OS_WIN32
@@ -24,23 +29,26 @@ cmbxCodNou_selectat(GtkComboBox *widget, gpointer user_data) {
 
 static void 
 cmbxCodCarte_selectat(GtkComboBox *widget, gpointer user_data) {
-  
+  gtk_combo_box_set_active(GTK_COMBO_BOX(widget), 0);
 }
 
 static void 
 btInfo_click(GtkWidget *widget, gpointer data) {
-  
+  if(dlgInfo == NULL)
+    dlgInfo = initializeaza_formular_info();
+
+  gtk_widget_show_all(dlgInfo);
 }
 
 static gboolean 
-delete_event(GtkWidget *widget, GdkEvent *event, gpointer data) {
+frmPrincipal_delev(GtkWidget *widget, GdkEvent *event, gpointer data) {
 
   return FALSE;
 }
 
 static void 
-destroy(GtkWidget *widget, gpointer data) {
-    gtk_main_quit();
+frmPrincipal_destroy(GtkWidget *widget, gpointer data) {
+  gtk_main_quit();
 }
 
 int main(int argc, char *argv[]) {
@@ -61,8 +69,8 @@ int main(int argc, char *argv[]) {
   gtk_window_set_resizable(GTK_WINDOW(formPrincipal), FALSE);
   gtk_window_set_title(GTK_WINDOW(formPrincipal), "psAle");
   gtk_window_set_position(GTK_WINDOW(formPrincipal), GTK_WIN_POS_CENTER);
-  g_signal_connect(formPrincipal, "delete-event", G_CALLBACK(delete_event), NULL);
-  g_signal_connect(formPrincipal, "destroy", G_CALLBACK(destroy), NULL);
+  g_signal_connect(formPrincipal, "delete-event", G_CALLBACK(frmPrincipal_delev), NULL);
+  g_signal_connect(formPrincipal, "destroy", G_CALLBACK(frmPrincipal_destroy), NULL);
 
   /* inițializăm cadrul formularului principal */
   cadruFormPrincipal = gtk_vbox_new(FALSE, 5);
@@ -89,6 +97,9 @@ int main(int argc, char *argv[]) {
 
   /* inițializăm meniul de selecție pentru exemplele de cod din carte */
   cmbxCodCarte = gtk_combo_box_text_new();
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(cmbxCodCarte), "Cod din cărțulie ...");
+  db_incarca_exemple_carte(GTK_COMBO_BOX_TEXT(cmbxCodCarte));
+  gtk_combo_box_set_active(GTK_COMBO_BOX(cmbxCodCarte), 0);
   g_signal_connect(cmbxCodCarte, "changed", G_CALLBACK(cmbxCodCarte_selectat), NULL);
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), cmbxCodCarte);
 
