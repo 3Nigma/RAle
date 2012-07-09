@@ -62,6 +62,9 @@ int main(int argc, char *argv[]) {
   GtkWidget *btIesire = NULL;
 
   gtk_init (&argc, &argv);
+  dl_initializeaza(db_obtine_adresa_actualizare());
+
+  dl_actualizeaza_bd();
 
   /* inițializăm formularul principal */
   formPrincipal = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -115,6 +118,7 @@ int main(int argc, char *argv[]) {
 
   gtk_widget_show_all(formPrincipal);
   gtk_main();
+  dl_curata();
 
   return 0;
 }

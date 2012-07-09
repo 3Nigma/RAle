@@ -3,6 +3,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dl.h"
+
 extern GtkWidget *
 initializeaza_formular_info();
 

@@ -18,12 +18,6 @@ imgLicenta_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
   return TRUE;
 }
 
-
-static void 
-btActExemple_click(GtkWidget *widget, gpointer data) {
-  
-}
-
 static gboolean 
 frmInfo_delev(GtkWidget *widget, GdkEvent *event, gpointer data) {
   gtk_widget_hide(widget);
@@ -81,6 +75,7 @@ incarca_info_general(GtkWidget *cadruFrm) {
   GtkTextBuffer *txtBuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(txtView));
 
   gtk_text_buffer_set_text(txtBuffer, PSALE_TEXT_DESPRE, -1);
+  //gtk_widget_set_size_request(txtView, 300, -1);
   gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(txtView), FALSE);
   gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(txtView), GTK_WRAP_WORD);
   gtk_text_view_set_editable(GTK_TEXT_VIEW(txtView), FALSE);
@@ -92,7 +87,6 @@ initializeaza_formular_info() {
   GtkWidget *frm = NULL;
   GtkWidget *cadruFrm = NULL;
   GtkWidget *imgInfo = NULL;
-  GtkWidget *btActExemple = NULL;
   GtkWidget *btParasesteFrm = NULL;
 
   /* inițializăm formularul de informații */
@@ -116,12 +110,6 @@ initializeaza_formular_info() {
   imgInfo = gtk_image_new_from_file("media/info_img.png");
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo,
                    0, 1, 0, 1);
-
-  /* inițializăm butonul de actualizare */
-  btActExemple = gtk_button_new_with_label("Actualizează exemple");
-  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), btActExemple,
-                   2, 3, 3, 4);
-  g_signal_connect(btActExemple, "clicked", G_CALLBACK(btActExemple_click), NULL);
 
   /* inițializăm butonul de părăsire a formularului */
   btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
