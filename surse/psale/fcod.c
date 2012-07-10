@@ -18,12 +18,45 @@
   "}"
 
 static void 
-btExpandatorActiuni_click(GtkWidget *widget, gpointer data) {
-  
+btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
+  GdkPixbuf *imgExpandatorPixBuf = NULL;
+  GtkWidget *imgExpandatorActiuni = NULL;
+
+  switch(fc->vActiuni) {
+  case ASCUNSE:
+    gtk_widget_show(fc->cadruActiuni);
+    imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size("media/bt_icoana_colapseaza.png", 16, 16, NULL);
+    fc->vActiuni = VIZIBILE;
+    break;
+  case VIZIBILE:
+    gtk_widget_hide(fc->cadruActiuni);
+    imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size("media/bt_icoana_expandeaza.png", 16, 16, NULL);
+    fc->vActiuni = ASCUNSE;
+    break;
+  }
+
+  imgExpandatorActiuni = gtk_image_new_from_pixbuf(imgExpandatorPixBuf);
+  gtk_button_set_image(GTK_BUTTON(fc->btExpandator), imgExpandatorActiuni);
 }
 
-GtkWidget *
-initializeaza_formular_cod(Limbaj lmDorit, gchar *codInitial, gboolean esteExemplu) {
+void 
+fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
+  if(vizibil)  gtk_widget_show_all(fc->frm);
+  else gtk_widget_hide_all(fc->frm);
+
+  switch(fc->vActiuni) {
+  case ASCUNSE:
+    gtk_widget_hide(fc->cadruActiuni);
+    break;
+  case VIZIBILE:
+    gtk_widget_show(fc->cadruActiuni);
+    break;
+  }
+}
+
+FormularCod *
+fc_initializeaza(Limbaj lmDorit, gchar *codInitial, gboolean esteExemplu) {
+  FormularCod *deRet = NULL;
   GtkWidget *frm = NULL;
   GtkWidget *cadruFrm = NULL;
   GtkWidget *txtSrc = NULL;
@@ -94,11 +127,9 @@ initializeaza_formular_cod(Limbaj lmDorit, gchar *codInitial, gboolean esteExemp
   btGestioneazaActiuni = gtk_button_new();
   GdkPixbuf *imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size(esteExemplu ? "media/bt_icoana_colapseaza.png" : "media/bt_icoana_expandeaza.png", 
 								    16, 16, NULL);
-
   GtkWidget *imgExpandatorActiuni = gtk_image_new_from_pixbuf(imgExpandatorPixBuf);
   gtk_button_set_image(GTK_BUTTON(btGestioneazaActiuni), imgExpandatorActiuni);
   gtk_table_attach(GTK_TABLE(cadruFrm), btGestioneazaActiuni, 1, 2, 0, 2, GTK_SHRINK, GTK_FILL, 0, 0);
-  g_signal_connect_swapped(btGestioneazaActiuni, "clicked", G_CALLBACK(btExpandatorActiuni_click), NULL);
 
   /* inițializează acțiunile speciale ale formularului de cod */  
   btIncarcaPeAle = gtk_button_new_with_label("Încarcă pe Ale");
@@ -147,5 +178,16 @@ initializeaza_formular_cod(Limbaj lmDorit, gchar *codInitial, gboolean esteExemp
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btParasesteFrm, FALSE, FALSE, 0);
   gtk_table_attach(GTK_TABLE(cadruFrm), cadruBxActiuni, 2, 3, 0, 2, GTK_SHRINK, GTK_FILL, 0, 0);
 
-  return frm;
+  /* împachetăm elementele esențiale pentru a le returna */
+  deRet = g_slice_new(FormularCod);
+  deRet->frm = frm;
+  deRet->btExpandator = btGestioneazaActiuni;
+  deRet->cadruActiuni = cadruBxActiuni;
+  if(esteExemplu) deRet->vActiuni = VIZIBILE;
+  else deRet->vActiuni = ASCUNSE;
+
+  /* legăm semnalele de funcțiile recurente */
+  g_signal_connect(btGestioneazaActiuni, "clicked", G_CALLBACK(btExpandatorActiuni_click), (gpointer)deRet);
+
+  return deRet;
 }

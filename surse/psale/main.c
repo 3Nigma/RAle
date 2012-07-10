@@ -11,9 +11,9 @@ imgLogo_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
 #ifdef G_OS_WIN32
   ShellExecute(NULL, "open", "http://tuscale.ro", NULL, NULL, SW_SHOWNORMAL);
 #elif defined G_OS_UNIX
-    system("xdg-open 'http://tuscale.ro' &");
+  system("xdg-open 'http://tuscale.ro' &");
 #endif
-
+ 
   return TRUE;
 }
 
@@ -21,21 +21,20 @@ static void
 cmbxCodNou_selectat(GtkComboBox *widget, gpointer user_data) {
   /* interpretăm selecția doar dacă ea este una validă (se dorește un limbaj valid) */
   if(gtk_combo_box_get_active(widget) != 0) {
-    GtkWidget *dlgCod = NULL;
-    
+    FormularCod *dlgCod = NULL;
     switch(gtk_combo_box_get_active(widget)) {
     case 1: /* ASM */
-      dlgCod = initializeaza_formular_cod(ASM, "", FALSE);
+      dlgCod = fc_initializeaza(ASM, "", FALSE);
       break;
     case 2: /* C */
-      dlgCod = initializeaza_formular_cod(C, "", FALSE);
+      dlgCod = fc_initializeaza(C, "", FALSE);
       break;
     }
 
     /* repoziționăm textul afișat */
     gtk_combo_box_set_active(GTK_COMBO_BOX(widget), 0);
 
-    gtk_widget_show_all(dlgCod);
+    fc_modifica_vizibilitate(dlgCod, TRUE);
   }
 }
 
