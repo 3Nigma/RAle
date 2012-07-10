@@ -25,10 +25,10 @@ cmbxCodNou_selectat(GtkComboBox *widget, gpointer user_data) {
 
     switch(gtk_combo_box_get_active(widget)) {
     case 1: /* ASM */
-      dlgCod = fc_initializeaza_fara_cod(ASM, FALSE);
+      dlgCod = fc_initializeaza_fara_cod(ASM);
       break;
     case 2: /* C */
-      dlgCod = fc_initializeaza_fara_cod(C, FALSE);
+      dlgCod = fc_initializeaza_fara_cod(C);
       break;
     }
 
@@ -45,14 +45,17 @@ cmbxCodCarte_selectat(GtkComboBox *widget, gpointer user_data) {
   GtkTreeIter iter;
   GtkTreeModel *model = NULL;
   gchar *titluScurt = NULL;
+  gchar *titluLung;
+  gchar numeExempluAfisat[256];
 
   if(gtk_combo_box_get_active_iter(widget, &iter)) {
     model = gtk_combo_box_get_model(widget);
-    gtk_tree_model_get(model, &iter, 0, &titluScurt, -1);
-    
+    gtk_tree_model_get(model, &iter, 0, &titluScurt, 1, &titluLung, -1);
+
     if(g_strcmp0(titluScurt, "") != 0) {
-      if(g_str_has_suffix(titluScurt, "s")) dlgCod = fc_initializeaza(ASM, db_obtine_cod_complet(titluScurt), TRUE);
-      else dlgCod = fc_initializeaza(C, db_obtine_cod_complet(titluScurt), TRUE);
+      g_sprintf(numeExempluAfisat, "Ex: %s", titluLung);
+      if(g_str_has_suffix(titluScurt, "s")) dlgCod = fc_initializeaza(ASM, db_obtine_cod_complet(titluScurt), numeExempluAfisat, TRUE);
+      else dlgCod = fc_initializeaza(C, db_obtine_cod_complet(titluScurt), numeExempluAfisat, TRUE);
 
       /* repoziționăm textul afișat */
       gtk_combo_box_set_active(GTK_COMBO_BOX(widget), 0);
@@ -163,9 +166,7 @@ int main(int argc, char *argv[]) {
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), cmbxCodNou);
 
   /* inițializăm meniul de selecție pentru exemplele de cod din carte */
-  cmbxCodCarte = creeaza_cmbxExemple();/*gtk_combo_box_text_new();
-  gtk_combo_box_set_wrap_width(GTK_COMBO_BOX(cmbxCodCarte), 2);
-  db_incarca_exemple_carte(GTK_COMBO_BOX_TEXT(cmbxCodCarte));*/
+  cmbxCodCarte = creeaza_cmbxExemple();
   g_signal_connect(cmbxCodCarte, "changed", G_CALLBACK(cmbxCodCarte_selectat), NULL);
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), cmbxCodCarte);
 

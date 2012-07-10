@@ -62,7 +62,7 @@ fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
 }
 
 FormularCod *
-fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gboolean esteExemplu) {
+fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gchar *denumireSursa, gboolean esteExemplu) {
   FormularCod *deRet = NULL;
   GtkWidget *frm = NULL;
   GtkWidget *cadruFrm = NULL;
@@ -194,9 +194,10 @@ fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gboolean esteE
   /* inițializăm bara de stare a formularului */
   lblStareLegatura = gtk_label_new("[Conexiune]");
   lblStareCod = gtk_label_new("[Dim. Cod]");
-  lblStareNumeSursa = gtk_label_new("[Nume Sursă]");
+  lblStareNumeSursa = gtk_label_new(denumireSursa);
 
-  cadruBaraStare = gtk_hbox_new(TRUE, 4);
+  cadruBaraStare = gtk_hbox_new(TRUE, 5);
+  gtk_container_set_border_width(GTK_CONTAINER(cadruBaraStare), 3);
   gtk_box_pack_start(GTK_BOX(cadruBaraStare), lblStareLegatura, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(cadruBaraStare), lblStareCod, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(cadruBaraStare), lblStareNumeSursa, FALSE, FALSE, 0);
@@ -222,6 +223,6 @@ fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gboolean esteE
 }
 
 FormularCod *
-fc_initializeaza_fara_cod(Limbaj lmDorit, gboolean esteExemplu) {
-  return fc_initializeaza(lmDorit, "", esteExemplu);
+fc_initializeaza_fara_cod(Limbaj lmDorit) {
+  return fc_initializeaza(lmDorit, "", "[Cod Nou]", FALSE);
 }

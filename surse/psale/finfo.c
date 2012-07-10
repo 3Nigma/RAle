@@ -31,8 +31,7 @@ incarca_info_general(GtkWidget *cadruFrm) {
 
   /* inițializăm cadrul etichetelor (titlu + valoare) */
   cadruTitluEtichete = gtk_vbox_new(FALSE, 4);
-  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruTitluEtichete,
-                   1, 2, 0, 1);
+  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruTitluEtichete, 1, 2, 0, 1);
 
   GtkWidget *lblTitluAutor = gtk_label_new("Autor : ");
   GtkWidget *lblTitluVersiune = gtk_label_new("Versiune : ");
@@ -47,8 +46,7 @@ incarca_info_general(GtkWidget *cadruFrm) {
   gtk_container_add(GTK_CONTAINER(cadruTitluEtichete), lblTitluLicenta);
   
   cadruValEtichete = gtk_vbox_new(FALSE, 4);
-  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruValEtichete,
-                   2, 3, 0, 1);
+  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruValEtichete, 2, 3, 0, 1);
 
   GtkWidget *lblValAutor = gtk_label_new(PSALE_NUME_AUTOR);
   GtkWidget *lblValVersiune = gtk_label_new(PSALE_VERSIUNE);
@@ -108,13 +106,11 @@ initializeaza_formular_info() {
 
   /* inițializăm imaginea de informație */
   imgInfo = gtk_image_new_from_file("media/info_img.png");
-  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo,
-                   0, 1, 0, 1);
+  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo, 0, 1, 0, 1);
 
   /* inițializăm butonul de părăsire a formularului */
   btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
-  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), btParasesteFrm,
-                   3, 4, 3, 4);
+  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), btParasesteFrm, 3, 4, 3, 4);
   g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(frmInfo_delev), frm);
 
   return frm;
