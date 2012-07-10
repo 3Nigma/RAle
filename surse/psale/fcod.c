@@ -17,6 +17,16 @@
   "  return 0;\n" \
   "}"
 
+static gboolean 
+frmCod_delev(GtkWidget *widget, GdkEvent *event, gpointer data) {
+  return FALSE;
+}
+
+/*static void 
+frmPrincipal_destroy(GtkWidget *widget, gpointer data) {
+  gtk_main_quit();
+  }*/
+
 static void 
 btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
   GdkPixbuf *imgExpandatorPixBuf = NULL;
@@ -205,7 +215,9 @@ fc_initializeaza(Limbaj lmDorit, gchar *codInitial, gboolean esteExemplu) {
   else deRet->vActiuni = ASCUNSE;
 
   /* legăm semnalele de funcțiile recurente */
+  g_signal_connect(frm, "delete-event", G_CALLBACK(frmCod_delev), NULL);
   g_signal_connect(btGestioneazaActiuni, "clicked", G_CALLBACK(btExpandatorActiuni_click), (gpointer)deRet);
+  g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(gtk_widget_destroy), frm);
 
   return deRet;
 }
