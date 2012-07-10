@@ -53,20 +53,28 @@ bd_executa_comanda(const char *fisBD, const char *com, int (*frecurenta)(void *,
 static int 
 db_incarca_exemplu_recurent(void *userArg, int nrOfCols, char **colTxts, char **colNames) {
   /* Legendă : [0] = TitluScurt, [1] = TextTitlu */
-  GtkComboBoxText *origcmbx = (GtkComboBoxText *)userArg;
-  int colId = 0;
-  char titluComplet[128];
+  GtkListStore *magazie = (GtkListStore *)userArg;
+  GtkTreeIter iter;
 
-  /* încărcăm în listă titlul complet al exemplului */
-  sprintf(titluComplet, "[%s] %s", colTxts[0], colTxts[1]);
-  gtk_combo_box_text_append_text(origcmbx, titluComplet);
+  gtk_list_store_append(magazie, &iter);
+  gtk_list_store_set(magazie, &iter, 0, colTxts[0], 1, colTxts[1], -1);
 
   return 0;
 }
 
 int 
-db_incarca_exemple_carte(GtkComboBoxText *widget) {
-  return bd_executa_comanda(PSALE_BD_NUME_FIS, "select TitluScurt, TextTitlu from exemple", db_incarca_exemplu_recurent, (void *)widget);
+db_incarca_exemple_carte(GtkListStore *st) {
+  return bd_executa_comanda(PSALE_BD_NUME_FIS, "select TitluScurt, TextTitlu from exemple", db_incarca_exemplu_recurent, (void *)st);
+}
+
+const unsigned char *
+db_obtine_cod_complet(const unsigned char *titluScurt) {
+  char sintaxaInterogare[124];
+
+  sprintf(sintaxaInterogare, "select TextCod from exemple where TitluScurt = '%s'", titluScurt);
+  sqlite3_value *rez = bd_obtine_rezultat_unic(PSALE_BD_NUME_FIS, sintaxaInterogare, 0);
+
+  return sqlite3_value_text(rez);
 }
 
 const unsigned char *

@@ -13,19 +13,16 @@
   "  rjmp ciclu_infinit"
 #define PSALE_CODC_IMPLICIT "#include \"ale.h\"\n\n" \
   "int main() {\n" \
-  "  \\* Scrieți codul dumneavoastră aici *\\\n" \
+  "  /* Scrieți codul dumneavoastră aici */\n"	\
   "  return 0;\n" \
   "}"
+
+static GtkSourceLanguageManager *txtSrcLimbAsignor = NULL;
 
 static gboolean 
 frmCod_delev(GtkWidget *widget, GdkEvent *event, gpointer data) {
   return FALSE;
 }
-
-/*static void 
-frmPrincipal_destroy(GtkWidget *widget, gpointer data) {
-  gtk_main_quit();
-  }*/
 
 static void 
 btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
@@ -65,7 +62,7 @@ fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
 }
 
 FormularCod *
-fc_initializeaza(Limbaj lmDorit, gchar *codInitial, gboolean esteExemplu) {
+fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gboolean esteExemplu) {
   FormularCod *deRet = NULL;
   GtkWidget *frm = NULL;
   GtkWidget *cadruFrm = NULL;
@@ -100,9 +97,11 @@ fc_initializeaza(Limbaj lmDorit, gchar *codInitial, gboolean esteExemplu) {
   gtk_container_add(GTK_CONTAINER(frm), cadruFrm);
 
   /* inițializăm entități ajutătoare pentru elementul de cod */
-  gchar *dirs[] = {"./limbaje", g_get_current_dir(), NULL};
-  GtkSourceLanguageManager *txtSrcLimbAsignor = gtk_source_language_manager_get_default();
-  gtk_source_language_manager_set_search_path(txtSrcLimbAsignor, dirs);
+  if(NULL == txtSrcLimbAsignor) {
+    gchar *dirs[] = {"./limbaje", g_get_current_dir(), NULL};
+    txtSrcLimbAsignor = gtk_source_language_manager_get_default();
+    gtk_source_language_manager_set_search_path(txtSrcLimbAsignor, dirs);
+  }
   GtkSourceLanguage *txtSrcLimb = NULL;
   switch(lmDorit) {
   case C:

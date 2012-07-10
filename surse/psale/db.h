@@ -6,7 +6,10 @@
 #include <sqlite3.h>
 
 extern int 
-db_incarca_exemple_carte(GtkComboBoxText *widget);
+db_incarca_exemple_carte(GtkListStore *st);
+
+extern const unsigned char *
+db_obtine_cod_complet(const unsigned char *titluScurt);
 
 extern const unsigned char *
 db_obtine_adresa_actualizare();

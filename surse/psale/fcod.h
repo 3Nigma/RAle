@@ -15,7 +15,7 @@ typedef struct {
 } FormularCod;
 
 extern FormularCod *
-fc_initializeaza(Limbaj lmDorit, gchar *codInitial, gboolean esteExemplu);
+fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gboolean esteExemplu);
 
 extern void 
 fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil);
