@@ -19,9 +19,65 @@
 
 static GtkSourceLanguageManager *txtSrcLimbAsignor = NULL;
 
+static gchar *
+obtine_codul_sursa_curent(GtkTextView *txtView) {
+  GtkTextIter csStart;
+  GtkTextIter csFinal;
+  GtkTextBuffer *txtBuf = gtk_text_view_get_buffer(txtView);
+
+  gtk_text_buffer_get_start_iter(txtBuf, &csStart);
+  gtk_text_buffer_get_end_iter(txtBuf, &csFinal);
+
+  return gtk_text_buffer_get_text(txtBuf, &csStart, &csFinal, FALSE);
+}
+
 static gboolean 
 frmCod_delev(GtkWidget *widget, GdkEvent *event, gpointer data) {
   return FALSE;
+}
+
+static void 
+btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
+  /* Acțiunile ce trebuie realizate pentru trimiterea de cod spre plăcuță sunt următoarele :
+     avr-gcc -Os -Wall -mmcu=attiny25 main.s -o main.o
+     avr-objcopy -j .text -O ihex main.o main.hex
+     sudo avrdude -c usbtiny -p t25 -U flash:w:main.hex */
+  char denFisSursa[L_tmpnam + 5];
+  FILE *fs = NULL;
+  gchar *codPrezent = NULL;
+
+  sprintf(denFisSursa, "%s%s", tmpnam(NULL), fc->lmFolosit == C ? ".c" : ".s");
+  fs = fopen(denFisSursa, "w");
+  codPrezent = obtine_codul_sursa_curent(GTK_TEXT_VIEW(fc->txtVizCod));
+  fwrite(codPrezent, sizeof(gchar), strlen(codPrezent), fs);
+  fclose(fs);
+
+  gchar textComandaGcc[256];
+  gchar textComandaObjcopy[256];
+  gchar textComandaAvrdude[256];
+  char denObiectRezultat[L_tmpnam];
+  char denHexRezultat[L_tmpnam];
+
+  tmpnam(denObiectRezultat);
+  tmpnam(denHexRezultat);
+  g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
+  g_sprintf(textComandaObjcopy, "avr-objcopy -j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
+
+  g_print("%s\n%s\n", textComandaGcc, textComandaObjcopy);
+#ifdef G_OS_WIN32
+  g_sprintf(textComandaAvrdude, "avrdude -c usbtiny -p t25 -U flash:w:%s", denHexRezultat);
+  //ShellExecute(NULL, "open", "http://creativecommons.org/licenses/by-nc-sa/3.0/", NULL, NULL, SW_SHOWNORMAL);
+#elif defined G_OS_UNIX
+  g_sprintf(textComandaAvrdude, "sudo avrdude -c usbtiny -p t25 -U flash:w:%s", denHexRezultat);
+
+  system(textComandaGcc);
+  system(textComandaObjcopy);
+  system(textComandaAvrdude);
+#endif
+
+  remove(denFisSursa);
+  remove(denObiectRezultat);
+  remove(denHexRezultat);
 }
 
 static void 
@@ -206,6 +262,8 @@ fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gchar *denumir
   /* împachetăm elementele esențiale pentru a le returna */
   deRet = g_slice_new(FormularCod);
   deRet->frm = frm;
+  deRet->lmFolosit = lmDorit;
+  deRet->txtVizCod = txtSrc;
   deRet->btExpandator = btGestioneazaActiuni;
   deRet->cadruActiuni = cadruBxActiuni;
   deRet->lblStareConex = lblStareLegatura;
@@ -217,6 +275,7 @@ fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gchar *denumir
   /* legăm semnalele de funcțiile recurente */
   g_signal_connect(frm, "delete-event", G_CALLBACK(frmCod_delev), NULL);
   g_signal_connect(btGestioneazaActiuni, "clicked", G_CALLBACK(btExpandatorActiuni_click), (gpointer)deRet);
+  g_signal_connect(btIncarcaPeAle, "clicked", G_CALLBACK(btIncarcaPeAle_click), (gpointer)deRet);
   g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(gtk_widget_destroy), frm);
 
   return deRet;
