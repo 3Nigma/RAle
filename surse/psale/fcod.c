@@ -220,3 +220,8 @@ fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gboolean esteE
 
   return deRet;
 }
+
+FormularCod *
+fc_initializeaza_fara_cod(Limbaj lmDorit, gboolean esteExemplu) {
+  return fc_initializeaza(lmDorit, "", esteExemplu);
+}

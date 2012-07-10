@@ -25,10 +25,10 @@ cmbxCodNou_selectat(GtkComboBox *widget, gpointer user_data) {
 
     switch(gtk_combo_box_get_active(widget)) {
     case 1: /* ASM */
-      dlgCod = fc_initializeaza(ASM, "", FALSE);
+      dlgCod = fc_initializeaza_fara_cod(ASM, FALSE);
       break;
     case 2: /* C */
-      dlgCod = fc_initializeaza(C, "", FALSE);
+      dlgCod = fc_initializeaza_fara_cod(C, FALSE);
       break;
     }
 
