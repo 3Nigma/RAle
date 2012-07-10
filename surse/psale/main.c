@@ -1,8 +1,17 @@
+#include <stdlib.h>
+
+#include <glib.h>
+#include <glib/gprintf.h>
 #include <gtk/gtk.h>
 
 #include "db.h"
 #include "finfo.h"
 #include "fcod.h"
+
+#ifndef G_VALUE_INIT 
+  /* îl introducem aici pentru compilarea sub windows. Se pare că GTK-ul de windows nu-l definiește */
+  #define G_VALUE_INIT { 0, { { 0 } } }
+#endif
 
 static GtkWidget *dlgInfo = NULL;
 
@@ -93,7 +102,7 @@ creeaza_cmbxExemple() {
   GtkTreeIter iter;
   GValue val = G_VALUE_INIT;
 
-  g_value_init (&val, G_TYPE_STRING);
+  g_value_init(&val, G_TYPE_STRING);
 
   magazie = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
   gtk_list_store_append(magazie, &iter);
@@ -101,7 +110,7 @@ creeaza_cmbxExemple() {
   db_incarca_exemple_carte(magazie);
 
   deRet = gtk_combo_box_new_with_model(GTK_TREE_MODEL(magazie));
-  gtk_widget_set_size_request(GTK_WIDGET(deRet), 50, -1);
+  //gtk_widget_set_size_request(GTK_WIDGET(deRet), 80, -1);
   gtk_combo_box_set_active(GTK_COMBO_BOX(deRet), 0);
   g_object_unref(G_OBJECT(magazie));
 

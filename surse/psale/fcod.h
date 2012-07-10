@@ -19,7 +19,7 @@ typedef struct {
 } FormularCod;
 
 extern FormularCod *
-fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gchar *denumireSursa, gboolean esteExemplu);
+fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, gboolean esteExemplu);
 
 extern FormularCod *
 fc_initializeaza_fara_cod(Limbaj lmDorit);

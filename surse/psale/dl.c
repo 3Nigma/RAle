@@ -9,7 +9,7 @@ dl_curata() {
 }
 
 int 
-dl_initializeaza(const unsigned char *adresa) {
+dl_initializeaza(const char *adresa) {
   strcpy(adrActualizare, adresa);
   pFisVersActuala = tmpfile();
 
@@ -24,7 +24,7 @@ citeste_lista_recurent(void *ptr, size_t size, size_t nmemb, void *userdata) {
 }
 
 static int
-dl_descarca_fisier_actualizari(const unsigned char *adresa) {
+dl_descarca_fisier_actualizari(const char *adresa) {
   CURL *legatura = curl_easy_init();
   int deRet = -1;
 

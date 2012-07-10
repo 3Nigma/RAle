@@ -1,9 +1,18 @@
 #include "fcod.h"
 
+#include <stdlib.h>
+
+#include <glib.h>
+#include <glib/gprintf.h>
 #include <gtksourceview/gtksourcelanguagemanager.h>
 #include <gtksourceview/gtksourcelanguage.h>
 #include <gtksourceview/gtksourcebuffer.h>
 #include <gtksourceview/gtksourceview.h>
+#include <gtksourceview/gtksourcestyleschememanager.h>
+
+#ifdef G_OS_WIN32
+#include <windows.h>
+#endif
 
 #define PSALE_CODS_IMPLICIT ".section text\n" \
   ".global main\n\n" \
@@ -13,11 +22,12 @@
   "  rjmp ciclu_infinit"
 #define PSALE_CODC_IMPLICIT "#include \"ale.h\"\n\n" \
   "int main() {\n" \
-  "  /* Scrieți codul dumneavoastră aici */\n"	\
+  "  /* Scrieți codul dumneavoastră aici */\n" \
   "  return 0;\n" \
   "}"
 
 static GtkSourceLanguageManager *txtSrcLimbAsignor = NULL;
+static GtkSourceStyleSchemeManager *txtSrcStilAsignor = NULL;
 
 static gchar *
 obtine_codul_sursa_curent(GtkTextView *txtView) {
@@ -60,14 +70,19 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
 
   tmpnam(denObiectRezultat);
   tmpnam(denHexRezultat);
-  g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
-  g_sprintf(textComandaObjcopy, "avr-objcopy -j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
 
   g_print("%s\n%s\n", textComandaGcc, textComandaObjcopy);
 #ifdef G_OS_WIN32
-  g_sprintf(textComandaAvrdude, "avrdude -c usbtiny -p t25 -U flash:w:%s", denHexRezultat);
-  //ShellExecute(NULL, "open", "http://creativecommons.org/licenses/by-nc-sa/3.0/", NULL, NULL, SW_SHOWNORMAL);
+  g_sprintf(textComandaGcc, "-Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
+  g_sprintf(textComandaObjcopy, "-j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
+  g_sprintf(textComandaAvrdude, "-c usbtiny -p t25 -U flash:w:%s", denHexRezultat);
+  
+  ShellExecute(NULL, "open", "winavr/bin/avr-gcc.exe", textComandaGcc, NULL, SW_SHOWNORMAL);
+  ShellExecute(NULL, "open", "winavr/bin/avr-objcopy.exe", textComandaObjcopy, NULL, SW_SHOWNORMAL);
+  ShellExecute(NULL, "open", "avrdude.exe", textComandaAvrdude, NULL, SW_SHOWNORMAL);
 #elif defined G_OS_UNIX
+  g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
+  g_sprintf(textComandaObjcopy, "avr-objcopy -j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
   g_sprintf(textComandaAvrdude, "sudo avrdude -c usbtiny -p t25 -U flash:w:%s", denHexRezultat);
 
   system(textComandaGcc);
@@ -104,6 +119,7 @@ btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
 
 void 
 fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
+  if(NULL != fc) {
   if(vizibil)  gtk_widget_show_all(fc->frm);
   else gtk_widget_hide_all(fc->frm);
 
@@ -115,10 +131,11 @@ fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
     gtk_widget_show(fc->cadruActiuni);
     break;
   }
+  }
 }
 
 FormularCod *
-fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gchar *denumireSursa, gboolean esteExemplu) {
+fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, gboolean esteExemplu) {
   FormularCod *deRet = NULL;
   GtkWidget *frm = NULL;
   GtkWidget *cadruFrm = NULL;
@@ -154,7 +171,7 @@ fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gchar *denumir
 
   /* inițializăm entități ajutătoare pentru elementul de cod */
   if(NULL == txtSrcLimbAsignor) {
-    gchar *dirs[] = {"./limbaje", g_get_current_dir(), NULL};
+    gchar *dirs[] = {"./limbaje", NULL};
     txtSrcLimbAsignor = gtk_source_language_manager_get_default();
     gtk_source_language_manager_set_search_path(txtSrcLimbAsignor, dirs);
   }
@@ -165,9 +182,15 @@ fc_initializeaza(Limbaj lmDorit, const unsigned char *codInitial, gchar *denumir
     break;
   case ASM:
     txtSrcLimb = gtk_source_language_manager_get_language(txtSrcLimbAsignor, "asm");
-    break;
+   break;
+  }
+  if(NULL == txtSrcStilAsignor) {
+	gchar *dirs[] = {"./stiluri", NULL};
+	txtSrcStilAsignor = gtk_source_style_scheme_manager_get_default();
+	gtk_source_style_scheme_manager_set_search_path(txtSrcStilAsignor, dirs);
   }
   GtkSourceBuffer *txtSrcBuf = gtk_source_buffer_new_with_language(txtSrcLimb);
+  gtk_source_buffer_set_style_scheme(txtSrcBuf, gtk_source_style_scheme_manager_get_scheme(txtSrcStilAsignor, "kate"));
   if(esteExemplu)
     gtk_text_buffer_set_text(GTK_TEXT_BUFFER(txtSrcBuf), codInitial, -1);
   else switch(lmDorit) {

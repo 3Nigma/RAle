@@ -7,7 +7,6 @@ bd_obtine_rezultat_unic(const char *fisBD, const char *com, int colId) {
   sqlite3 *db = NULL;
   sqlite3_stmt *af = NULL;
   sqlite3_value *rez = NULL;
-  char *zErrMsg = NULL;
   
   if(sqlite3_open(fisBD, &db)) {
     fprintf(stderr, "Nu pot deschide baza de date : %s\n", sqlite3_errmsg(db));
@@ -67,21 +66,21 @@ db_incarca_exemple_carte(GtkListStore *st) {
   return bd_executa_comanda(PSALE_BD_NUME_FIS, "select TitluScurt, TextTitlu from exemple", db_incarca_exemplu_recurent, (void *)st);
 }
 
-const unsigned char *
-db_obtine_cod_complet(const unsigned char *titluScurt) {
+const char *
+db_obtine_cod_complet(gchar *titluScurt) {
   char sintaxaInterogare[124];
 
   sprintf(sintaxaInterogare, "select TextCod from exemple where TitluScurt = '%s'", titluScurt);
   sqlite3_value *rez = bd_obtine_rezultat_unic(PSALE_BD_NUME_FIS, sintaxaInterogare, 0);
 
-  return sqlite3_value_text(rez);
+  return (const char *)sqlite3_value_text(rez);
 }
 
-const unsigned char *
+const char *
 db_obtine_adresa_actualizare() {
   sqlite3_value *rez = bd_obtine_rezultat_unic(PSALE_BD_NUME_FIS, "select LinkReinoire FROM meta", 0);
 
-  return sqlite3_value_text(rez);
+  return (const char *)sqlite3_value_text(rez);
 }
 
 int 
