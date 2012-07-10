@@ -21,8 +21,16 @@ static void
 cmbxCodNou_selectat(GtkComboBox *widget, gpointer user_data) {
   /* interpretăm selecția doar dacă ea este una validă (se dorește un limbaj valid) */
   if(gtk_combo_box_get_active(widget) != 0) {
-    GtkWidget *dlgCod = initializeaza_formular_cod();
-    g_print("%s\n", gtk_combo_box_get_active_text(widget));
+    GtkWidget *dlgCod = NULL;
+    
+    switch(gtk_combo_box_get_active(widget)) {
+    case 1: /* ASM */
+      dlgCod = initializeaza_formular_cod(ASM, "", FALSE);
+      break;
+    case 2: /* C */
+      dlgCod = initializeaza_formular_cod(C, "", FALSE);
+      break;
+    }
 
     /* repoziționăm textul afișat */
     gtk_combo_box_set_active(GTK_COMBO_BOX(widget), 0);
@@ -121,6 +129,10 @@ int main(int argc, char *argv[]) {
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), btIesire);
 
   gtk_widget_show_all(formPrincipal);
+
+  /* permite butoanelor să afișeze atât imaginea cât și textul dorit */
+  GtkSettings *default_settings = gtk_settings_get_default();
+  g_object_set(default_settings, "gtk-button-images", TRUE, NULL); 
   gtk_main();
   dl_curata();
 

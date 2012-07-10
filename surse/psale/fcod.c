@@ -5,23 +5,147 @@
 #include <gtksourceview/gtksourcebuffer.h>
 #include <gtksourceview/gtksourceview.h>
 
+#define PSALE_CODS_IMPLICIT ".section text\n" \
+  ".global main\n\n" \
+  "main:\n" \
+  "  ; introduceți codul dumneavoastră aici\n" \
+  "ciclu_infinit:\n" \
+  "  rjmp ciclu_infinit"
+#define PSALE_CODC_IMPLICIT "#include \"ale.h\"\n\n" \
+  "int main() {\n" \
+  "  \\* Scrieți codul dumneavoastră aici *\\\n" \
+  "  return 0;\n" \
+  "}"
+
+static void 
+btExpandatorActiuni_click(GtkWidget *widget, gpointer data) {
+  
+}
+
 GtkWidget *
-initializeaza_formular_cod() {
+initializeaza_formular_cod(Limbaj lmDorit, gchar *codInitial, gboolean esteExemplu) {
   GtkWidget *frm = NULL;
+  GtkWidget *cadruFrm = NULL;
   GtkWidget *txtSrc = NULL;
-  GtkSourceBuffer *txtSrcBuf = NULL;
-  GtkSourceLanguageManager *txtSrcLimbAsignor = NULL;
-  GtkSourceLanguage *txtSrcLimb = NULL;
+  GtkWidget *btGestioneazaActiuni = NULL;
+  GtkWidget *btIncarcaPeAle = NULL;
+  GtkWidget *btSalveazaLucrul = NULL;
+  GtkWidget *btReiaLucrul = NULL;
+  GtkWidget *btCitesteEEPROM = NULL;
+  GtkWidget *btParasesteFrm = NULL;
+  GtkWidget *cadruBxActiuni = NULL;
+  GtkWidget *cadruBxActiuniCentrale = NULL;
 
+  /* inițializăm formularul principal */
   frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  switch(lmDorit) {
+  case C:
+    gtk_window_set_title(GTK_WINDOW(frm), "[C] psAle ~ Fereastră de cod");
+    break;
+  case ASM:
+    gtk_window_set_title(GTK_WINDOW(frm), "[ASM] psAle ~ Fereastră de cod");
+    break;
+  }
+  gtk_window_set_position(GTK_WINDOW(frm), GTK_WIN_POS_CENTER);
 
+  /* inițializăm cadrul formularului de cod */
+  cadruFrm = gtk_table_new(2, 3, FALSE);
+  gtk_container_add(GTK_CONTAINER(frm), cadruFrm);
+
+  /* inițializăm entități ajutătoare pentru elementul de cod */
   gchar *dirs[] = {"./limbaje", g_get_current_dir(), NULL};
-  txtSrcLimbAsignor = gtk_source_language_manager_get_default();
+  GtkSourceLanguageManager *txtSrcLimbAsignor = gtk_source_language_manager_get_default();
   gtk_source_language_manager_set_search_path(txtSrcLimbAsignor, dirs);
-  txtSrcLimb = gtk_source_language_manager_get_language(txtSrcLimbAsignor, "c");
-  txtSrcBuf = gtk_source_buffer_new_with_language(txtSrcLimb);
+  GtkSourceLanguage *txtSrcLimb = NULL;
+  switch(lmDorit) {
+  case C:
+    txtSrcLimb = gtk_source_language_manager_get_language(txtSrcLimbAsignor, "c");
+    break;
+  case ASM:
+    txtSrcLimb = gtk_source_language_manager_get_language(txtSrcLimbAsignor, "asm");
+    break;
+  }
+  GtkSourceBuffer *txtSrcBuf = gtk_source_buffer_new_with_language(txtSrcLimb);
+  if(esteExemplu)
+    gtk_text_buffer_set_text(GTK_TEXT_BUFFER(txtSrcBuf), codInitial, -1);
+  else switch(lmDorit) {
+    case C:
+      gtk_text_buffer_set_text(GTK_TEXT_BUFFER(txtSrcBuf), PSALE_CODC_IMPLICIT, -1);
+      break;
+    case ASM:
+      gtk_text_buffer_set_text(GTK_TEXT_BUFFER(txtSrcBuf), PSALE_CODS_IMPLICIT, -1);
+      break;
+    }
+
+  /* inițializăm elementul central care va găzdui codul utilizatorului */
   txtSrc = gtk_source_view_new_with_buffer(txtSrcBuf);
-  gtk_container_add(GTK_CONTAINER(frm), txtSrc);
+  gtk_widget_set_size_request(txtSrc, 480, 320);
+  gtk_source_view_set_tab_width(GTK_SOURCE_VIEW(txtSrc), 2);
+  gtk_source_view_set_insert_spaces_instead_of_tabs(GTK_SOURCE_VIEW(txtSrc), TRUE);
+  gtk_source_view_set_auto_indent(GTK_SOURCE_VIEW(txtSrc), TRUE);
+  gtk_source_view_set_show_line_numbers(GTK_SOURCE_VIEW(txtSrc), TRUE);
+  gtk_source_view_set_show_right_margin(GTK_SOURCE_VIEW(txtSrc), TRUE);
+
+  GtkWidget *txtSrcScroll = gtk_scrolled_window_new(NULL, NULL);
+  gtk_container_add(GTK_CONTAINER(txtSrcScroll), txtSrc);
+  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), txtSrcScroll, 0, 1, 0, 1);
+
+  /* inițializăm butonul de afișare/ascundere acțiuni */
+  btGestioneazaActiuni = gtk_button_new();
+  GdkPixbuf *imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size(esteExemplu ? "media/bt_icoana_colapseaza.png" : "media/bt_icoana_expandeaza.png", 
+								    16, 16, NULL);
+
+  GtkWidget *imgExpandatorActiuni = gtk_image_new_from_pixbuf(imgExpandatorPixBuf);
+  gtk_button_set_image(GTK_BUTTON(btGestioneazaActiuni), imgExpandatorActiuni);
+  gtk_table_attach(GTK_TABLE(cadruFrm), btGestioneazaActiuni, 1, 2, 0, 2, GTK_SHRINK, GTK_FILL, 0, 0);
+  g_signal_connect_swapped(btGestioneazaActiuni, "clicked", G_CALLBACK(btExpandatorActiuni_click), NULL);
+
+  /* inițializează acțiunile speciale ale formularului de cod */  
+  btIncarcaPeAle = gtk_button_new_with_label("Încarcă pe Ale");
+  gtk_widget_set_size_request(GTK_WIDGET(btIncarcaPeAle), -1, 60);
+  GtkWidget *imgIncarcaPeAle = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_trimite_la_ale.png", 16, 16, NULL));
+  gtk_button_set_image_position(GTK_BUTTON(btIncarcaPeAle), GTK_POS_RIGHT);
+  gtk_button_set_image(GTK_BUTTON(btIncarcaPeAle), imgIncarcaPeAle);
+
+  btSalveazaLucrul = gtk_button_new_with_label("Salvează lucrul");
+  gtk_widget_set_size_request(GTK_WIDGET(btSalveazaLucrul), -1, 50);
+  GtkWidget *imgSalveazaLucrul = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_salveaza.png", 16, 16, NULL));
+  gtk_button_set_image_position(GTK_BUTTON(btSalveazaLucrul), GTK_POS_LEFT);
+  gtk_button_set_image(GTK_BUTTON(btSalveazaLucrul), imgSalveazaLucrul);
+
+  btReiaLucrul = gtk_button_new_with_label("Reia cod");
+  gtk_widget_set_size_request(GTK_WIDGET(btReiaLucrul), -1, 40);
+  GtkWidget *imgReiaLucrul = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_reia.png", 16, 16, NULL));
+  gtk_button_set_image_position(GTK_BUTTON(btReiaLucrul), GTK_POS_LEFT);
+  gtk_button_set_image(GTK_BUTTON(btReiaLucrul), imgReiaLucrul);
+
+  btCitesteEEPROM = gtk_button_new_with_label("Citește EEPROM");
+  gtk_widget_set_size_request(GTK_WIDGET(btCitesteEEPROM), -1, 35);
+  GtkWidget *imgCitesteEEPROM = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_eeprom.png", 16, 16, NULL));
+  gtk_button_set_image_position(GTK_BUTTON(btCitesteEEPROM), GTK_POS_LEFT);
+  gtk_button_set_image(GTK_BUTTON(btCitesteEEPROM), imgCitesteEEPROM);
+
+  btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
+  gtk_widget_set_size_request(GTK_WIDGET(btParasesteFrm), -1, 30);
+  GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_paraseste.png", 16, 16, NULL));
+  gtk_button_set_image_position(GTK_BUTTON(btParasesteFrm), GTK_POS_LEFT);
+  gtk_button_set_image(GTK_BUTTON(btParasesteFrm), imgParasesteFrm);
+
+  /* inițializăm cadrul regiunii de acțiuni */
+  cadruBxActiuni = gtk_vbutton_box_new();
+  gtk_button_box_set_layout(GTK_BUTTON_BOX(cadruBxActiuni), GTK_BUTTONBOX_DEFAULT_STYLE);
+  gtk_box_set_homogeneous(GTK_BOX(cadruBxActiuni), FALSE);
+  cadruBxActiuniCentrale = gtk_vbutton_box_new();
+  gtk_button_box_set_layout(GTK_BUTTON_BOX(cadruBxActiuniCentrale), GTK_BUTTONBOX_CENTER);
+  gtk_box_set_homogeneous(GTK_BOX(cadruBxActiuniCentrale), FALSE);
+
+  gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btIncarcaPeAle, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBxActiuniCentrale), btSalveazaLucrul, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBxActiuniCentrale), btReiaLucrul, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBxActiuniCentrale), btCitesteEEPROM, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBxActiuni), cadruBxActiuniCentrale, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btParasesteFrm, FALSE, FALSE, 0);
+  gtk_table_attach(GTK_TABLE(cadruFrm), cadruBxActiuni, 2, 3, 0, 2, GTK_SHRINK, GTK_FILL, 0, 0);
 
   return frm;
 }
