@@ -5,7 +5,7 @@ static char adrActualizare[128];
 
 void 
 dl_curata() {
-  fclose(pFisVersActuala);
+  if(NULL != pFisVersActuala)  fclose(pFisVersActuala);
 }
 
 int 

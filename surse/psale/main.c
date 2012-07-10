@@ -73,9 +73,10 @@ int main(int argc, char *argv[]) {
   GtkWidget *btIesire = NULL;
 
   gtk_init (&argc, &argv);
-  dl_initializeaza(db_obtine_adresa_actualizare());
+  /* Dezactivate momentan pentru a nu folosi inutil resursele rețelei
+     dl_initializeaza(db_obtine_adresa_actualizare());
 
-  dl_actualizeaza_bd();
+     dl_actualizeaza_bd();*/
 
   /* inițializăm formularul principal */
   formPrincipal = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -111,6 +112,8 @@ int main(int argc, char *argv[]) {
 
   /* inițializăm meniul de selecție pentru exemplele de cod din carte */
   cmbxCodCarte = gtk_combo_box_text_new();
+  gtk_widget_set_size_request(GTK_WIDGET(cmbxCodCarte), 50, -1);
+  gtk_combo_box_set_wrap_width(GTK_COMBO_BOX(cmbxCodCarte), 2);
   gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(cmbxCodCarte), "Cod din cărțulie ...");
   db_incarca_exemple_carte(GTK_COMBO_BOX_TEXT(cmbxCodCarte));
   gtk_combo_box_set_active(GTK_COMBO_BOX(cmbxCodCarte), 0);

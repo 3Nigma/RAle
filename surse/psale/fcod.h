@@ -10,6 +10,7 @@ typedef struct {
   GtkWidget *frm;
   GtkWidget *btExpandator;
   GtkWidget *cadruActiuni;
+  GtkWidget *lblStareConex, *lblStareDCod, *lblStareNSursa;
   VizActiuni vActiuni;
 } FormularCod;
 

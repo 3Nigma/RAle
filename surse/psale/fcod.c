@@ -68,6 +68,10 @@ fc_initializeaza(Limbaj lmDorit, gchar *codInitial, gboolean esteExemplu) {
   GtkWidget *btParasesteFrm = NULL;
   GtkWidget *cadruBxActiuni = NULL;
   GtkWidget *cadruBxActiuniCentrale = NULL;
+  GtkWidget *cadruBaraStare = NULL;
+  GtkWidget *lblStareLegatura = NULL;
+  GtkWidget *lblStareCod = NULL;
+  GtkWidget *lblStareNumeSursa = NULL;
 
   /* inițializăm formularul principal */
   frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -117,7 +121,7 @@ fc_initializeaza(Limbaj lmDorit, gchar *codInitial, gboolean esteExemplu) {
   gtk_source_view_set_insert_spaces_instead_of_tabs(GTK_SOURCE_VIEW(txtSrc), TRUE);
   gtk_source_view_set_auto_indent(GTK_SOURCE_VIEW(txtSrc), TRUE);
   gtk_source_view_set_show_line_numbers(GTK_SOURCE_VIEW(txtSrc), TRUE);
-  gtk_source_view_set_show_right_margin(GTK_SOURCE_VIEW(txtSrc), TRUE);
+  gtk_source_view_set_show_right_margin(GTK_SOURCE_VIEW(txtSrc), FALSE);
 
   GtkWidget *txtSrcScroll = gtk_scrolled_window_new(NULL, NULL);
   gtk_container_add(GTK_CONTAINER(txtSrcScroll), txtSrc);
@@ -178,11 +182,25 @@ fc_initializeaza(Limbaj lmDorit, gchar *codInitial, gboolean esteExemplu) {
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btParasesteFrm, FALSE, FALSE, 0);
   gtk_table_attach(GTK_TABLE(cadruFrm), cadruBxActiuni, 2, 3, 0, 2, GTK_SHRINK, GTK_FILL, 0, 0);
 
+  /* inițializăm bara de stare a formularului */
+  lblStareLegatura = gtk_label_new("[Conexiune]");
+  lblStareCod = gtk_label_new("[Dim. Cod]");
+  lblStareNumeSursa = gtk_label_new("[Nume Sursă]");
+
+  cadruBaraStare = gtk_hbox_new(TRUE, 4);
+  gtk_box_pack_start(GTK_BOX(cadruBaraStare), lblStareLegatura, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBaraStare), lblStareCod, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBaraStare), lblStareNumeSursa, FALSE, FALSE, 0);
+  gtk_table_attach(GTK_TABLE(cadruFrm), cadruBaraStare, 0, 1, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
   /* împachetăm elementele esențiale pentru a le returna */
   deRet = g_slice_new(FormularCod);
   deRet->frm = frm;
   deRet->btExpandator = btGestioneazaActiuni;
   deRet->cadruActiuni = cadruBxActiuni;
+  deRet->lblStareConex = lblStareLegatura;
+  deRet->lblStareDCod = lblStareCod;
+  deRet->lblStareNSursa = lblStareNumeSursa;
   if(esteExemplu) deRet->vActiuni = VIZIBILE;
   else deRet->vActiuni = ASCUNSE;
 
