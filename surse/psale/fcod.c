@@ -19,15 +19,48 @@
   "main:\n" \
   "  ; introduceți codul dumneavoastră aici\n" \
   "ciclu_infinit:\n" \
-  "  rjmp ciclu_infinit"
+  "  rjmp ciclu_infinit\n"
 #define PSALE_CODC_IMPLICIT "#include \"ale.h\"\n\n" \
   "int main() {\n" \
   "  /* Scrieți codul dumneavoastră aici */\n" \
   "  return 0;\n" \
-  "}"
+  "}\n"
 
+static gboolean placutaConectata;
 static GtkSourceLanguageManager *txtSrcLimbAsignor = NULL;
 static GtkSourceStyleSchemeManager *txtSrcStilAsignor = NULL;
+
+static gboolean 
+este_placuta_conectata() {
+  int avrdudeRet = 0;
+
+#ifdef G_OS_WIN32
+  /* DE FĂCUT : obține același efect pentru windows */
+#elif defined G_OS_UNIX
+  avrdudeRet = system("sudo avrdude -c usbtiny -p t25 -V 2> /dev/null");
+#endif
+  
+  if(WIFEXITED(avrdudeRet))
+    return WEXITSTATUS(avrdudeRet) == 0;
+
+  return FALSE;
+}
+
+static gboolean 
+actualizeaza_stare_placuta(GtkWidget *lblStare) {
+  gboolean placutaOnline = FALSE;
+
+  g_assert(GTK_IS_LABEL(lblStare));
+
+  if(este_placuta_conectata()) {
+    gtk_label_set_markup(GTK_LABEL(lblStare), "<span color=\"#003300\">Am găsit plăcuța!</span>");
+    placutaOnline = TRUE;
+  } else {
+    gtk_label_set_markup(GTK_LABEL(lblStare), "<span color=\"#980000\"><b>NU</b> s-a găsit plăcuța!</span>");
+  }
+
+  return placutaOnline;
+}
 
 static gchar *
 obtine_codul_sursa_curent(GtkTextView *txtView) {
@@ -71,23 +104,28 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   tmpnam(denObiectRezultat);
   tmpnam(denHexRezultat);
 
-  g_print("%s\n%s\n", textComandaGcc, textComandaObjcopy);
 #ifdef G_OS_WIN32
   g_sprintf(textComandaGcc, "-Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
   g_sprintf(textComandaObjcopy, "-j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
   g_sprintf(textComandaAvrdude, "-c usbtiny -p t25 -U flash:w:%s", denHexRezultat);
-  
+ 
   ShellExecute(NULL, "open", "winavr/bin/avr-gcc.exe", textComandaGcc, NULL, SW_SHOWNORMAL);
   ShellExecute(NULL, "open", "winavr/bin/avr-objcopy.exe", textComandaObjcopy, NULL, SW_SHOWNORMAL);
-  ShellExecute(NULL, "open", "avrdude.exe", textComandaAvrdude, NULL, SW_SHOWNORMAL);
+  if(actualizeaza_stare_placuta(fc->lblStareConex))
+    ShellExecute(NULL, "open", "avrdude.exe", textComandaAvrdude, NULL, SW_SHOWNORMAL);
+  else
+    placutaConectata = FALSE;
 #elif defined G_OS_UNIX
   g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
   g_sprintf(textComandaObjcopy, "avr-objcopy -j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
-  g_sprintf(textComandaAvrdude, "sudo avrdude -c usbtiny -p t25 -U flash:w:%s", denHexRezultat);
-
+  g_sprintf(textComandaAvrdude, "sudo avrdude -c usbtiny -p t25 -U flash:w:%s 2> /dev/null", denHexRezultat);
+  
   system(textComandaGcc);
   system(textComandaObjcopy);
-  system(textComandaAvrdude);
+  if(actualizeaza_stare_placuta(fc->lblStareConex))
+    system(textComandaAvrdude);
+  else
+    placutaConectata = FALSE;
 #endif
 
   remove(denFisSursa);
@@ -132,6 +170,19 @@ fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
     break;
   }
   }
+}
+
+static gboolean 
+la_interval_tick(gpointer user_data) {
+  FormularCod *fc = (FormularCod *)user_data;
+
+  if(GTK_IS_WIDGET(fc->frm) == FALSE) return FALSE;
+
+  if(placutaConectata == FALSE && actualizeaza_stare_placuta(fc->lblStareConex)) {
+    placutaConectata = TRUE;
+  }
+  
+  return TRUE;
 }
 
 FormularCod *
@@ -307,6 +358,11 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   g_signal_connect(btIncarcaPeAle, "clicked", G_CALLBACK(btIncarcaPeAle_click), (gpointer)deRet);
   g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(gtk_widget_destroy), frm);
 
+  /* dăm drumul la tick-ul de interval */
+  placutaConectata = FALSE;
+  actualizeaza_stare_placuta(deRet->lblStareConex);
+  g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, 3, la_interval_tick, (gpointer)deRet, NULL);
+  
   return deRet;
 }
 
