@@ -103,12 +103,12 @@ btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
   switch(fc->vActiuni) {
   case ASCUNSE:
     gtk_widget_show(fc->cadruActiuni);
-    imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size("media/bt_icoana_colapseaza.png", 16, 16, NULL);
+    imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size("media/bt_icoana_colapseaza.png", 20, 20, NULL);
     fc->vActiuni = VIZIBILE;
     break;
   case VIZIBILE:
     gtk_widget_hide(fc->cadruActiuni);
-    imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size("media/bt_icoana_expandeaza.png", 16, 16, NULL);
+    imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size("media/bt_icoana_expandeaza.png", 20, 20, NULL);
     fc->vActiuni = ASCUNSE;
     break;
   }
@@ -147,7 +147,6 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   GtkWidget *btCitesteEEPROM = NULL;
   GtkWidget *btParasesteFrm = NULL;
   GtkWidget *cadruBxActiuni = NULL;
-  GtkWidget *cadruBxActiuniCentrale = NULL;
   GtkWidget *cadruBaraStare = NULL;
   GtkWidget *lblStareLegatura = NULL;
   GtkWidget *lblStareCod = NULL;
@@ -217,38 +216,49 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
 
   /* inițializăm butonul de afișare/ascundere acțiuni */
   btGestioneazaActiuni = gtk_button_new();
+  gtk_button_set_relief(GTK_BUTTON(btGestioneazaActiuni), GTK_RELIEF_NONE);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btGestioneazaActiuni), FALSE);
   GdkPixbuf *imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size(esteExemplu ? "media/bt_icoana_colapseaza.png" : "media/bt_icoana_expandeaza.png", 
-								    16, 16, NULL);
+								    20, 20, NULL);
   GtkWidget *imgExpandatorActiuni = gtk_image_new_from_pixbuf(imgExpandatorPixBuf);
   gtk_button_set_image(GTK_BUTTON(btGestioneazaActiuni), imgExpandatorActiuni);
   gtk_table_attach(GTK_TABLE(cadruFrm), btGestioneazaActiuni, 1, 2, 0, 2, GTK_SHRINK, GTK_FILL, 0, 0);
 
   /* inițializează acțiunile speciale ale formularului de cod */  
   btIncarcaPeAle = gtk_button_new_with_label("Încarcă pe Ale");
+  gtk_button_set_focus_on_click(GTK_BUTTON(btIncarcaPeAle), FALSE);
   gtk_widget_set_size_request(GTK_WIDGET(btIncarcaPeAle), -1, 60);
   GtkWidget *imgIncarcaPeAle = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_trimite_la_ale.png", 16, 16, NULL));
   gtk_button_set_image_position(GTK_BUTTON(btIncarcaPeAle), GTK_POS_RIGHT);
   gtk_button_set_image(GTK_BUTTON(btIncarcaPeAle), imgIncarcaPeAle);
 
   btSalveazaLucrul = gtk_button_new_with_label("Salvează lucrul");
+  gtk_button_set_relief(GTK_BUTTON(btSalveazaLucrul), GTK_RELIEF_NONE);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btSalveazaLucrul), FALSE);
   gtk_widget_set_size_request(GTK_WIDGET(btSalveazaLucrul), -1, 50);
   GtkWidget *imgSalveazaLucrul = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_salveaza.png", 16, 16, NULL));
   gtk_button_set_image_position(GTK_BUTTON(btSalveazaLucrul), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btSalveazaLucrul), imgSalveazaLucrul);
 
   btReiaLucrul = gtk_button_new_with_label("Reia cod");
+  gtk_button_set_relief(GTK_BUTTON(btReiaLucrul), GTK_RELIEF_NONE);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btReiaLucrul), FALSE);
   gtk_widget_set_size_request(GTK_WIDGET(btReiaLucrul), -1, 40);
   GtkWidget *imgReiaLucrul = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_reia.png", 16, 16, NULL));
   gtk_button_set_image_position(GTK_BUTTON(btReiaLucrul), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btReiaLucrul), imgReiaLucrul);
 
   btCitesteEEPROM = gtk_button_new_with_label("Citește EEPROM");
+  gtk_button_set_relief(GTK_BUTTON(btCitesteEEPROM), GTK_RELIEF_NONE);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btCitesteEEPROM), FALSE);
   gtk_widget_set_size_request(GTK_WIDGET(btCitesteEEPROM), -1, 35);
   GtkWidget *imgCitesteEEPROM = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_eeprom.png", 16, 16, NULL));
   gtk_button_set_image_position(GTK_BUTTON(btCitesteEEPROM), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btCitesteEEPROM), imgCitesteEEPROM);
 
   btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
+  gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btParasesteFrm), FALSE);
   gtk_widget_set_size_request(GTK_WIDGET(btParasesteFrm), -1, 30);
   GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_paraseste.png", 16, 16, NULL));
   gtk_button_set_image_position(GTK_BUTTON(btParasesteFrm), GTK_POS_LEFT);
@@ -258,15 +268,11 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   cadruBxActiuni = gtk_vbutton_box_new();
   gtk_button_box_set_layout(GTK_BUTTON_BOX(cadruBxActiuni), GTK_BUTTONBOX_DEFAULT_STYLE);
   gtk_box_set_homogeneous(GTK_BOX(cadruBxActiuni), FALSE);
-  cadruBxActiuniCentrale = gtk_vbutton_box_new();
-  gtk_button_box_set_layout(GTK_BUTTON_BOX(cadruBxActiuniCentrale), GTK_BUTTONBOX_CENTER);
-  gtk_box_set_homogeneous(GTK_BOX(cadruBxActiuniCentrale), FALSE);
 
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btIncarcaPeAle, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(cadruBxActiuniCentrale), btSalveazaLucrul, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(cadruBxActiuniCentrale), btReiaLucrul, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(cadruBxActiuniCentrale), btCitesteEEPROM, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(cadruBxActiuni), cadruBxActiuniCentrale, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btSalveazaLucrul, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btReiaLucrul, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btCitesteEEPROM, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btParasesteFrm, FALSE, FALSE, 0);
   gtk_table_attach(GTK_TABLE(cadruFrm), cadruBxActiuni, 2, 3, 0, 2, GTK_SHRINK, GTK_FILL, 0, 0);
 

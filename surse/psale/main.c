@@ -185,11 +185,15 @@ int main(int argc, char *argv[]) {
 
   /* inițializăm butonul de informații */
   btInfo = gtk_button_new_with_label("Ce avem aici?");
+  gtk_button_set_relief(GTK_BUTTON(btInfo), GTK_RELIEF_NONE);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btInfo), FALSE);
   g_signal_connect(btInfo, "clicked", G_CALLBACK(btInfo_click), NULL);
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), btInfo);
 
   /* inițializăm butonul de ieșire */
   btIesire = gtk_button_new_with_label("Gata, am ieșit!");
+  gtk_button_set_relief(GTK_BUTTON(btIesire), GTK_RELIEF_NONE);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btIesire), FALSE);
   g_signal_connect_swapped(btIesire, "clicked", G_CALLBACK(gtk_widget_destroy), formPrincipal);
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), btIesire);
 

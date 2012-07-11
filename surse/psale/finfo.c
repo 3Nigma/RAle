@@ -110,6 +110,8 @@ initializeaza_formular_info() {
 
   /* inițializăm butonul de părăsire a formularului */
   btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
+  gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btParasesteFrm), FALSE);
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), btParasesteFrm, 3, 4, 3, 4);
   g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(frmInfo_delev), frm);
 
