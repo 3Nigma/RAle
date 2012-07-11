@@ -51,7 +51,7 @@ bd_executa_comanda(const char *fisBD, const char *com, int (*frecurenta)(void *,
 
 static int 
 db_incarca_exemplu_recurent(void *userArg, int nrOfCols, char **colTxts, char **colNames) {
-  /* Legendă : [0] = TitluScurt, [1] = TextTitlu */
+  /* Legendă : [0] = Secțiune, [1] = Titlu */
   GtkListStore *magazie = (GtkListStore *)userArg;
   GtkTreeIter iter;
 
@@ -63,14 +63,14 @@ db_incarca_exemplu_recurent(void *userArg, int nrOfCols, char **colTxts, char **
 
 int 
 db_incarca_exemple_carte(GtkListStore *st) {
-  return bd_executa_comanda(PSALE_BD_NUME_FIS, "select TitluScurt, TextTitlu from exemple", db_incarca_exemplu_recurent, (void *)st);
+  return bd_executa_comanda(PSALE_BD_NUME_FIS, "select Sectiune, Titlu from exemple", db_incarca_exemplu_recurent, (void *)st);
 }
 
 const char *
 db_obtine_cod_complet(gchar *titluScurt) {
   char sintaxaInterogare[124];
 
-  sprintf(sintaxaInterogare, "select TextCod from exemple where TitluScurt = '%s'", titluScurt);
+  sprintf(sintaxaInterogare, "select TextCod from exemple where Sectiune = '%s'", titluScurt);
   sqlite3_value *rez = bd_obtine_rezultat_unic(PSALE_BD_NUME_FIS, sintaxaInterogare, 0);
 
   return (const char *)sqlite3_value_text(rez);
