@@ -84,9 +84,6 @@ libavrdude_a_SOURCES = \
 	lexer.l \
 	avr.c \
 	avr.h \
-	avr910.c \
-	avr910.h \
-	avrdude.h \
 	avrftdi.c \
 	avrftdi.h \
 	avrpart.c \
@@ -95,8 +92,6 @@ libavrdude_a_SOURCES = \
 	bitbang.h \
 	buspirate.c \
 	buspirate.h \
-	butterfly.c \
-	butterfly.h \
 	config.c \
 	config.h \
 	confwin.c \
@@ -106,18 +101,10 @@ libavrdude_a_SOURCES = \
 	fileio.c \
 	fileio.h \
 	freebsd_ppi.h \
-	jtagmkI.c \
-	jtagmkI.h \
-	jtagmkI_private.h \
-	jtagmkII.c \
-	jtagmkII.h \
-	jtagmkII_private.h \
 	linux_ppdev.h \
 	lists.c \
 	lists.h \
 	my_ddk_hidsdi.h \
-	par.c \
-	par.h \
 	pgm.c \
 	pgm.h \
 	pindefs.h \

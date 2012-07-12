@@ -389,12 +389,6 @@ prog_parm :
     }
   } |
 
-  K_TYPE TKN_EQUAL K_PAR {
-    { 
-      par_initpgm(current_prog);
-    }
-  } |
-
   K_TYPE TKN_EQUAL K_SERBB {
     {
       serbb_initpgm(current_prog);
@@ -413,74 +407,9 @@ prog_parm :
     }
   } |
 
-  K_TYPE TKN_EQUAL K_AVR910 {
-    { 
-      avr910_initpgm(current_prog);
-    }
-  } |
-
   K_TYPE TKN_EQUAL K_USBTINY {
     {
       usbtiny_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_BUTTERFLY {
-    { 
-      butterfly_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_BUTTERFLY_MK {
-    { 
-      butterfly_mk_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_JTAG_MKI {
-    {
-      jtagmkI_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_JTAG_MKII {
-    {
-      jtagmkII_initpgm(current_prog);
-    }
-  } |
-  K_TYPE TKN_EQUAL K_JTAG_MKII_AVR32 {
-    {
-      jtagmkII_avr32_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_JTAG_MKII_DW {
-    {
-      jtagmkII_dw_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_JTAG_MKII_PDI {
-    {
-      jtagmkII_pdi_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_DRAGON_DW {
-    {
-      jtagmkII_dragon_dw_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_DRAGON_JTAG {
-    {
-      jtagmkII_dragon_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_DRAGON_PDI {
-    {
-      jtagmkII_dragon_pdi_initpgm(current_prog);
     }
   } |
 

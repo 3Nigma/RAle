@@ -85,15 +85,14 @@ libavrdude_a_AR = $(AR) $(ARFLAGS)
 libavrdude_a_LIBADD =
 am_libavrdude_a_OBJECTS = libavrdude_a-config_gram.$(OBJEXT) \
 	libavrdude_a-lexer.$(OBJEXT) \
-	libavrdude_a-avr.$(OBJEXT) libavrdude_a-avr910.$(OBJEXT) \
+	libavrdude_a-avr.$(OBJEXT) \
 	libavrdude_a-avrftdi.$(OBJEXT) libavrdude_a-avrpart.$(OBJEXT) \
 	libavrdude_a-bitbang.$(OBJEXT) \
 	libavrdude_a-buspirate.$(OBJEXT) \
-	libavrdude_a-butterfly.$(OBJEXT) libavrdude_a-config.$(OBJEXT) \
+	libavrdude_a-config.$(OBJEXT) \
 	libavrdude_a-confwin.$(OBJEXT) libavrdude_a-crc16.$(OBJEXT) \
-	libavrdude_a-fileio.$(OBJEXT) libavrdude_a-jtagmkI.$(OBJEXT) \
-	libavrdude_a-jtagmkII.$(OBJEXT) libavrdude_a-lists.$(OBJEXT) \
-	libavrdude_a-par.$(OBJEXT) libavrdude_a-pgm.$(OBJEXT) \
+	libavrdude_a-fileio.$(OBJEXT) libavrdude_a-lists.$(OBJEXT) \
+	libavrdude_a-pgm.$(OBJEXT) \
 	libavrdude_a-ppi.$(OBJEXT) libavrdude_a-ppiwin.$(OBJEXT) \
 	libavrdude_a-safemode.$(OBJEXT) \
 	libavrdude_a-serbb_posix.$(OBJEXT) \
@@ -351,9 +350,6 @@ libavrdude_a_SOURCES = \
 	lexer.l \
 	avr.c \
 	avr.h \
-	avr910.c \
-	avr910.h \
-	avrdude.h \
 	avrftdi.c \
 	avrftdi.h \
 	avrpart.c \
@@ -362,8 +358,6 @@ libavrdude_a_SOURCES = \
 	bitbang.h \
 	buspirate.c \
 	buspirate.h \
-	butterfly.c \
-	butterfly.h \
 	config.c \
 	config.h \
 	confwin.c \
@@ -373,18 +367,10 @@ libavrdude_a_SOURCES = \
 	fileio.c \
 	fileio.h \
 	freebsd_ppi.h \
-	jtagmkI.c \
-	jtagmkI.h \
-	jtagmkI_private.h \
-	jtagmkII.c \
-	jtagmkII.h \
-	jtagmkII_private.h \
 	linux_ppdev.h \
 	lists.c \
 	lists.h \
 	my_ddk_hidsdi.h \
-	par.c \
-	par.h \
 	pgm.c \
 	pgm.h \
 	pindefs.h \
@@ -402,8 +388,6 @@ libavrdude_a_SOURCES = \
 	ser_win32.c \
 	solaris_ecpp.h \
 	tpi.h \
-	usbasp.c \
-	usbasp.h \
 	usbdevs.h \
 	usb_libusb.c \
 	usbtiny.h \
