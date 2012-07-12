@@ -31,20 +31,11 @@
 
 #include "config.h"
 #include "lists.h"
-#include "par.h"
-#include "serbb.h"
 #include "pindefs.h"
 #include "ppi.h"
 #include "pgm.h"
-#include "buspirate.h"
-#include "avr910.h"
-#include "butterfly.h"
-#include "usbasp.h"
 #include "usbtiny.h"
 #include "avr.h"
-#include "jtagmkI.h"
-#include "jtagmkII.h"
-#include "avrftdi.h"
 
 #if defined(WIN32NATIVE)
 #define strtok_r( _s, _sep, _lasts ) \
@@ -386,24 +377,6 @@ prog_parm :
         ladd(current_prog->id, dup_string(t->value.string));
         free_token(t);
       }
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_SERBB {
-    {
-      serbb_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_AVRFTDI {
-    {
-      avrftdi_initpgm(current_prog);
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_BUSPIRATE {
-    {
-      buspirate_initpgm(current_prog);
     }
   } |
 

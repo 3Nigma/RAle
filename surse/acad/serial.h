@@ -75,3 +75,4 @@ extern struct serial_device avrdoper_serdev;
 #define serial_set_dtr_rts (serdev->set_dtr_rts)
 
 #endif /* serial_h */
+

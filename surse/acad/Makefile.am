@@ -84,14 +84,8 @@ libavrdude_a_SOURCES = \
 	lexer.l \
 	avr.c \
 	avr.h \
-	avrftdi.c \
-	avrftdi.h \
 	avrpart.c \
 	avrpart.h \
-	bitbang.c \
-	bitbang.h \
-	buspirate.c \
-	buspirate.h \
 	config.c \
 	config.h \
 	confwin.c \
@@ -115,15 +109,8 @@ libavrdude_a_SOURCES = \
 	safemode.h \
 	serial.h \
 	serbb.h \
-	serbb_posix.c \
-	serbb_win32.c \
-	ser_avrdoper.c \
-	ser_posix.c \
-	ser_win32.c \
 	solaris_ecpp.h \
 	tpi.h \
-	usbasp.c \
-	usbasp.h \
 	usbdevs.h \
 	usb_libusb.c \
 	usbtiny.h \

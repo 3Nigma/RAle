@@ -86,20 +86,12 @@ libavrdude_a_LIBADD =
 am_libavrdude_a_OBJECTS = libavrdude_a-config_gram.$(OBJEXT) \
 	libavrdude_a-lexer.$(OBJEXT) \
 	libavrdude_a-avr.$(OBJEXT) \
-	libavrdude_a-avrftdi.$(OBJEXT) libavrdude_a-avrpart.$(OBJEXT) \
-	libavrdude_a-bitbang.$(OBJEXT) \
-	libavrdude_a-buspirate.$(OBJEXT) \
+	libavrdude_a-avrpart.$(OBJEXT) \
 	libavrdude_a-config.$(OBJEXT) \
 	libavrdude_a-confwin.$(OBJEXT) libavrdude_a-crc16.$(OBJEXT) \
 	libavrdude_a-fileio.$(OBJEXT) libavrdude_a-lists.$(OBJEXT) \
 	libavrdude_a-pgm.$(OBJEXT) \
-	libavrdude_a-ppi.$(OBJEXT) libavrdude_a-ppiwin.$(OBJEXT) \
 	libavrdude_a-safemode.$(OBJEXT) \
-	libavrdude_a-serbb_posix.$(OBJEXT) \
-	libavrdude_a-serbb_win32.$(OBJEXT) \
-	libavrdude_a-ser_avrdoper.$(OBJEXT) \
-	libavrdude_a-ser_posix.$(OBJEXT) \
-	libavrdude_a-ser_win32.$(OBJEXT) \
 	libavrdude_a-usb_libusb.$(OBJEXT) \
 	libavrdude_a-usbtiny.$(OBJEXT) libavrdude_a-update.$(OBJEXT)
 libavrdude_a_OBJECTS = $(am_libavrdude_a_OBJECTS)
