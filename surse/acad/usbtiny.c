@@ -67,8 +67,7 @@ struct pdata
 
 // ----------------------------------------------------------------------
 
-static void usbtiny_setup(PROGRAMMER * pgm)
-{
+static void usbtiny_setup(PROGRAMMER * pgm) {
   if ((pgm->cookie = malloc(sizeof(struct pdata))) == 0) {
     fprintf(stderr,
 	    "%s: usbtiny_setup(): Out of memory allocating private data\n",
@@ -78,8 +77,7 @@ static void usbtiny_setup(PROGRAMMER * pgm)
   memset(pgm->cookie, 0, sizeof(struct pdata));
 }
 
-static void usbtiny_teardown(PROGRAMMER * pgm)
-{
+static void usbtiny_teardown(PROGRAMMER * pgm) {
   free(pgm->cookie);
 }
 

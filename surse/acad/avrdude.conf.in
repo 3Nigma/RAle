@@ -15,13 +15,7 @@
 #   programmer
 #       id       = <id1> [, <id2> [, <id3>] ...] ;  # <idN> are quoted strings
 #       desc     = <description> ;                  # quoted string
-#       type     = par | stk500 | stk500v2 | stk500pp | stk500hvsp | stk500generic |
-#                  stk600 | stk600pp | stk600hvsp |
-#                  avr910 | butterfly | usbasp |
-#                  jtagmki | jtagmkii | jtagmkii_isp | jtagmkii_dw |
-#                  jtagmkII_avr32 | jtagmkii_pdi |
-#                  dragon_dw | dragon_jtag | dragon_isp | dragon_pp |
-#                  dragon_hvsp | dragon_pdi | arduino | wiring; # programmer type
+#       type     = usbtiny; # programmer type
 #       baudrate = <num> ;                          # baudrate for avr910-programmer
 #       vcc      = <num1> [, <num2> ... ] ;         # pin number(s)
 #       reset    = <num> ;                          # pin number
@@ -50,7 +44,6 @@
 #       has_pdi          = <yes/no> ;             # part has PDI i/f
 #       has_tpi          = <yes/no> ;             # part has TPI i/f
 #       devicecode       = <num> ;            # deprecated, use stk500_devcode
-#       avr910_devcode   = <num> ;                # numeric
 #       signature        = <num> <num> <num> ;    # signature bytes
 #       chip_erase_delay = <num> ;                # micro-seconds
 #       reset            = dedicated | io;
@@ -404,7 +397,6 @@ part
 part
     id                  = "t12";
     desc                = "ATtiny12";
-    avr910_devcode      = 0x55;
     signature           = 0x1e 0x90 0x05;
     chip_erase_delay    = 20000;
     pgm_enable          = "1 0 1 0  1 1 0 0   0 1 0 1  0 0 1 1",
@@ -708,7 +700,6 @@ part
 part
     id                  = "t15";
     desc                = "ATtiny15";
-    avr910_devcode      = 0x56;
     signature           = 0x1e 0x90 0x06;
     chip_erase_delay    = 8200;
     pgm_enable          = "1 0 1 0  1 1 0 0   0 1 0 1  0 0 1 1",
@@ -841,7 +832,6 @@ part
     id               = "1200";
     desc             = "AT90S1200";
     is_at90s1200     = yes;
-    avr910_devcode   = 0x13;
     signature        = 0x1e 0x90 0x01;
     pagel            = 0xd7;
     bs2              = 0xa0;
@@ -955,7 +945,6 @@ part
 part
     id               = "4414";
     desc             = "AT90S4414";
-    avr910_devcode   = 0x28;
     signature        = 0x1e 0x92 0x01;
     chip_erase_delay = 20000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -1067,7 +1056,6 @@ part
 part
     id               = "2313";
     desc             = "AT90S2313";
-    avr910_devcode   = 0x20;
     signature        = 0x1e 0x91 0x01;
     chip_erase_delay = 20000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -1180,7 +1168,6 @@ part
     id               = "2333";
 ##### WARNING: No XML file for device 'AT90S2333'! #####
     desc             = "AT90S2333";
-    avr910_devcode   = 0x34;
     signature        = 0x1e 0x91 0x05;
     chip_erase_delay = 20000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -1306,7 +1293,6 @@ part
 part
     id               = "2343";
     desc             = "AT90S2343";
-    avr910_devcode   = 0x4c;
     signature        = 0x1e 0x91 0x03;
     chip_erase_delay = 18000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -1429,7 +1415,6 @@ part
 part
     id               = "4433";
     desc             = "AT90S4433";
-    avr910_devcode   = 0x30;
     signature        = 0x1e 0x92 0x03;
     chip_erase_delay = 20000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -1553,7 +1538,6 @@ part
     id               = "4434";
 ##### WARNING: No XML file for device 'AT90S4434'! #####
     desc             = "AT90S4434";
-    avr910_devcode   = 0x6c;
     signature        = 0x1e 0x92 0x02;
     chip_erase_delay = 20000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -1634,7 +1618,6 @@ part
 part
     id               = "8515";
     desc             = "AT90S8515";
-    avr910_devcode   = 0x38;
     signature        = 0x1e 0x93 0x01;
     chip_erase_delay = 20000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -1747,7 +1730,6 @@ part
 part
     id               = "8535";
     desc             = "AT90S8535";
-    avr910_devcode   = 0x68;
     signature        = 0x1e 0x93 0x03;
     chip_erase_delay = 20000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -1867,7 +1849,6 @@ part
 part
     id               = "m103";
     desc             = "ATMEGA103";
-    avr910_devcode   = 0x41;
     signature        = 0x1e 0x97 0x01;
     chip_erase_delay = 112000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -2007,7 +1988,6 @@ part
     id               = "m64";
     desc             = "ATMEGA64";
     has_jtag         = yes;
-    avr910_devcode   = 0x45;
     signature        = 0x1e 0x96 0x02;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
@@ -2187,7 +2167,6 @@ part
     id               = "m128";
     desc             = "ATMEGA128";
     has_jtag         = yes;
-    avr910_devcode   = 0x43;
     signature        = 0x1e 0x97 0x02;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
@@ -2364,7 +2343,6 @@ part
     id               = "c128";
     desc             = "AT90CAN128";
     has_jtag         = yes;
-#    avr910_devcode   = 0x43;
     signature        = 0x1e 0x97 0x81;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
@@ -2553,7 +2531,6 @@ part
     id               = "c64";
     desc             = "AT90CAN64";
     has_jtag         = yes;
-#    avr910_devcode   = 0x43;
     signature        = 0x1e 0x96 0x81;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
@@ -2742,7 +2719,6 @@ part
     id               = "c32";
     desc             = "AT90CAN32";
     has_jtag         = yes;
-#    avr910_devcode   = 0x43;
     signature        = 0x1e 0x95 0x81;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
@@ -2932,7 +2908,6 @@ part
     id               = "m16";
     desc             = "ATMEGA16";
     has_jtag         = yes;
-    avr910_devcode   = 0x74;
     signature        = 0x1e 0x94 0x03;
     pagel            = 0xd7;
     bs2              = 0xa0;
@@ -3109,7 +3084,6 @@ part
     id               = "m164p";
     desc             = "ATMEGA164P";
     has_jtag         = yes;
-    avr910_devcode   = 0x74;
     signature        = 0x1e 0x94 0x0a;
     pagel            = 0xd7;
     bs2              = 0xa0;
@@ -3299,7 +3273,6 @@ part
     id               = "m324p";
     desc             = "ATMEGA324P";
     has_jtag         = yes;
-    avr910_devcode   = 0x74;
     signature        = 0x1e 0x95 0x08;
     pagel            = 0xd7;
     bs2              = 0xa0;
@@ -3489,7 +3462,6 @@ part
     id               = "m324pa";
     desc             = "ATmega324PA";
     has_jtag         = yes;
-    avr910_devcode   = 0x74;
     signature        = 0x1e 0x95 0x11;
     pagel            = 0xd7;
     bs2              = 0xa0;
@@ -3679,7 +3651,6 @@ part
     id               = "m644";
     desc             = "ATMEGA644";
     has_jtag         = yes;
-    avr910_devcode   = 0x74;
     signature        = 0x1e 0x96 0x09;
     pagel            = 0xd7;
     bs2              = 0xa0;
@@ -3868,7 +3839,6 @@ part
     id               = "m644p";
     desc             = "ATMEGA644P";
     has_jtag         = yes;
-    avr910_devcode   = 0x74;
     signature        = 0x1e 0x96 0x0a;
     pagel            = 0xd7;
     bs2              = 0xa0;
@@ -4059,7 +4029,6 @@ part
     id               = "m1284p";
     desc             = "ATMEGA1284P";
     has_jtag         = yes;
-    avr910_devcode   = 0x74;
     signature        = 0x1e 0x97 0x05;
     pagel            = 0xd7;
     bs2              = 0xa0;
@@ -4248,7 +4217,6 @@ part
     id               = "m162";
     desc             = "ATMEGA162";
     has_jtag         = yes;
-    avr910_devcode   = 0x63;
     signature        = 0x1e 0x94 0x04;
     chip_erase_delay = 9000;
     pagel            = 0xd7;
@@ -4442,7 +4410,6 @@ part
 part
     id               = "m163";
     desc             = "ATMEGA163";
-    avr910_devcode   = 0x64;
     signature        = 0x1e 0x94 0x02;
     chip_erase_delay = 32000;
     pagel            = 0xd7;
@@ -4600,7 +4567,6 @@ part
     id               = "m169";
     desc             = "ATMEGA169";
     has_jtag         = yes;
-    avr910_devcode   = 0x78;
     signature        = 0x1e 0x94 0x05;
     chip_erase_delay = 9000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -4779,8 +4745,6 @@ part
     id               = "m329";
     desc             = "ATMEGA329";
     has_jtag         = yes;
-#    avr910_devcode   = 0x?;  # try the ATmega169 one:
-    avr910_devcode   = 0x75;
     signature        = 0x1e 0x95 0x03;
     chip_erase_delay = 9000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -4962,8 +4926,6 @@ part
     id               = "m329p";
     desc             = "ATMEGA329P";
     has_jtag         = yes;
-#    avr910_devcode   = 0x?;  # try the ATmega169 one:
-    avr910_devcode   = 0x75;
     signature        = 0x1e 0x95 0x0b;
     chip_erase_delay = 9000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -5146,8 +5108,6 @@ part
     id               = "m3290";
     desc             = "ATMEGA3290";
     has_jtag         = yes;
-#    avr910_devcode   = 0x?;  # try the ATmega169 one:
-    avr910_devcode   = 0x75;
     signature        = 0x1e 0x95 0x04;
     chip_erase_delay = 9000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -5330,8 +5290,6 @@ part
     id               = "m3290p";
     desc             = "ATMEGA3290P";
     has_jtag         = yes;
-#    avr910_devcode   = 0x?;  # try the ATmega169 one:
-    avr910_devcode   = 0x75;
     signature        = 0x1e 0x95 0x0c;
     chip_erase_delay = 9000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -5512,8 +5470,6 @@ part
     id               = "m649";
     desc             = "ATMEGA649";
     has_jtag         = yes;
-#    avr910_devcode   = 0x?;  # try the ATmega169 one:
-    avr910_devcode   = 0x75;
     signature        = 0x1e 0x96 0x03;
     chip_erase_delay = 9000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -5696,9 +5652,6 @@ part
     id               = "m6490";
     desc             = "ATMEGA6490";
     has_jtag         = yes;
-#    stk500_devcode   = 0x85; # no STK500 support, only STK500v2
-#    avr910_devcode   = 0x?;  # try the ATmega169 one:
-    avr910_devcode   = 0x75;
     signature        = 0x1e 0x96 0x04;
     chip_erase_delay = 9000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -5889,7 +5842,6 @@ part
     id               = "m32";
     desc             = "ATMEGA32";
     has_jtag         = yes;
-    avr910_devcode   = 0x72;
     signature        = 0x1e 0x95 0x02;
     chip_erase_delay = 9000;
     pagel            = 0xd7;
@@ -6062,7 +6014,6 @@ part
 part
     id               = "m161";
     desc             = "ATMEGA161";
-    avr910_devcode   = 0x60;
     signature        = 0x1e 0x94 0x01;
     chip_erase_delay = 28000;
     pagel            = 0xd7;
@@ -6201,7 +6152,6 @@ part
 part
     id               = "m8";
     desc             = "ATMEGA8";
-    avr910_devcode   = 0x76;
     signature        = 0x1e 0x93 0x07;
     pagel            = 0xd7;
     bs2              = 0xc2;
@@ -6361,7 +6311,6 @@ part
 part
     id               = "m8515";
     desc             = "ATMEGA8515";
-    avr910_devcode   = 0x3A;
     signature        = 0x1e 0x93 0x06;
     chip_erase_delay = 9000;
     pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
@@ -6518,7 +6467,6 @@ part
 part
     id               = "m8535";
     desc             = "ATMEGA8535";
-    avr910_devcode   = 0x69;
     signature        = 0x1e 0x93 0x08;
     pagel            = 0xd7;
     bs2              = 0xa0;
@@ -6675,7 +6623,6 @@ part
 part
     id                  = "t26";
     desc                = "ATTINY26";
-    avr910_devcode      = 0x5e;
     signature           = 0x1e 0x91 0x09;
     pagel               = 0xb3;
     bs2                 = 0xb2;
@@ -6836,8 +6783,6 @@ part
      eeprom_instr  = 0xBB, 0xFF, 0xBB, 0xEE, 0xBB, 0xCC, 0xB2, 0x0D,
 	             0xBC, 0x00, 0xB4, 0x00, 0xBA, 0x0D, 0xBB, 0xBC,
 	             0x99, 0xE1, 0xBB, 0xAC;
-#    stk500_devcode      = 0x21;
-#    avr910_devcode      = 0x5e;
     signature           = 0x1e 0x91 0x0c;
     pagel               = 0xb3;
     bs2                 = 0xb2;
@@ -7025,8 +6970,6 @@ part
      eeprom_instr  = 0xBB, 0xFF, 0xBB, 0xEE, 0xBB, 0xCC, 0xB2, 0x0D,
 	             0xBC, 0x00, 0xB4, 0x00, 0xBA, 0x0D, 0xBB, 0xBC,
 	             0x99, 0xE1, 0xBB, 0xAC;
-#    stk500_devcode      = 0x21;
-#    avr910_devcode      = 0x5e;
     signature           = 0x1e 0x92 0x08;
     pagel               = 0xb3;
     bs2                 = 0xb2;
@@ -7214,8 +7157,6 @@ part
      eeprom_instr  = 0xBB, 0xFF, 0xBB, 0xEE, 0xBB, 0xCC, 0xB2, 0x0D,
 	             0xBC, 0x00, 0xB4, 0x00, 0xBA, 0x0D, 0xBB, 0xBC,
 	             0x99, 0xE1, 0xBB, 0xAC;
-#    stk500_devcode      = 0x21;
-#    avr910_devcode      = 0x5e;
     signature           = 0x1e 0x93 0x0d;
     pagel               = 0xb3;
     bs2                 = 0xb2;
@@ -7402,7 +7343,6 @@ part
      eeprom_instr  = 0xBD, 0xF2, 0xBD, 0xE1, 0xBB, 0xCF, 0xB4, 0x00,
 	             0xBE, 0x01, 0xB6, 0x01, 0xBC, 0x00, 0xBB, 0xBF,
 	             0x99, 0xF9, 0xBB, 0xAF;
-#    avr910_devcode   = 0x;
     signature        = 0x1e 0x92 0x05;
     pagel            = 0xd7;
     bs2              = 0xc2;
@@ -7588,7 +7528,6 @@ part
      eeprom_instr  = 0xBD, 0xF2, 0xBD, 0xE1, 0xBB, 0xCF, 0xB4, 0x00,
 	             0xBE, 0x01, 0xB6, 0x01, 0xBC, 0x00, 0xBB, 0xBF,
 	             0x99, 0xF9, 0xBB, 0xAF;
-#    avr910_devcode   = 0x;
     signature        = 0x1e 0x93 0x0a;
     pagel            = 0xd7;
     bs2              = 0xc2;
@@ -7773,7 +7712,6 @@ part
      eeprom_instr  = 0xBD, 0xF2, 0xBD, 0xE1, 0xBB, 0xCF, 0xB4, 0x00,
                      0xBE, 0x01, 0xB6, 0x01, 0xBC, 0x00, 0xBB, 0xBF,
                      0x99, 0xF9, 0xBB, 0xAF;
-#    avr910_devcode   = 0x;
     signature        = 0x1e 0x93 0x0f;
     pagel            = 0xd7;
     bs2              = 0xc2;
@@ -8333,7 +8271,6 @@ part
      eeprom_instr  = 0xBD, 0xF2, 0xBD, 0xE1, 0xBB, 0xCF, 0xB4, 0x00,
 	             0xBE, 0x01, 0xB6, 0x01, 0xBC, 0x00, 0xBB, 0xBF,
 	             0x99, 0xF9, 0xBB, 0xAF;
-#    avr910_devcode   = 0x;
     signature        = 0x1e 0x93 0x11;
     pagel            = 0xd7;
     bs2              = 0xc2;
@@ -8706,7 +8643,6 @@ part
 	             0xBA, 0x0F, 0xB2, 0x0F, 0xBA, 0x0D, 0xBB, 0xBC,
 	             0x99, 0xE1, 0xBB, 0xAC;
 ##   Use the ATtiny26 devcode:
-     avr910_devcode   = 0x5e;
      signature        = 0x1e 0x91 0x0a;
      pagel            = 0xD4;
      bs2              = 0xD6;
@@ -8892,7 +8828,6 @@ part
 	             0xBA, 0x0F, 0xB2, 0x0F, 0xBA, 0x0D, 0xBB, 0xBC,
 	             0x99, 0xE1, 0xBB, 0xAC;
 ##   Use the ATtiny26 devcode:
-     avr910_devcode   = 0x5e;
      signature        = 0x1e 0x92 0x0d;
      pagel            = 0xD4;
      bs2              = 0xD6;
@@ -9802,7 +9737,6 @@ part
 ## no STK500 devcode in XML file, use the ATtiny45 one
 ##  avr910_devcode   = ?;
 ##  Try the AT90S2313 devcode:
-     avr910_devcode   = 0x20;
      signature        = 0x1e 0x91 0x08;
      reset            = io;
      chip_erase_delay = 4500;
@@ -9980,7 +9914,6 @@ part
 	             0x99, 0xE1, 0xBB, 0xAC;
 ##  avr910_devcode   = ?;
 ##  Try the AT90S2313 devcode:
-     avr910_devcode   = 0x20;
      signature        = 0x1e 0x92 0x06;
      reset            = io;
      chip_erase_delay = 4500;
@@ -10159,7 +10092,6 @@ part
 ## no STK500 devcode in XML file, use the ATtiny45 one
 ##  avr910_devcode   = ?;
 ##  Try the AT90S2313 devcode:
-     avr910_devcode   = 0x20;
      signature        = 0x1e 0x93 0x0b;
      reset            = io;
      chip_erase_delay = 4500;
@@ -10333,8 +10265,6 @@ part
     desc             = "ATMEGA640";
     signature        = 0x1e 0x96 0x08;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
     bs2              = 0xA0;
@@ -10521,8 +10451,6 @@ part
     desc             = "ATMEGA1280";
     signature        = 0x1e 0x97 0x03;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
     bs2              = 0xA0;
@@ -10710,8 +10638,6 @@ part
     desc             = "ATMEGA1281";
     signature        = 0x1e 0x97 0x04;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
     bs2              = 0xA0;
@@ -10898,8 +10824,6 @@ part
     desc             = "ATMEGA2560";
     signature        = 0x1e 0x98 0x01;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
     bs2              = 0xA0;
@@ -11091,8 +11015,6 @@ part
     desc             = "ATMEGA2561";
     signature        = 0x1e 0x98 0x02;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
     bs2              = 0xA0;
@@ -11285,8 +11207,6 @@ part
     desc             = "ATMEGA128RFA1";
     signature        = 0x1e 0xa7 0x01;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 55000;
     pagel            = 0xD7;
     bs2              = 0xE2;
@@ -11476,10 +11396,6 @@ part
      eeprom_instr  = 0xBB, 0xFF, 0xBB, 0xEE, 0xBB, 0xCC, 0xB2, 0x0D,
 	             0xBC, 0x07, 0xB4, 0x07, 0xBA, 0x0D, 0xBB, 0xBC,
 	             0x99, 0xE1, 0xBB, 0xAC;
-## no STK500 devcode in XML file, use the ATtiny45 one
-##  avr910_devcode   = ?;
-##  Try the AT90S2313 devcode:
-     avr910_devcode   = 0x20;
      signature        = 0x1e 0x91 0x0b;
      reset            = io;
      chip_erase_delay = 4500;
@@ -11657,10 +11573,6 @@ part
      eeprom_instr  = 0xBB, 0xFF, 0xBB, 0xEE, 0xBB, 0xCC, 0xB2, 0x0D,
                      0xBC, 0x07, 0xB4, 0x07, 0xBA, 0x0D, 0xBB, 0xBC,
                      0x99, 0xE1, 0xBB, 0xAC;
-## no STK500 devcode in XML file, use the ATtiny45 one
-##  avr910_devcode   = ?;
-##  Try the AT90S2313 devcode:
-     avr910_devcode   = 0x20;
      signature        = 0x1e 0x92 0x07;
      reset            = io;
      chip_erase_delay = 4500;
@@ -11838,10 +11750,6 @@ part
      eeprom_instr  = 0xBB, 0xFF, 0xBB, 0xEE, 0xBB, 0xCC, 0xB2, 0x0D,
 	             0xBC, 0x07, 0xB4, 0x07, 0xBA, 0x0D, 0xBB, 0xBC,
 	             0x99, 0xE1, 0xBB, 0xAC;
-## no STK500 devcode in XML file, use the ATtiny45 one
-##  avr910_devcode   = ?;
-##  Try the AT90S2313 devcode:
-     avr910_devcode   = 0x20;
      signature        = 0x1e 0x93 0x0c;
      reset            = io;
      chip_erase_delay = 4500;
@@ -12017,8 +11925,6 @@ part
     desc             = "ATmega32U4";
     signature        = 0x1e 0x95 0x87;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
     bs2              = 0xA0;
@@ -12205,8 +12111,6 @@ part
     desc             = "AT90USB646";
     signature        = 0x1e 0x96 0x82;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
     bs2              = 0xA0;
@@ -12394,8 +12298,6 @@ part
     desc             = "AT90USB647";
     signature        = 0x1e 0x96 0x82;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
     bs2              = 0xA0;
@@ -12582,8 +12484,6 @@ part
     desc             = "AT90USB1286";
     signature        = 0x1e 0x97 0x82;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
     bs2              = 0xA0;
@@ -12771,8 +12671,6 @@ part
     desc             = "AT90USB1287";
     signature        = 0x1e 0x97 0x82;
     has_jtag         = yes;
-#    stk500_devcode   = 0xB2;
-#    avr910_devcode   = 0x43;
     chip_erase_delay = 9000;
     pagel            = 0xD7;
     bs2              = 0xA0;
@@ -13879,9 +13777,6 @@ part
     desc             = "ATMEGA325";
     signature        = 0x1e 0x95 0x05;
     has_jtag         = yes;
-#   stk500_devcode   = 0x??; # No STK500v1 support?
-#   avr910_devcode   = 0x??; # Try the ATmega16 one
-    avr910_devcode   = 0x74;
     pagel            = 0xd7;
     bs2              = 0xa0;
     chip_erase_delay = 9000;
@@ -14068,9 +13963,6 @@ part
     desc             = "ATMEGA645";
     signature        = 0x1E 0x96 0x05;
     has_jtag         = yes;
-#   stk500_devcode   = 0x??; # No STK500v1 support?
-#   avr910_devcode   = 0x??; # Try the ATmega16 one
-    avr910_devcode   = 0x74;
     pagel            = 0xd7;
     bs2              = 0xa0;
     chip_erase_delay = 9000;
@@ -14257,9 +14149,6 @@ part
     desc             = "ATMEGA3250";
     signature        = 0x1E 0x95 0x06;
     has_jtag         = yes;
-#   stk500_devcode   = 0x??; # No STK500v1 support?
-#   avr910_devcode   = 0x??; # Try the ATmega16 one
-    avr910_devcode   = 0x74;
     pagel            = 0xd7;
     bs2              = 0xa0;
     chip_erase_delay = 9000;
@@ -14446,9 +14335,6 @@ part
     desc             = "ATMEGA6450";
     signature        = 0x1E 0x96 0x06;
     has_jtag         = yes;
-#   stk500_devcode   = 0x??; # No STK500v1 support?
-#   avr910_devcode   = 0x??; # Try the ATmega16 one
-    avr910_devcode   = 0x74;
     pagel            = 0xd7;
     bs2              = 0xa0;
     chip_erase_delay = 9000;

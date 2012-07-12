@@ -94,22 +94,15 @@ libavrdude_a_SOURCES = \
 	crc16.h \
 	fileio.c \
 	fileio.h \
-	freebsd_ppi.h \
-	linux_ppdev.h \
 	lists.c \
 	lists.h \
 	my_ddk_hidsdi.h \
 	pgm.c \
 	pgm.h \
 	pindefs.h \
-	ppi.c \
-	ppi.h \
-	ppiwin.c \
 	safemode.c \
 	safemode.h \
 	serial.h \
-	serbb.h \
-	solaris_ecpp.h \
 	tpi.h \
 	usbdevs.h \
 	usb_libusb.c \

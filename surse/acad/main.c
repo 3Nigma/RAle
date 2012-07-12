@@ -20,16 +20,6 @@
 
 /* $Id: main.c 988 2011-08-26 20:30:26Z joerg_wunsch $ */
 
-/*
- * Code to program an Atmel AVR device through one of the supported
- * programmers.
- *
- * For parallel port connected programmers, the pin definitions can be
- * changed via a config file.  See the config file for instructions on
- * how to add a programmer definition.
- *  
- */
-
 #include "ac_cfg.h"
 
 #include <stdio.h>
@@ -50,30 +40,24 @@
 #include "confwin.h"
 #include "fileio.h"
 #include "lists.h"
-#include "par.h"
 #include "pindefs.h"
 #include "term.h"
 #include "safemode.h"
 #include "update.h"
 
-
 /* Get VERSION from ac_cfg.h */
 char * version      = VERSION;
-
 char * progname;
 char   progbuf[PATH_MAX]; /* temporary buffer of spaces the same
                              length as progname; used for lining up
                              multiline messages */
 
-struct list_walk_cookie
-{
+struct list_walk_cookie {
     FILE *f;
     const char *prefix;
 };
 
 static LISTID updates;
-
-static LISTID extended_params;
 
 static PROGRAMMER * pgm;
 
@@ -95,16 +79,12 @@ static void usage(void)
  "Usage: %s [options]\n"
  "Options:\n"
  "  -p <partno>                Required. Specify AVR device.\n"
- "  -b <baudrate>              Override RS-232 baud rate.\n"
  "  -B <bitclock>              Specify JTAG/STK500v2 bit clock period (us).\n"
  "  -C <config-file>           Specify location of configuration file.\n"
- "  -c <programmer>            Specify programmer type.\n"
  "  -D                         Disable auto erase for flash memory\n"
- "  -i <delay>                 ISP Clock Delay [in microseconds]\n"
  "  -P <port>                  Specify connection port.\n"
  "  -F                         Override invalid signature check.\n"
  "  -e                         Perform a chip erase.\n"
- "  -O                         Perform RC oscillator calibration (see AVR053). \n"
  "  -U <memtype>:r|w|v:<filename>[:format]\n"
  "                             Memory operation specification.\n"
  "                             Multiple -U options are allowed, each request\n"
@@ -115,11 +95,8 @@ static void usage(void)
  "  -s                         Silent safemode operation, will not ask you if\n"
  "                             fuses should be changed back.\n"
  "  -t                         Enter terminal mode.\n"
- "  -E <exitspec>[,<exitspec>] List programmer exit specifications.\n"
- "  -x <extended_param>        Pass <extended_param> to programmer.\n"
  "  -y                         Count # erase cycles in EEPROM.\n"
  "  -Y <number>                Initialize erase cycle # in EEPROM.\n"
- "  -v                         Verbose output. -v -v for more.\n"
  "  -q                         Quell progress output. -q -q for less.\n"
  "  -?                         Display this usage.\n"
  "\navrdude version %s, URL: <http://savannah.nongnu.org/projects/avrdude/>\n"
@@ -127,8 +104,7 @@ static void usage(void)
 }
 
 
-static void update_progress_tty (int percent, double etime, char *hdr)
-{
+static void update_progress_tty (int percent, double etime, char *hdr) {
   static char hashes[51];
   static char *header;
   static int last = 0;
@@ -162,8 +138,7 @@ static void update_progress_tty (int percent, double etime, char *hdr)
   setvbuf(stderr, (char*)NULL, _IOLBF, 0);
 }
 
-static void update_progress_no_tty (int percent, double etime, char *hdr)
-{
+static void update_progress_no_tty (int percent, double etime, char *hdr) {
   static int done = 0;
   static int last = 0;
   int cnt = (percent>>1)*2;
@@ -193,38 +168,16 @@ static void update_progress_no_tty (int percent, double etime, char *hdr)
   setvbuf(stderr, (char*)NULL, _IOLBF, 0);
 }
 
-static void list_programmers_callback(const char *name, const char *desc,
-                                      const char *cfgname, int cfglineno,
-                                      void *cookie)
-{
-    struct list_walk_cookie *c = (struct list_walk_cookie *)cookie;
-
-    fprintf(c->f, "%s%-8s = %-30s [%s:%d]\n",
-            c->prefix, name, desc, cfgname, cfglineno);
-}
-
-static void list_programmers(FILE * f, const char *prefix, LISTID programmers)
-{
-    struct list_walk_cookie c;
-
-    c.f = f;
-    c.prefix = prefix;
-
-    walk_programmers(programmers, list_programmers_callback, &c);
-}
-
 static void list_avrparts_callback(const char *name, const char *desc,
                                    const char *cfgname, int cfglineno,
-                                   void *cookie)
-{
-    struct list_walk_cookie *c = (struct list_walk_cookie *)cookie;
+                                   void *cookie) {
+  struct list_walk_cookie *c = (struct list_walk_cookie *)cookie;
 
-    fprintf(c->f, "%s%-4s = %-15s [%s:%d]\n",
-            c->prefix, name, desc, cfgname, cfglineno);
+  fprintf(c->f, "%s%-4s = %-15s [%s:%d]\n",
+          c->prefix, name, desc, cfgname, cfglineno);
 }
 
-static void list_parts(FILE * f, const char *prefix, LISTID avrparts)
-{
+static void list_parts(FILE * f, const char *prefix, LISTID avrparts) {
     struct list_walk_cookie c;
 
     c.f = f;
@@ -233,9 +186,8 @@ static void list_parts(FILE * f, const char *prefix, LISTID avrparts)
     walk_avrparts(avrparts, list_avrparts_callback, &c);
 }
 
-static void exithook(void)
-{
-    if (pgm->teardown)
+static void exithook(void) {
+  if (pgm->teardown)
         pgm->teardown(pgm);
 }
 
@@ -259,14 +211,12 @@ int main(int argc, char * argv [])
 
   /* options / operating mode variables */
   int     erase;       /* 1=erase chip, 0=don't */
-  int     calibrate;   /* 1=calibrate RC oscillator, 0=don't */
   int     auto_erase;  /* 0=never erase unless explicity told to do
                           so, 1=erase if we are going to program flash */
   char  * port;        /* device port (/dev/xxx) */
   int     terminal;    /* 1=enter terminal mode, 0=don't */
   int     nowrite;     /* don't actually write anything to the chip */
   int     verify;      /* perform a verify operation */
-  char  * exitspecs;   /* exit specs string from command line */
   char  * programmer;  /* programmer id */
   char  * partdesc;    /* part id */
   char    sys_config[PATH_MAX]; /* system wide config file */
@@ -274,9 +224,7 @@ int main(int argc, char * argv [])
   int     cycles;      /* erase-rewrite cycles */
   int     set_cycles;  /* value to set the erase-rewrite cycles to */
   char  * e;           /* for strtol() error checking */
-  int     baudrate;    /* override default programmer baud rate */
   double  bitclock;    /* Specify programmer bit clock (JTAG ICE) */
-  int     ispdelay;    /* Specify the delay for ISP clock */
   int     safemode;    /* Enable safemode, 1=safemode on, 0=normal */
   int     silentsafe;  /* Don't ask about fuses, 1=silent, 0=normal */
   int     init_ok;     /* Device initialization worked well */
@@ -324,16 +272,9 @@ int main(int argc, char * argv [])
     exit(1);
   }
 
-  extended_params = lcreat(NULL, 0);
-  if (extended_params == NULL) {
-    fprintf(stderr, "%s: cannot initialize extended parameter list\n", progname);
-    exit(1);
-  }
-
   partdesc      = NULL;
   port          = default_parallel;
   erase         = 0;
-  calibrate     = 0;
   auto_erase    = 1;
   p             = NULL;
   ovsigck       = 0;
@@ -341,15 +282,12 @@ int main(int argc, char * argv [])
   nowrite       = 0;
   verify        = 1;        /* on by default */
   quell_progress = 0;
-  exitspecs     = NULL;
   pgm           = NULL;
   programmer    = "usbtiny";
   verbose       = 0;
   do_cycles     = 0;
   set_cycles    = -1;
-  baudrate      = 0;
   bitclock      = 0.0;
-  ispdelay      = 0;
   safemode      = 1;       /* Safemode on by default */
   silentsafe    = 0;       /* Ask by default */
   is_open       = 0;
@@ -401,38 +339,16 @@ int main(int argc, char * argv [])
   /*
    * process command line arguments
    */
-  while ((ch = getopt(argc,argv,"?b:B:c:C:DeE:Fi:np:OP:qstU:uvVx:yY:")) != -1) {
+  while ((ch = getopt(argc,argv,"?B:C:De:F:np:P:qstU:uV:yY:")) != -1) {
 
     switch (ch) {
-      case 'b': /* override default programmer baud rate */
-        baudrate = strtol(optarg, &e, 0);
-        if ((e == optarg) || (*e != 0)) {
-          fprintf(stderr, "%s: invalid baud rate specified '%s'\n",
-                  progname, optarg);
-          exit(1);
-        }
-        break;
-
-      case 'B':	/* specify JTAG ICE bit clock period */
+      case 'B':	/* clock sck period for usbtiny */
 	bitclock = strtod(optarg, &e);
 	if ((e == optarg) || (*e != 0) || bitclock == 0.0) {
 	  fprintf(stderr, "%s: invalid bit clock period specified '%s'\n",
                   progname, optarg);
           exit(1);
         }
-        break;
-
-      case 'i':	/* specify isp clock delay */
-	ispdelay = strtol(optarg, &e,10);
-	if ((e == optarg) || (*e != 0) || ispdelay == 0) {
-	  fprintf(stderr, "%s: invalid isp clock delay specified '%s'\n",
-                  progname, optarg);
-          exit(1);
-        }
-        break;
-
-      case 'c': /* programmer id */
-        programmer = optarg;
         break;
 
       case 'C': /* system wide configuration file */
@@ -448,10 +364,6 @@ int main(int argc, char * argv [])
         erase = 1;
         break;
 
-      case 'E':
-        exitspecs = optarg;
-        break;
-
       case 'F': /* override invalid signature check */
         ovsigck = 1;
         break;
@@ -459,10 +371,6 @@ int main(int argc, char * argv [])
       case 'n':
         nowrite = 1;
         break;
-
-      case 'O': /* perform RC oscillator calibration */
-	calibrate = 1;
-	break;
 
       case 'p' : /* specify AVR part */
         partdesc = optarg;
@@ -505,16 +413,8 @@ int main(int argc, char * argv [])
         }
         break;
 
-      case 'v':
-        verbose++;
-        break;
-
       case 'V':
         verify = 0;
-        break;
-
-      case 'x':
-        ladd(extended_params, optarg);
         break;
 
       case 'y':
@@ -544,7 +444,6 @@ int main(int argc, char * argv [])
     }
 
   }
-
 
   if (quell_progress == 0) {
     if (isatty (STDERR_FILENO))
@@ -591,55 +490,14 @@ int main(int argc, char * argv [])
       }
     }
   }
+
   // set bitclock from configuration files unless changed by command line
   if (default_bitclock > 0 && bitclock == 0.0) {
     bitclock = default_bitclock;
   }
 
-  /*if (partdesc) {
-    if (strcmp(partdesc, "?") == 0) {
-      fprintf(stderr, "\n");
-      fprintf(stderr,"Valid parts are:\n");
-      list_parts(stderr, "  ", part_list);
-      fprintf(stderr, "\n");
-      exit(1);
-    }
-  }
-
-  if (programmer) {
-    if (strcmp(programmer, "?") == 0) {
-      fprintf(stderr, "\n");
-      fprintf(stderr,"Valid programmers are:\n");
-      list_programmers(stderr, "  ", programmers);
-      fprintf(stderr,"\n");
-      exit(1);
-    }
-  }*/
-
-
-  /*if (programmer[0] == 0) {
-    fprintf(stderr,
-            "\n%s: no programmer has been specified on the command line "
-            "or the config file\n",
-            progname);
-    fprintf(stderr,
-            "%sSpecify a programmer using the -c option and try again\n\n",
-            progbuf);
-    exit(1);
-  }*/
-
-  pgm = pgm_new();//locate_programmer(programmers, programmer);
-  usbtiny_initpgm(pgm); //
-  /*if (pgm == NULL) {
-    fprintf(stderr,"\n");
-    fprintf(stderr,
-            "%s: Can't find programmer id \"%s\"\n",
-            progname, programmer);
-    fprintf(stderr,"\nValid programmers are:\n");
-    list_programmers(stderr, "  ", programmers);
-    fprintf(stderr,"\n");
-    exit(1);
-  }*/
+  pgm = pgm_new();
+  usbtiny_initpgm(pgm); 
 
   if (pgm->setup) {
     pgm->setup(pgm);
@@ -647,43 +505,6 @@ int main(int argc, char * argv [])
   if (pgm->teardown) {
     atexit(exithook);
   }
-
-  /*if (lsize(extended_params) > 0) {
-    if (pgm->parseextparams == NULL) {
-      fprintf(stderr,
-              "%s: WARNING: Programmer doesn't support extended parameters,"
-              " -x option(s) ignored\n",
-              progname);
-    } else {
-      if (pgm->parseextparams(pgm, extended_params) < 0) {
-        fprintf(stderr,
-              "%s: Error parsing extended parameter list\n",
-              progname);
-        exit(1);
-      }
-    }
-  }*/
-
-  /*if ((strcmp(pgm->type, "STK500") == 0) ||
-      (strcmp(pgm->type, "avr910") == 0) ||
-      (strcmp(pgm->type, "BusPirate") == 0) ||
-      (strcmp(pgm->type, "STK500V2") == 0) ||
-      (strcmp(pgm->type, "JTAGMKII") == 0)) {
-    if (port == default_parallel) {
-      port = default_serial;
-    }
-  }*/
-  
-  /*if (partdesc == NULL) {
-    fprintf(stderr,
-            "%s: No AVR part has been specified, use \"-p Part\"\n\n",
-            progname);
-    fprintf(stderr,"Valid parts are:\n");
-    list_parts(stderr, "  ", part_list);
-    fprintf(stderr, "\n");
-    exit(1);
-  }*/
-
 
   p = locate_part(part_list, partdesc);
   if (p == NULL) {
@@ -695,20 +516,6 @@ int main(int argc, char * argv [])
     fprintf(stderr, "\n");
     exit(1);
   }
-
-
-  /*if (exitspecs != NULL) {
-    if (pgm->parseexitspecs == NULL) {
-      fprintf(stderr,
-              "%s: WARNING: -E option not supported by this programmer type\n",
-              progname);
-      exitspecs = NULL;
-    }
-    else if (pgm->parseexitspecs(pgm, exitspecs) < 0) {
-      usage();
-      exit(1);
-    }
-  }*/
 
   if(p->flags & AVRPART_AVR32) {
     safemode = 0;
@@ -730,97 +537,20 @@ int main(int argc, char * argv [])
   /*
    * open the programmer
    */
-  if (port[0] == 0) {
-    fprintf(stderr, "\n%s: no port has been specified on the command line "
-            "or the config file\n",
-            progname);
-    fprintf(stderr, "%sSpecify a port using the -P option and try again\n\n",
-            progbuf);
-    exit(1);
-  }
-
-  /*if (verbose) {
-    fprintf(stderr, "%sUsing Port                    : %s\n", progbuf, port);
-    fprintf(stderr, "%sUsing Programmer              : %s\n", progbuf, programmer);
-    if ((strcmp(pgm->type, "avr910") == 0)) {
-	  fprintf(stderr, "%savr910_devcode (avrdude.conf) : ", progbuf);
-      if(p->avr910_devcode)fprintf(stderr, "0x%x\n", p->avr910_devcode);
-	  else fprintf(stderr, "none\n");
-    }  
-  }*/
-
-  /*if (baudrate != 0) {
-    if (verbose) {
-      fprintf(stderr, "%sOverriding Baud Rate          : %d\n", progbuf, baudrate);
-    }
-    pgm->baudrate = baudrate;
-  }
-
-  if (bitclock != 0.0) {
-    if (verbose) {
-      fprintf(stderr, "%sSetting bit clk period        : %.1f\n", progbuf, bitclock);
-    }
-    pgm->bitclock = bitclock * 1e-6;
-  }
-
-  if (ispdelay != 0) {
-    if (verbose) {
-      fprintf(stderr, "%sSetting isp clock delay        : %3i\n", progbuf, ispdelay);
-    }
-    pgm->ispdelay = ispdelay;
-  }*/
-
   rc = pgm->open(pgm, port);
   if (rc < 0) {
     exitrc = 1;
     pgm->ppidata = 0; /* clear all bits at exit */
     goto main_exit;
   }
+
   is_open = 1;
-
-  /*if (calibrate) {
-    // perform an RC oscillator calibration as outlined in appnote AVR053
-    if (pgm->perform_osccal == 0) {
-      fprintf(stderr,
-              "%s: programmer does not support RC oscillator calibration\n",
-	      progname);
-      exitrc = 1;
-    } else {
-      fprintf(stderr, "%s: performing RC oscillator calibration\n", progname);
-      exitrc = pgm->perform_osccal(pgm);
-    }
-    if (exitrc == 0 && quell_progress < 2) {
-      fprintf(stderr,
-              "%s: calibration value is now stored in EEPROM at address 0\n",
-              progname);
-    }
-    goto main_exit;
-  }
-
-  if (verbose) {
-    avr_display(stderr, p, progbuf, verbose);
-    fprintf(stderr, "\n");
-    programmer_display(pgm, progbuf);
-  }
-
-  if (quell_progress < 2) {
-    fprintf(stderr, "\n");
-  }*/
-
   exitrc = 0;
 
   /*
    * enable the programmer : isn't required by usbtiny (check usbtiny.c)
    */
   //pgm->enable(pgm);
-
-  /*
-   * turn off all the status leds
-   */
-  /*pgm->rdy_led(pgm, OFF);
-  pgm->err_led(pgm, OFF);
-  pgm->pgm_led(pgm, OFF);
-  pgm->vfy_led(pgm, OFF);*/
 
   /*
    * initialize the chip in preperation for accepting commands
@@ -840,12 +570,6 @@ int main(int argc, char * argv [])
 
   /* indicate ready */
   /*pgm->rdy_led(pgm, ON);
-
-  if (quell_progress < 2) {
-    fprintf(stderr,
-            "%s: AVR device initialized and ready to accept instructions\n",
-            progname);
-  }*/
 
   /*
    * Let's read the signature bytes to make sure there is at least a

@@ -32,7 +32,6 @@
 #include "config.h"
 #include "lists.h"
 #include "pindefs.h"
-#include "ppi.h"
 #include "pgm.h"
 #include "usbtiny.h"
 #include "avr.h"
@@ -69,11 +68,8 @@ static int parse_cmdbits(OPCODE * op);
 %token K_PAGE_SIZE
 %token K_PAGED
 
-%token K_AVRFTDI
-%token K_BAUDRATE
 %token K_BS2
 %token K_BUFF
-%token K_BUSPIRATE
 %token K_CHIP_ERASE_DELAY
 %token K_DEDICATED
 %token K_DEFAULT_PARALLEL
@@ -82,13 +78,6 @@ static int parse_cmdbits(OPCODE * op);
 %token K_DEFAULT_BITCLOCK
 %token K_DESC
 %token K_DEVICECODE
-%token K_DRAGON_DW
-%token K_DRAGON_HVSP
-%token K_DRAGON_ISP
-%token K_DRAGON_JTAG
-%token K_DRAGON_PDI
-%token K_DRAGON_PP
-%token K_AVR910_DEVCODE
 %token K_EEPROM
 %token K_ERRLED
 %token K_FLASH
@@ -465,12 +454,6 @@ prog_parm :
       strncpy(current_prog->usbproduct, $3->value.string, PGM_USBSTRINGLEN);
       current_prog->usbproduct[PGM_USBSTRINGLEN-1] = 0;
       free_token($3);
-    }
-  } |
-  
-  K_BAUDRATE TKN_EQUAL TKN_NUMBER {
-    {
-      current_prog->baudrate = $3->value.number;
     }
   } |
 

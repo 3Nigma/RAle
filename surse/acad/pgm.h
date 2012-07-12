@@ -67,12 +67,10 @@ typedef struct programmer_t {
   exit_datahigh_t exit_datahigh;
   int ppidata;
   int ppictrl;
-  int baudrate;
   int usbvid, usbpid;
   char usbdev[PGM_USBSTRINGLEN], usbsn[PGM_USBSTRINGLEN];
   char usbvendor[PGM_USBSTRINGLEN], usbproduct[PGM_USBSTRINGLEN];
-  double bitclock;    /* JTAG ICE clock period in microseconds */
-  int ispdelay;    /* ISP clock delay */
+  double bitclock;
   union filedescriptor fd;
   int  page_size;  /* page size if the programmer supports paged write/load */
   int  (*rdy_led)        (struct programmer_t * pgm, int value);
