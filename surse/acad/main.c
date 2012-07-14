@@ -55,7 +55,7 @@ enum {
   ACAD_SIG_BAD_VAL_ERR,		/* An error while reading the signature value occured. The resulting signature has been corupted. */
   ACAD_SIG_MISSMATCH_ERR,	/* The expected signature doesn't match the real one */
   ACAD_UPDATE_ACT_ERR,		/* There was an error in the ubpdate processing stage */
-  ACAD_FUSES_REREAD_ERR
+  ACAD_ERASE_ACT_ERR		/* Signifies the fact that the erase procedure had a problem and didn't ended succesfully */
 };
 
 /* Get VERSION from ac_cfg.h */
@@ -69,9 +69,7 @@ struct list_walk_cookie {
     FILE *f;
     const char *prefix;
 };
-
 static LISTID updates;
-
 static PROGRAMMER * pgm;
 
 /*
@@ -477,7 +475,7 @@ int main(int argc, char * argv [])
     }
   }
 
-  if (init_ok && safemode == 1) {
+  if (safemode == 1) {
     /* If safemode is enabled, go ahead and read the current low, high,
        and extended fuse bytes as needed */
     rc = safemode_readfuses(&safemode_lfuse, &safemode_hfuse,
@@ -507,7 +505,7 @@ int main(int argc, char * argv [])
    *
    * The cycle count will be displayed anytime it will be changed later.
    */
-  if (init_ok && (set_cycles == -1) && ((erase == 0) || (do_cycles == 0))) {
+  if ((set_cycles == -1) && ((erase == 0) || (do_cycles == 0))) {
     /*
      * see if the cycle count in the last four bytes of eeprom seems
      * reasonable
@@ -526,14 +524,17 @@ int main(int argc, char * argv [])
     }
   }
   
-  if (init_ok && erase) {
+  if (erase) {
     /*
      * Erase the chip's flash and eeprom memories, this is required
      * before the chip can accept new programming
      */
     if (!nowrite) {
       exitrc = avr_chip_erase(pgm, p);
-      if(exitrc) goto main_exit;
+      if(exitrc) {
+	exitrc = ACAD_ERASE_ACT_ERR;
+	goto main_exit;
+      }
     }
   }
 
@@ -568,7 +569,7 @@ int main(int argc, char * argv [])
       /* Uh-oh.. try once more to read back fuses */
       if (safemode_readfuses(&safemodeafter_lfuse, &safemodeafter_hfuse,
                              &safemodeafter_efuse, &safemodeafter_fuse, pgm, p, verbose) != 0) { 
-        exitrc = ACAD_FUSES_REREAD_ERR;
+        exitrc = ACAD_SIG_READ_ERR;
         goto main_exit;		  
       }
     }
@@ -641,9 +642,7 @@ int main(int argc, char * argv [])
     if (fuses_updated && fuses_specified) {
       exitrc = 1;
     }
-
   }
-
 
 main_exit:
 
