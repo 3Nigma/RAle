@@ -46,7 +46,6 @@ int avr_read_byte_default(PROGRAMMER * pgm, AVRPART * p, AVRMEM * mem,
   unsigned char cmd[4];
   unsigned char res[4];
   unsigned char data;
-  int r;
   OPCODE * readop, * lext;
 
   if (pgm->cmd == NULL) {
@@ -151,7 +150,6 @@ int avr_read(PROGRAMMER * pgm, AVRPART * p, char * memtype, int size,
   unsigned char    rbyte;
   unsigned long    i;
   unsigned char  * buf;
-  unsigned char    cmd[4];
   AVRMEM * mem;
   int rc;
 
@@ -184,12 +182,6 @@ int avr_read(PROGRAMMER * pgm, AVRPART * p, char * memtype, int size,
         return avr_mem_hiaddr(mem);
       else
         return rc;
-    }
-  }
-
-  if (strcmp(mem->desc, "signature") == 0) {
-    if (pgm->read_sig_bytes) {
-      return pgm->read_sig_bytes(pgm, p, mem);
     }
   }
 
@@ -546,7 +538,6 @@ int avr_write(PROGRAMMER * pgm, AVRPART * p, char * memtype, int size,
   long             i;
   unsigned char    data;
   int              werror;
-  unsigned char    cmd[4];
   AVRMEM         * m;
 
   m = avr_locate_mem(p, memtype);
@@ -630,8 +621,6 @@ int avr_write(PROGRAMMER * pgm, AVRPART * p, char * memtype, int size,
 
   return i;
 }
-
-
 
 /*
  * read the AVR device's signature bytes

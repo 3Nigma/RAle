@@ -293,22 +293,22 @@ void avr_mem_display(const char * prefix, FILE * f, AVRMEM * m, int type,
 
   if (m == NULL) {
       fprintf(f,
-              "%s                       Block Poll               Page                       Polled\n"
-              "%sMemory Type Mode Delay Size  Indx Paged  Size   Size #Pages MinW  MaxW   ReadBack\n"
-              "%s----------- ---- ----- ----- ---- ------ ------ ---- ------ ----- ----- ---------\n",
+              "%s                          Page                       Polled\n"
+              "%sMemory Type  Paged Size   Size #Pages MinW  MaxW   ReadBack\n"
+              "%s----------- ------ ----- ----- ---- ------ ------ ---- ------ ----- ----- ---------\n",
             prefix, prefix, prefix);
   }
   else {
     if (verbose > 2) {
       fprintf(f,
-              "%s                       Block Poll               Page                       Polled\n"
-              "%sMemory Type Mode Delay Size  Indx Paged  Size   Size #Pages MinW  MaxW   ReadBack\n"
-              "%s----------- ---- ----- ----- ---- ------ ------ ---- ------ ----- ----- ---------\n",
+              "%s                          Page                       Polled\n"
+              "%sMemory Type  Paged Size   Size #Pages MinW  MaxW   ReadBack\n"
+              "%s----------- ------ ----- ----- ---- ------ ------ ---- ------ ----- ----- ---------\n",
               prefix, prefix, prefix);
     }
     fprintf(f,
-            "%s%-11s %4d %5d %5d %4d %-6s %6d %4d %6d %5d %5d 0x%02x 0x%02x\n",
-            prefix, m->desc, m->mode, m->delay, m->blocksize, m->pollindex,
+            "%s%-11s %-6s %6d %4d %6d %5d %5d 0x%02x 0x%02x\n",
+            prefix, m->desc,
             m->paged ? "yes" : "no",
             m->size,
             m->page_size,

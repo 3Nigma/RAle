@@ -121,7 +121,6 @@ PROGRAMMER * pgm_new(void)
   pgm->paged_write    = NULL;
   pgm->paged_load     = NULL;
   pgm->write_setup    = NULL;
-  pgm->read_sig_bytes = NULL;
   pgm->set_vtarget    = NULL;
   pgm->set_varef      = NULL;
   pgm->set_fosc       = NULL;

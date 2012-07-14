@@ -98,52 +98,34 @@ int safemode_readfuses (unsigned char * lfuse, unsigned char * hfuse,
   safemode_efuse = *efuse;
   safemode_fuse  = *fuse;
 
-
   /* Read fuse three times */ 
   fusegood = 2; /* If AVR device doesn't support this fuse, don't want
                    to generate a verify error */
   m = avr_locate_mem(p, "fuse");
   if (m != NULL) {
     fusegood = 0; /* By default fuse is a failure */
-    if(pgm->read_byte(pgm, p, m, 0, &safemode_fuse) != 0)
-        {
-        allowfuseread = 0;
-        }
-	if (verbose > 2)
-		{
-		fprintf(stderr, "%s: safemode read 1, fuse value: %x\n",progname, safemode_fuse);
-		}
-    if(pgm->read_byte(pgm, p, m, 0, &value) != 0)
-        {
-        allowfuseread = 0;
-        }
-	if (verbose > 2)
-		{
-		fprintf(stderr, "%s: safemode read 2, fuse value: %x\n",progname,  value);
-		}
+    if(pgm->read_byte(pgm, p, m, 0, &safemode_fuse) != 0) {
+      allowfuseread = 0;
+    }
+    if(pgm->read_byte(pgm, p, m, 0, &value) != 0) {
+      allowfuseread = 0;
+    }
     if (value == safemode_fuse) {
-        if (pgm->read_byte(pgm, p, m, 0, &value) != 0)
-            {
-            allowfuseread = 0;
-            }
-		if (verbose > 2)
-			{
-			fprintf(stderr, "%s: safemode read 3, fuse value: %x\n",progname,  value);
-			}
-        if (value == safemode_fuse)
-            {
-            fusegood = 1; /* Fuse read OK three times */
-            }
+      if (pgm->read_byte(pgm, p, m, 0, &value) != 0) {
+	allowfuseread = 0;
+      }
+      if (value == safemode_fuse) {
+	fusegood = 1; /* Fuse read OK three times */
+      }
     }
   } 
+  
+  /* Programmer does not allow fuse reading.... no point trying anymore */
+  /* if (allowfuseread == 0) {
+    return -5;
+  } */
 
-	//Programmer does not allow fuse reading.... no point trying anymore
-    if (allowfuseread == 0)
-		{
-		return -5;
-		}
-
-    if (fusegood == 0)   {
+  if (fusegood == 0) {
         fprintf(stderr,
            "%s: safemode: Verify error - unable to read fuse properly. "
            "Programmer may not be reliable.\n", progname);
@@ -160,53 +142,33 @@ int safemode_readfuses (unsigned char * lfuse, unsigned char * hfuse,
   m = avr_locate_mem(p, "lfuse");
   if (m != NULL) {
     fusegood = 0; /* By default fuse is a failure */
-    if (pgm->read_byte(pgm, p, m, 0, &safemode_lfuse) != 0)
-        {
-        allowfuseread = 0;
-        }
-	if (verbose > 2)
-		{
-		fprintf(stderr, "%s: safemode read 1, lfuse value: %x\n",progname,  safemode_lfuse);
-		}
-    if (pgm->read_byte(pgm, p, m, 0, &value) != 0)
-        {
-        allowfuseread = 0;
-        }
-	if (verbose > 2)
-		{
-		fprintf(stderr, "%s: safemode read 2, lfuse value: %x\n",progname,  value);
-		}
+    if (pgm->read_byte(pgm, p, m, 0, &safemode_lfuse) != 0) {
+      allowfuseread = 0;
+    }
+    if (pgm->read_byte(pgm, p, m, 0, &value) != 0) {
+      allowfuseread = 0;
+    }
     if (value == safemode_lfuse) {
-        if (pgm->read_byte(pgm, p, m, 0, &value) != 0)
-            {
-            allowfuseread = 0;
-            }
-		if (verbose > 2)
-			{
-			fprintf(stderr, "%s: safemode read 3, lfuse value: %x\n",progname,  value);
-			}
-        if (value == safemode_lfuse){
+      if (pgm->read_byte(pgm, p, m, 0, &value) != 0) {
+	allowfuseread = 0;
+      }
+      if (value == safemode_lfuse) {
         fusegood = 1; /* Fuse read OK three times */
-        }
+      }
     }
   }
 
-	//Programmer does not allow fuse reading.... no point trying anymore
-    if (allowfuseread == 0)
-		{
-		return -5;
-		}
+  /* Programmer does not allow fuse reading.... no point trying anymore */
+  /* if (allowfuseread == 0) {
+     return -5;
+     } */
 
-
-    if (fusegood == 0)	 {
-        fprintf(stderr,
-           "%s: safemode: Verify error - unable to read lfuse properly. "
-           "Programmer may not be reliable.\n", progname);
-        return -1;
-    }
-    else if ((fusegood == 1) && (verbose > 0)) {
-        fprintf(stderr, "%s: safemode: lfuse reads as %X\n", progname, safemode_lfuse);
-    }
+  if (fusegood == 0) {
+    return -1;
+  }
+  else if ((fusegood == 1) && (verbose > 0)) {
+    fprintf(stderr, "%s: safemode: lfuse reads as %X\n", progname, safemode_lfuse);
+  }
 
   /* Read hfuse three times */  
   fusegood = 2; /* If AVR device doesn't support this fuse, don't want
@@ -214,52 +176,33 @@ int safemode_readfuses (unsigned char * lfuse, unsigned char * hfuse,
   m = avr_locate_mem(p, "hfuse");
   if (m != NULL) {
     fusegood = 0; /* By default fuse is a failure */
-    if (pgm->read_byte(pgm, p, m, 0, &safemode_hfuse) != 0)
-        {
-        allowfuseread = 0;
-        }
-	if (verbose > 2)
-		{
-		fprintf(stderr, "%s: safemode read 1, hfuse value: %x\n",progname,  safemode_hfuse);
-		}
-    if (pgm->read_byte(pgm, p, m, 0, &value) != 0)
-        {
-        allowfuseread = 0;
-        }
-	if (verbose > 2)
-		{
-		fprintf(stderr, "%s: safemode read 2, hfuse value: %x\n",progname,  value);
-		}
+    if (pgm->read_byte(pgm, p, m, 0, &safemode_hfuse) != 0) {
+      allowfuseread = 0;
+    }
+    if (pgm->read_byte(pgm, p, m, 0, &value) != 0) {
+      allowfuseread = 0;
+    }
     if (value == safemode_hfuse) {
-        if (pgm->read_byte(pgm, p, m, 0, &value) != 0)
-            {
-            allowfuseread = 0;
-            }
-		if (verbose > 2)
-			{
-			fprintf(stderr, "%s: safemode read 3, hfuse value: %x\n",progname, value);
-			}
-        if (value == safemode_hfuse){
-             fusegood = 1; /* Fuse read OK three times */
-        }
+      if (pgm->read_byte(pgm, p, m, 0, &value) != 0) {
+	allowfuseread = 0;
+      }
+      if (value == safemode_hfuse) {
+	fusegood = 1; /* Fuse read OK three times */
+      }
     }
   }
 
-	//Programmer does not allow fuse reading.... no point trying anymore
-    if (allowfuseread == 0)
-		{
-		return -5;
-		}
+  /* Programmer does not allow fuse reading.... no point trying anymore */
+  /* if (allowfuseread == 0) {
+     return -5;
+     } */
 
-    if (fusegood == 0)	 {
-            fprintf(stderr,
-           "%s: safemode: Verify error - unable to read hfuse properly. "
-           "Programmer may not be reliable.\n", progname);
-       return -2;
-    }
-    else if ((fusegood == 1) && (verbose > 0)){
-        fprintf(stderr, "%s: safemode: hfuse reads as %X\n", progname, safemode_hfuse);
-    }
+  if (fusegood == 0) {
+    return -2;
+  }
+  else if ((fusegood == 1) && (verbose > 0)) {
+    fprintf(stderr, "%s: safemode: hfuse reads as %X\n", progname, safemode_hfuse);
+  }
 
   /* Read efuse three times */  
   fusegood = 2; /* If AVR device doesn't support this fuse, don't want
@@ -267,52 +210,33 @@ int safemode_readfuses (unsigned char * lfuse, unsigned char * hfuse,
   m = avr_locate_mem(p, "efuse");
   if (m != NULL) {
     fusegood = 0; /* By default fuse is a failure */
-    if (pgm->read_byte(pgm, p, m, 0, &safemode_efuse) != 0)
-        {
-        allowfuseread = 0;
-        }
-	if (verbose > 2)
-		{
-		fprintf(stderr, "%s: safemode read 1, efuse value: %x\n",progname, safemode_efuse);
-		}
-    if (pgm->read_byte(pgm, p, m, 0, &value) != 0)
-        {
-        allowfuseread = 0;
-        }
-	if (verbose > 2)
-		{
-		fprintf(stderr, "%s: safemode read 2, efuse value: %x\n",progname,  value);
-		}
+    if (pgm->read_byte(pgm, p, m, 0, &safemode_efuse) != 0) {
+      allowfuseread = 0;
+    }
+    if (pgm->read_byte(pgm, p, m, 0, &value) != 0) {
+      allowfuseread = 0;
+    }
     if (value == safemode_efuse) {
-        if (pgm->read_byte(pgm, p, m, 0, &value) != 0)
-            {
-            allowfuseread = 0;
-            }
-		if (verbose > 2)
-			{
-			fprintf(stderr, "%s: safemode read 3, efuse value: %x\n",progname, value);
-			}
-        if (value == safemode_efuse){
-             fusegood = 1; /* Fuse read OK three times */
-        }
+      if (pgm->read_byte(pgm, p, m, 0, &value) != 0) {
+	allowfuseread = 0;
+      }
+      if (value == safemode_efuse) {
+	fusegood = 1; /* Fuse read OK three times */
+      }
     }
   }
    
-	//Programmer does not allow fuse reading.... no point trying anymore
-    if (allowfuseread == 0)
-		{
-		return -5;
-		}
+  /* Programmer does not allow fuse reading.... no point trying anymore */
+  /* if (allowfuseread == 0) {
+     return -5;
+     } */
  
-    if (fusegood == 0)	 {
-        fprintf(stderr,
-           "%s: safemode: Verify error - unable to read efuse properly. "
-           "Programmer may not be reliable.\n", progname);
-        return -3;
-        }
-    else if ((fusegood == 1) && (verbose > 0)) {
-        fprintf(stderr, "%s: safemode: efuse reads as %X\n", progname, safemode_efuse);
-        }
+  if (fusegood == 0) {
+    return -3;
+  }
+  else if ((fusegood == 1) && (verbose > 0)) {
+    fprintf(stderr, "%s: safemode: efuse reads as %X\n", progname, safemode_efuse);
+  }
 
   *lfuse = safemode_lfuse;
   *hfuse = safemode_hfuse;

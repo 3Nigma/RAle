@@ -517,20 +517,6 @@ part_parm :
     }
   } |
 
-  K_STK500_DEVCODE TKN_EQUAL TKN_NUMBER {
-    {
-      current_part->stk500_devcode = $3->value.number;
-      free_token($3);
-    }
-  } |
-
-  K_AVR910_DEVCODE TKN_EQUAL TKN_NUMBER {
-    {
-      current_part->avr910_devcode = $3->value.number;
-      free_token($3);
-    }
-  } |
-
   K_SIGNATURE TKN_EQUAL TKN_NUMBER TKN_NUMBER TKN_NUMBER {
     {
       current_part->signature[0] = $3->value.number;
@@ -1138,38 +1124,6 @@ mem_spec :
       current_mem->readback[1] = $3->value.number;
       free_token($3);
     } |
-
-
-  K_MODE TKN_EQUAL TKN_NUMBER
-    {
-      current_mem->mode = $3->value.number;
-      free_token($3);
-    } |
-
-  K_DELAY TKN_EQUAL TKN_NUMBER
-    {
-      current_mem->delay = $3->value.number;
-      free_token($3);
-    } |
-
-  K_BLOCKSIZE TKN_EQUAL TKN_NUMBER
-    {
-      current_mem->blocksize = $3->value.number;
-      free_token($3);
-    } |
-
-  K_READSIZE TKN_EQUAL TKN_NUMBER
-    {
-      current_mem->readsize = $3->value.number;
-      free_token($3);
-    } |
-
-  K_POLLINDEX TKN_EQUAL TKN_NUMBER
-    {
-      current_mem->pollindex = $3->value.number;
-      free_token($3);
-    } |
-
 
   opcode TKN_EQUAL string_list {
     { 

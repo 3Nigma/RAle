@@ -41,17 +41,21 @@
 #include "fileio.h"
 #include "lists.h"
 #include "pindefs.h"
-#include "term.h"
 #include "safemode.h"
 #include "update.h"
 #include "usbtiny.h"
 
 /* Set 'main' return value possibilities */
 enum {
-  ACAD_OP_OK,	                /* The operation was carried out succesfully */
+  ACAD_OP_OK = 0,               /* The operation was carried out succesfully */
   ACAD_CONFIG_FILE_PARSE_ERR,	/* There was an error in parsing the ".conf" file */
   ACAD_COULDNT_OPEN_PGM_ERR,	/* Couldn't make link with 'usbtiny'. Is it connected ? */
-  ACAD_PGM_INIT_ERR		/* Something went wrong with the initialization of the programmer. Double check connections and try again ... */
+  ACAD_PGM_INIT_ERR,		/* Something went wrong with the initialization of the programmer. Double check connections and try again ... */
+  ACAD_SIG_READ_ERR,            /* There was an error in reading the MCU's signature stored value */
+  ACAD_SIG_BAD_VAL_ERR,		/* An error while reading the signature value occured. The resulting signature has been corupted. */
+  ACAD_SIG_MISSMATCH_ERR,	/* The expected signature doesn't match the real one */
+  ACAD_UPDATE_ACT_ERR,		/* There was an error in the ubpdate processing stage */
+  ACAD_FUSES_REREAD_ERR
 };
 
 /* Get VERSION from ac_cfg.h */
@@ -103,7 +107,6 @@ static void usage(void)
  "  -u                         Disable safemode, default when running from a script.\n"
  "  -s                         Silent safemode operation, will not ask you if\n"
  "                             fuses should be changed back.\n"
- "  -t                         Enter terminal mode.\n"
  "  -y                         Count # erase cycles in EEPROM.\n"
  "  -Y <number>                Initialize erase cycle # in EEPROM.\n"
  "  -q                         Quell progress output. -q -q for less.\n"
@@ -132,7 +135,7 @@ static void list_parts(FILE * f, const char *prefix, LISTID avrparts) {
 
 static void exithook(void) {
   if (pgm->teardown)
-        pgm->teardown(pgm);
+    pgm->teardown(pgm);
 }
 
 /*
@@ -146,7 +149,6 @@ int main(int argc, char * argv [])
   int              ch;          /* options flag */
   int              len;         /* length for various strings */
   struct avrpart * p;           /* which avr part we are programming */
-  struct avrpart * v;           /* used for verify */
   AVRMEM         * sig;         /* signature data */
   UPDATE         * upd;
   LNODEID        * ln;
@@ -157,10 +159,8 @@ int main(int argc, char * argv [])
   int     auto_erase;  /* 0=never erase unless explicity told to do
                           so, 1=erase if we are going to program flash */
   char  * port;        /* device port (/dev/xxx) */
-  int     terminal;    /* 1=enter terminal mode, 0=don't */
   int     nowrite;     /* don't actually write anything to the chip */
   int     verify;      /* perform a verify operation */
-  char  * programmer;  /* programmer id */
   char  * partdesc;    /* part id */
   char    sys_config[PATH_MAX]; /* system wide config file */
   int     cycles;      /* erase-rewrite cycles */
@@ -168,7 +168,6 @@ int main(int argc, char * argv [])
   char  * e;           /* for strtol() error checking */
   double  bitclock;    /* Specify programmer bit clock (JTAG ICE) */
   int     safemode;    /* Enable safemode, 1=safemode on, 0=normal */
-  int     silentsafe;  /* Don't ask about fuses, 1=silent, 0=normal */
   int     init_ok;     /* Device initialization worked well */
   int     is_open;     /* Device open succeeded */
   unsigned char safemode_lfuse = 0xff;
@@ -217,18 +216,15 @@ int main(int argc, char * argv [])
   auto_erase    = 1;
   p             = NULL;
   ovsigck       = 0;
-  terminal      = 0;
   nowrite       = 0;
   verify        = 1;        /* on by default */
   quell_progress = 0;
   pgm           = NULL;
-  programmer    = "usbtiny";
   verbose       = 0;
   do_cycles     = 0;
   set_cycles    = -1;
   bitclock      = 0.0;
   safemode      = 1;       /* Safemode on by default */
-  silentsafe    = 0;       /* Ask by default */
   is_open       = 0;
   
   if (isatty(STDIN_FILENO) == 0)
@@ -259,11 +255,8 @@ int main(int argc, char * argv [])
   }*/
 
 
-  /*
-   * process command line arguments
-   */
+  /* Process command line arguments */
   while ((ch = getopt(argc,argv,"?B:C:De:F:np:P:qstU:uV:yY:")) != -1) {
-
     switch (ch) {
       case 'B':	/* clock sck period for usbtiny */
 	bitclock = strtod(optarg, &e);
@@ -308,12 +301,7 @@ int main(int argc, char * argv [])
         break;
 
       case 's' : /* Silent safemode */
-        silentsafe = 1;
         safemode = 1;
-        break;
-        
-      case 't': /* enter terminal mode */
-        terminal = 1;
         break;
 
       case 'u' : /* Disable safemode */
@@ -365,7 +353,6 @@ int main(int argc, char * argv [])
         exit(1);
         break;
     }
-
   }
 
   if (quell_progress == 0) {
@@ -417,7 +404,6 @@ int main(int argc, char * argv [])
    * because they need separate flash and eeprom buffer space
    */
   p = avr_dup_part(p);
-  v = avr_dup_part(p);
 
   /*
    * open the programmer
@@ -441,7 +427,7 @@ int main(int argc, char * argv [])
    * initialize the chip in preperation for accepting commands
    */
   init_ok = (rc = pgm->initialize(pgm, p)) >= 0;
-  if (!init_ok && !ovsigck) {
+  if (!init_ok) {
     exitrc = ACAD_PGM_INIT_ERR;
     goto main_exit;
   }
@@ -455,104 +441,49 @@ int main(int argc, char * argv [])
    * against 0xffffff / 0x000000 should ensure that the signature bytes
    * are valid.
    */
-  if (init_ok) {
+  if(!ovsigck) {
     rc = avr_signature(pgm, p);
     if (rc != 0) {
-      fprintf(stderr, "%s: error reading signature data, rc=%d\n",
-	      progname, rc);
-      exitrc = 1;
+      exitrc = ACAD_SIG_READ_ERR;
       goto main_exit;
     }
   }
   
-  sig = avr_locate_mem(p, "signature");
-  if (sig == NULL) {
-    fprintf(stderr,
-	    "%s: WARNING: signature data not defined for device \"%s\"\n",
-	    progname, p->desc);
-  }
-  
+  sig = avr_locate_mem(p, "signature");  
   if (sig != NULL) {
     int ff, zz;
     
-    if (quell_progress < 2) {
-      fprintf(stderr, "%s: Device signature = 0x", progname);
-    }
+    /* Check signature-read validity */
     ff = zz = 1;
     for (i=0; i<sig->size; i++) {
-      if (quell_progress < 2) {
-	fprintf(stderr, "%02x", sig->buf[i]);
-      }
       if (sig->buf[i] != 0xff)
 	ff = 0;
       if (sig->buf[i] != 0x00)
 	zz = 0;
     }
-    if (quell_progress < 2) {
-      fprintf(stderr, "\n");
-    }
     
     if (ff || zz) {
-      fprintf(stderr,
-	      "%s: Yikes!  Invalid device signature.\n", progname);
-      if (!ovsigck) {
-	fprintf(stderr, "%sDouble check connections and try again, "
-		"or use -F to override\n"
-		"%sthis check.\n\n",
-		progbuf, progbuf);
-	exitrc = 1;
-	goto main_exit;
-      }
+      exitrc = ACAD_SIG_BAD_VAL_ERR;
+      goto main_exit;
     }
-  }
     
-  if (sig->size != 3 ||
-      sig->buf[0] != p->signature[0] ||
-      sig->buf[1] != p->signature[1] ||
-      sig->buf[2] != p->signature[2]) {
-    fprintf(stderr,
-	    "%s: Expected signature for %s is %02X %02X %02X\n",
-	    progname, p->desc,
-	    p->signature[0], p->signature[1], p->signature[2]);
-    if (!ovsigck) {
-      fprintf(stderr, "%sDouble check chip, "
-	      "or use -F to override this check.\n",
-	      progbuf);
-      exitrc = 1;
+    if ((sig->size != 3 ||
+	 sig->buf[0] != p->signature[0] ||
+	 sig->buf[1] != p->signature[1] ||
+	 sig->buf[2] != p->signature[2]) &&
+	!ovsigck) {
+      exitrc = ACAD_SIG_MISSMATCH_ERR;
       goto main_exit;
     }
   }
-  
+
   if (init_ok && safemode == 1) {
     /* If safemode is enabled, go ahead and read the current low, high,
        and extended fuse bytes as needed */
-
     rc = safemode_readfuses(&safemode_lfuse, &safemode_hfuse,
-                           &safemode_efuse, &safemode_fuse, pgm, p, verbose);
-
-    if (rc != 0) {
-
-	  //Check if the programmer just doesn't support reading
-  	  if (rc == -5)
-			{
-			  if (verbose > 0)
-				{
-				fprintf(stderr, "%s: safemode: Fuse reading not support by programmer.\n"
-                	            "              Safemode disabled.\n", progname);
-				}
-	  		safemode = 0;
-			}
-      else
-			{
-
-      		fprintf(stderr, "%s: safemode: To protect your AVR the programming "
-            				    "will be aborted\n",
-               					 progname);
-      		exitrc = 1;
-		    goto main_exit;
-			}
-    } else {
-      //Save the fuses as default
+			    &safemode_efuse, &safemode_fuse, pgm, p, verbose);
+    if (rc == 0) {
+      /* Save the fuses as default */
       safemode_memfuses(1, &safemode_lfuse, &safemode_hfuse, &safemode_efuse, &safemode_fuse);
     }
   }
@@ -566,13 +497,6 @@ int main(int argc, char * argv [])
         continue;
       if ((strcasecmp(m->desc, "flash") == 0) && (upd->op == DEVICE_WRITE)) {
         erase = 1;
-        if (quell_progress < 2) {
-          fprintf(stderr,
-                "%s: NOTE: FLASH memory has been specified, an erase cycle "
-                "will be performed\n"
-                "%sTo disable this feature, specify the -D option.\n",
-                progname, progbuf);
-        }
         break;
       }
     }
@@ -589,77 +513,36 @@ int main(int argc, char * argv [])
      * reasonable
      */
     rc = avr_get_cycle_count(pgm, p, &cycles);
-    if (quell_progress < 2) {
-      if ((rc >= 0) && (cycles != 0)) {
-        fprintf(stderr,
-              "%s: current erase-rewrite cycle count is %d%s\n",
-              progname, cycles,
-              do_cycles ? "" : " (if being tracked)");
+    if (init_ok && set_cycles != -1) {
+      rc = avr_get_cycle_count(pgm, p, &cycles);
+      if (rc == 0) {
+	/*
+	 * only attempt to update the cycle counter if we can actually
+	 * read the old value
+	 */
+	cycles = set_cycles;
+	rc = avr_put_cycle_count(pgm, p, cycles);
       }
     }
   }
-
-  if (init_ok && set_cycles != -1) {
-    rc = avr_get_cycle_count(pgm, p, &cycles);
-    if (rc == 0) {
-      /*
-       * only attempt to update the cycle counter if we can actually
-       * read the old value
-       */
-      cycles = set_cycles;
-      if (quell_progress < 2) {
-        fprintf(stderr, "%s: setting erase-rewrite cycle count to %d\n",
-              progname, cycles);
-      }
-      rc = avr_put_cycle_count(pgm, p, cycles);
-      if (rc < 0) {
-        fprintf(stderr,
-                "%s: WARNING: failed to update the erase-rewrite cycle "
-                "counter\n",
-                progname);
-      }
-    }
-  }
-
+  
   if (init_ok && erase) {
     /*
-     * erase the chip's flash and eeprom memories, this is required
+     * Erase the chip's flash and eeprom memories, this is required
      * before the chip can accept new programming
      */
-    if (nowrite) {
-      fprintf(stderr,
-	      "%s: conflicting -e and -n options specified, NOT erasing chip\n",
-	      progname);
-    } else {
-      if (quell_progress < 2) {
-      	fprintf(stderr, "%s: erasing chip\n", progname);
-      }
+    if (!nowrite) {
       exitrc = avr_chip_erase(pgm, p);
       if(exitrc) goto main_exit;
     }
   }
 
-  if (terminal) {
-    /*
-     * terminal mode
-     */
-    exitrc = terminal_mode(pgm, p);
-  }
-
-  if (!init_ok) {
-    /*
-     * If we came here by the -tF options, bail out now.
-     */
-    exitrc = 1;
-    goto main_exit;
-  }
-
-
+  /* Prrfrom the update actions demanded through the '-U' param list */
   for (ln=lfirst(updates); ln; ln=lnext(ln)) {
     upd = ldata(ln);
     rc = do_op(pgm, p, upd, nowrite, verify);
     if (rc) {
-      exitrc = 1;
+      exitrc = ACAD_UPDATE_ACT_ERR;
       break;
     }
   }
@@ -676,11 +559,7 @@ int main(int argc, char * argv [])
     unsigned char failures = 0;
     char yes[1] = {'y'};
 
-    if (quell_progress < 2) {
-      fprintf(stderr, "\n");
-    }
-
-    //Restore the default fuse values
+    /* Restore the default fuse values */
     safemode_memfuses(0, &safemode_lfuse, &safemode_hfuse, &safemode_efuse, &safemode_fuse);
 
     /* Try reading back fuses, make sure they are reliable to read back */
@@ -689,11 +568,7 @@ int main(int argc, char * argv [])
       /* Uh-oh.. try once more to read back fuses */
       if (safemode_readfuses(&safemodeafter_lfuse, &safemodeafter_hfuse,
                              &safemodeafter_efuse, &safemodeafter_fuse, pgm, p, verbose) != 0) { 
-        fprintf(stderr,
-                "%s: safemode: Sorry, reading back fuses was unreliable. "
-                "I have given up and exited programming mode\n",
-                progname);
-        exitrc = 1;
+        exitrc = ACAD_FUSES_REREAD_ERR;
         goto main_exit;		  
       }
     }
@@ -701,118 +576,67 @@ int main(int argc, char * argv [])
     /* Now check what fuses are against what they should be */
     if (safemodeafter_fuse != safemode_fuse) {
       fuses_updated = 1;
-      fprintf(stderr, "%s: safemode: fuse changed! Was %x, and is now %x\n",
-              progname, safemode_fuse, safemodeafter_fuse);
+      
+      /* TODO: Ask the user - should we change them */
+      safemode_response = yes;
 
-              
-      /* Ask user - should we change them */
-       
-       if (silentsafe == 0)
-            safemode_response = terminal_get_input("Would you like this fuse to be changed back? [y/n] ");
-       else
-            safemode_response = yes;
-       
-       if (tolower((int)(safemode_response[0])) == 'y') {
-              
-            /* Enough chit-chat, time to program some fuses and check them */
-            if (safemode_writefuse (safemode_fuse, "fuse", pgm, p,
-                                    10, verbose) == 0) {
-                fprintf(stderr, "%s: safemode: and is now rescued\n", progname);
-            }
-            else {
-                fprintf(stderr, "%s: and COULD NOT be changed\n", progname);
-                failures++;
-            }
+      if (tolower((int)(safemode_response[0])) == 'y') {
+	/* Enough chit-chat, time to program some fuses and check them */
+	if (safemode_writefuse (safemode_fuse, "fuse", pgm, p,
+				10, verbose) != 0) {
+	  failures++;
+	}
       }
     }
-
+    
     /* Now check what fuses are against what they should be */
     if (safemodeafter_lfuse != safemode_lfuse) {
       fuses_updated = 1;
-      fprintf(stderr, "%s: safemode: lfuse changed! Was %x, and is now %x\n",
-              progname, safemode_lfuse, safemodeafter_lfuse);
+      
+      /* TODO: Ask user - should we change them */
+      safemode_response = yes;
 
-              
-      /* Ask user - should we change them */
-       
-       if (silentsafe == 0)
-            safemode_response = terminal_get_input("Would you like this fuse to be changed back? [y/n] ");
-       else
-            safemode_response = yes;
-       
-       if (tolower((int)(safemode_response[0])) == 'y') {
-              
-            /* Enough chit-chat, time to program some fuses and check them */
-            if (safemode_writefuse (safemode_lfuse, "lfuse", pgm, p,
-                                    10, verbose) == 0) {
-                fprintf(stderr, "%s: safemode: and is now rescued\n", progname);
-            }
-            else {
-                fprintf(stderr, "%s: and COULD NOT be changed\n", progname);
-                failures++;
-            }
+      if (tolower((int)(safemode_response[0])) == 'y') {        
+	/* Enough chit-chat, time to program some fuses and check them */
+	if (safemode_writefuse (safemode_lfuse, "lfuse", pgm, p,
+				10, verbose) != 0) {
+	  failures++;
+	}
       }
     }
 
     /* Now check what fuses are against what they should be */
     if (safemodeafter_hfuse != safemode_hfuse) {
       fuses_updated = 1;
-      fprintf(stderr, "%s: safemode: hfuse changed! Was %x, and is now %x\n",
-              progname, safemode_hfuse, safemodeafter_hfuse);
               
-      /* Ask user - should we change them */
-       if (silentsafe == 0)
-            safemode_response = terminal_get_input("Would you like this fuse to be changed back? [y/n] ");
-       else
-            safemode_response = yes;
-       if (tolower((int)(safemode_response[0])) == 'y') {
-
-            /* Enough chit-chat, time to program some fuses and check them */
-            if (safemode_writefuse(safemode_hfuse, "hfuse", pgm, p,
-                                    10, verbose) == 0) {
-                fprintf(stderr, "%s: safemode: and is now rescued\n", progname);
-            }
-            else {
-                fprintf(stderr, "%s: and COULD NOT be changed\n", progname);
-                failures++;
-            }
+      /* TODO: Ask user - should we change them */
+      safemode_response = yes;
+      if (tolower((int)(safemode_response[0])) == 'y') {
+	/* Enough chit-chat, time to program some fuses and check them */
+	if (safemode_writefuse(safemode_hfuse, "hfuse", pgm, p,
+			       10, verbose) != 0) {
+	  failures++;
+	}
       }
     }
-
+    
     /* Now check what fuses are against what they should be */
     if (safemodeafter_efuse != safemode_efuse) {
       fuses_updated = 1;
-      fprintf(stderr, "%s: safemode: efuse changed! Was %x, and is now %x\n",
-              progname, safemode_efuse, safemodeafter_efuse);
+      
+      /* TODO: Ask user - should we change them */
+      safemode_response = yes;
 
-      /* Ask user - should we change them */
-       if (silentsafe == 0)
-            safemode_response = terminal_get_input("Would you like this fuse to be changed back? [y/n] ");
-       else
-            safemode_response = yes;
-       if (tolower((int)(safemode_response[0])) == 'y') {
-              
-            /* Enough chit-chat, time to program some fuses and check them */
-            if (safemode_writefuse (safemode_efuse, "efuse", pgm, p,
-                                    10, verbose) == 0) {
-                fprintf(stderr, "%s: safemode: and is now rescued\n", progname);
-            }
-            else {
-                fprintf(stderr, "%s: and COULD NOT be changed\n", progname);
-                failures++;
-            }
-       }
-    }
-
-    if (quell_progress < 2) {
-      fprintf(stderr, "%s: safemode: ", progname);
-      if (failures == 0) {
-        fprintf(stderr, "Fuses OK\n");
-      }
-      else {
-        fprintf(stderr, "Fuses not recovered, sorry\n");
+      if (tolower((int)(safemode_response[0])) == 'y') {
+	/* Enough chit-chat, time to program some fuses and check them */
+	if (safemode_writefuse (safemode_efuse, "efuse", pgm, p,
+				10, verbose) != 0) {
+	  failures++;
+	}
       }
     }
+    
+    /* TODO: check failures here and take apropriate actions */
 
     if (fuses_updated && fuses_specified) {
       exitrc = 1;
@@ -836,10 +660,6 @@ main_exit:
   }
 
   pgm->close(pgm);
-
-  if (quell_progress < 2) {
-    fprintf(stderr, "\n%s done.  Thank you.\n\n", progname);
-  }
 
   return exitrc;
 }

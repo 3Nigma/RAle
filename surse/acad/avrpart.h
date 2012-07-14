@@ -177,12 +177,6 @@ typedef struct avrmem {
                                  http://www.atmel.com/atmel/acrobat/doc1280.pdf */
   unsigned char readback[2];  /* polled read-back values */
 
-  int mode;                   /* stk500 v2 xml file parameter */
-  int delay;                  /* stk500 v2 xml file parameter */
-  int blocksize;              /* stk500 v2 xml file parameter */
-  int readsize;               /* stk500 v2 xml file parameter */
-  int pollindex;              /* stk500 v2 xml file parameter */
-
   unsigned char * buf;        /* pointer to memory buffer */
   OPCODE * op[AVR_OP_MAX];    /* opcodes */
 } AVRMEM;

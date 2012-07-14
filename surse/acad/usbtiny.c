@@ -550,6 +550,8 @@ usbtiny_initpgm(void) {
   pgm->set_sck_period	= usbtiny_set_sck_period;
   pgm->setup            = usbtiny_setup;
   pgm->teardown         = usbtiny_teardown;
+
+  return pgm;
 }
 
 #else  /* !HAVE_LIBUSB */
