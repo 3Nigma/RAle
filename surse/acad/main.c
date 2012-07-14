@@ -44,11 +44,14 @@
 #include "term.h"
 #include "safemode.h"
 #include "update.h"
+#include "usbtiny.h"
 
 /* Set 'main' return value possibilities */
 enum {
   ACAD_OP_OK,	                /* The operation was carried out succesfully */
-  ACAD_CONFIG_FILE_PARSE_ERR	/* There was an error in parsing the ".conf" file */
+  ACAD_CONFIG_FILE_PARSE_ERR,	/* There was an error in parsing the ".conf" file */
+  ACAD_COULDNT_OPEN_PGM_ERR,	/* Couldn't make link with 'usbtiny'. Is it connected ? */
+  ACAD_PGM_INIT_ERR		/* Something went wrong with the initialization of the programmer. Double check connections and try again ... */
 };
 
 /* Get VERSION from ac_cfg.h */
@@ -386,7 +389,6 @@ int main(int argc, char * argv [])
   }
 
   pgm = usbtiny_initpgm(); 
-
   if (pgm->setup) {
     pgm->setup(pgm);
   }
@@ -403,11 +405,6 @@ int main(int argc, char * argv [])
     list_parts(stderr, "  ", part_list);
     fprintf(stderr, "\n");
     exit(1);
-  }
-
-  if(p->flags & AVRPART_AVR32) {
-    safemode = 0;
-    auto_erase = 0;
   }
 
   if(p->flags & (AVRPART_HAS_PDI | AVRPART_HAS_TPI)) {
@@ -427,7 +424,7 @@ int main(int argc, char * argv [])
    */
   rc = pgm->open(pgm, port);
   if (rc < 0) {
-    exitrc = 1;
+    exitrc = ACAD_COULDNT_OPEN_PGM_ERR;
     pgm->ppidata = 0; /* clear all bits at exit */
     goto main_exit;
   }
@@ -444,16 +441,9 @@ int main(int argc, char * argv [])
    * initialize the chip in preperation for accepting commands
    */
   init_ok = (rc = pgm->initialize(pgm, p)) >= 0;
-  if (!init_ok) {
-    fprintf(stderr, "%s: initialization failed, rc=%d\n", progname, rc);
-    if (!ovsigck) {
-      fprintf(stderr, "%sDouble check connections and try again, "
-              "or use -F to override\n"
-              "%sthis check.\n\n",
-              progbuf, progbuf);
-      exitrc = 1;
-      goto main_exit;
-    }
+  if (!init_ok && !ovsigck) {
+    exitrc = ACAD_PGM_INIT_ERR;
+    goto main_exit;
   }
 
   /* indicate ready */
@@ -465,76 +455,74 @@ int main(int argc, char * argv [])
    * against 0xffffff / 0x000000 should ensure that the signature bytes
    * are valid.
    */
-  if(!(p->flags & AVRPART_AVR32)) {
-    if (init_ok) {
-      rc = avr_signature(pgm, p);
-      if (rc != 0) {
-        fprintf(stderr, "%s: error reading signature data, rc=%d\n",
-          progname, rc);
-        exitrc = 1;
-        goto main_exit;
-      }
+  if (init_ok) {
+    rc = avr_signature(pgm, p);
+    if (rc != 0) {
+      fprintf(stderr, "%s: error reading signature data, rc=%d\n",
+	      progname, rc);
+      exitrc = 1;
+      goto main_exit;
     }
+  }
   
-    sig = avr_locate_mem(p, "signature");
-    if (sig == NULL) {
-      fprintf(stderr,
-              "%s: WARNING: signature data not defined for device \"%s\"\n",
-              progname, p->desc);
+  sig = avr_locate_mem(p, "signature");
+  if (sig == NULL) {
+    fprintf(stderr,
+	    "%s: WARNING: signature data not defined for device \"%s\"\n",
+	    progname, p->desc);
+  }
+  
+  if (sig != NULL) {
+    int ff, zz;
+    
+    if (quell_progress < 2) {
+      fprintf(stderr, "%s: Device signature = 0x", progname);
     }
-
-    if (sig != NULL) {
-      int ff, zz;
-
+    ff = zz = 1;
+    for (i=0; i<sig->size; i++) {
       if (quell_progress < 2) {
-        fprintf(stderr, "%s: Device signature = 0x", progname);
+	fprintf(stderr, "%02x", sig->buf[i]);
       }
-      ff = zz = 1;
-      for (i=0; i<sig->size; i++) {
-        if (quell_progress < 2) {
-          fprintf(stderr, "%02x", sig->buf[i]);
-        }
-        if (sig->buf[i] != 0xff)
-          ff = 0;
-        if (sig->buf[i] != 0x00)
-          zz = 0;
-      }
-      if (quell_progress < 2) {
-        fprintf(stderr, "\n");
-      }
-
-      if (ff || zz) {
-        fprintf(stderr,
-                "%s: Yikes!  Invalid device signature.\n", progname);
-        if (!ovsigck) {
-          fprintf(stderr, "%sDouble check connections and try again, "
-                  "or use -F to override\n"
-                  "%sthis check.\n\n",
-                  progbuf, progbuf);
-          exitrc = 1;
-          goto main_exit;
-        }
-      }
+      if (sig->buf[i] != 0xff)
+	ff = 0;
+      if (sig->buf[i] != 0x00)
+	zz = 0;
+    }
+    if (quell_progress < 2) {
+      fprintf(stderr, "\n");
     }
     
-    if (sig->size != 3 ||
-    sig->buf[0] != p->signature[0] ||
-    sig->buf[1] != p->signature[1] ||
-    sig->buf[2] != p->signature[2]) {
+    if (ff || zz) {
       fprintf(stderr,
-          "%s: Expected signature for %s is %02X %02X %02X\n",
-          progname, p->desc,
-          p->signature[0], p->signature[1], p->signature[2]);
+	      "%s: Yikes!  Invalid device signature.\n", progname);
       if (!ovsigck) {
-        fprintf(stderr, "%sDouble check chip, "
-        "or use -F to override this check.\n",
-                progbuf);
-        exitrc = 1;
-        goto main_exit;
+	fprintf(stderr, "%sDouble check connections and try again, "
+		"or use -F to override\n"
+		"%sthis check.\n\n",
+		progbuf, progbuf);
+	exitrc = 1;
+	goto main_exit;
       }
     }
   }
-
+    
+  if (sig->size != 3 ||
+      sig->buf[0] != p->signature[0] ||
+      sig->buf[1] != p->signature[1] ||
+      sig->buf[2] != p->signature[2]) {
+    fprintf(stderr,
+	    "%s: Expected signature for %s is %02X %02X %02X\n",
+	    progname, p->desc,
+	    p->signature[0], p->signature[1], p->signature[2]);
+    if (!ovsigck) {
+      fprintf(stderr, "%sDouble check chip, "
+	      "or use -F to override this check.\n",
+	      progbuf);
+      exitrc = 1;
+      goto main_exit;
+    }
+  }
+  
   if (init_ok && safemode == 1) {
     /* If safemode is enabled, go ahead and read the current low, high,
        and extended fuse bytes as needed */
@@ -595,8 +583,7 @@ int main(int argc, char * argv [])
    *
    * The cycle count will be displayed anytime it will be changed later.
    */
-  if (init_ok && !(p->flags & AVRPART_AVR32) && 
-      (set_cycles == -1) && ((erase == 0) || (do_cycles == 0))) {
+  if (init_ok && (set_cycles == -1) && ((erase == 0) || (do_cycles == 0))) {
     /*
      * see if the cycle count in the last four bytes of eeprom seems
      * reasonable
@@ -612,7 +599,7 @@ int main(int argc, char * argv [])
     }
   }
 
-  if (init_ok && set_cycles != -1 && !(p->flags & AVRPART_AVR32)) {
+  if (init_ok && set_cycles != -1) {
     rc = avr_get_cycle_count(pgm, p, &cycles);
     if (rc == 0) {
       /*

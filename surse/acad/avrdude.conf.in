@@ -26,11 +26,11 @@
 #       rdyled   = <num> ;                          # pin number
 #       pgmled   = <num> ;                          # pin number
 #       vfyled   = <num> ;                          # pin number
-#  			usbvid   = <hexnum>;												# USB VID (Vendor ID)
-#       usbpid   = <hexnum>;												#	USB PID (Product ID)
-#       usbdev   = <interface>;											# USB interface or other device info 
-#       usbvendor = <vendorname>;										#	USB Vendor Name
-#       usbproduct = <productname>;									# USB Product Name
+#  	usbvid   = <hexnum>;			    # USB VID (Vendor ID)
+#       usbpid   = <hexnum>;			    # USB PID (Product ID)
+#       usbdev   = <interface>;			    # USB interface or other device info 
+#       usbvendor = <vendorname>;		    # USB Vendor Name
+#       usbproduct = <productname>;		    # USB Product Name
 #       usbsn    = <serialno>;                      # USB Serial Number
 #
 #        To invert a bit, use = ~ <num>, the spaces are important.
@@ -100,7 +100,6 @@
 #       spmcr            = <num> ;                # mem addr of SPMC[S]R reg.
 #       eecr             = <num> ;                # mem addr of EECR reg.
 #                                                 # (only when != 0x3c)
-#       is_avr32         = <yes/no> ;             # AVR32 part
 #
 #       memory <memtype>
 #           paged           = <yes/no> ;          # yes / no
@@ -15862,28 +15861,6 @@ part
     memory "lock"
         size		= 1;
         offset		= 0x8f0027;
-    ;
-;
-
-
-#------------------------------------------------------------
-# AVR32UC3A0512
-#------------------------------------------------------------
-
-part
-    id		= "ucr2";
-    desc	= "32UC3A0512";
-    signature	= 0xED 0xC0 0x3F;
-    has_jtag	= yes;
-    is_avr32    = yes;
-
-    memory "flash"
-        paged           = yes;
-        page_size		= 512;               # bytes
-        readsize		= 512;				 # bytes
-        num_pages       = 1024;              # could be set dynamicly
-        size			= 0x00080000;		 # could be set dynamicly
-        offset			= 0x80000000;
     ;
 ;
 

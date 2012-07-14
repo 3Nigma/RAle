@@ -936,16 +936,6 @@ part_parm :
       free_token($3);
     } |
 
-  K_IS_AVR32 TKN_EQUAL yesno
-    {
-      if ($3->primary == K_YES)
-        current_part->flags |= AVRPART_AVR32;
-      else if ($3->primary == K_NO)
-        current_part->flags &= AVRPART_AVR32;
-
-      free_token($3);
-    } |
-
   K_ALLOWFULLPAGEBITSTREAM TKN_EQUAL yesno
     {
       if ($3->primary == K_YES)
