@@ -117,8 +117,6 @@ SIGN     [+-]
             exit(1); }
 
 allowfullpagebitstream { yylval=NULL; return K_ALLOWFULLPAGEBITSTREAM; }
-usbasp           { yylval=NULL; return K_USBASP; }
-usbtiny          { yylval=NULL; return K_USBTINY; }
 bank_size        { yylval=NULL; return K_PAGE_SIZE; }
 banked           { yylval=NULL; return K_PAGED; }
 bs2              { yylval=NULL; return K_BS2; }
@@ -155,7 +153,6 @@ offset           { yylval=NULL; return K_OFFSET; }
 page_size        { yylval=NULL; return K_PAGE_SIZE; }
 paged            { yylval=NULL; return K_PAGED; }
 pagel            { yylval=NULL; return K_PAGEL; }
-par              { yylval=NULL; return K_PAR; }
 parallel         { yylval=NULL; return K_PARALLEL; }
 part             { yylval=NULL; return K_PART; }
 pgmled           { yylval=NULL; return K_PGMLED; }
@@ -166,7 +163,6 @@ rdyled           { yylval=NULL; return K_RDYLED; }
 readback_p1      { yylval=NULL; return K_READBACK_P1; }
 readback_p2      { yylval=NULL; return K_READBACK_P2; }
 retry_pulse      { yylval=NULL; return K_RETRY_PULSE; }
-serbb            { yylval=NULL; return K_SERBB; }
 serial           { yylval=NULL; return K_SERIAL; }
 signature        { yylval=NULL; return K_SIGNATURE; }
 size             { yylval=NULL; return K_SIZE; }

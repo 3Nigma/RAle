@@ -45,6 +45,12 @@
 #include "safemode.h"
 #include "update.h"
 
+/* Set 'main' return value possibilities */
+enum {
+  ACAD_OP_OK,	                /* The operation was carried out succesfully */
+  ACAD_CONFIG_FILE_PARSE_ERR	/* There was an error in parsing the ".conf" file */
+};
+
 /* Get VERSION from ac_cfg.h */
 char * version      = VERSION;
 char * progname;
@@ -99,73 +105,8 @@ static void usage(void)
  "  -Y <number>                Initialize erase cycle # in EEPROM.\n"
  "  -q                         Quell progress output. -q -q for less.\n"
  "  -?                         Display this usage.\n"
- "\navrdude version %s, URL: <http://savannah.nongnu.org/projects/avrdude/>\n"
+ "\nacad version %s, URL: <http://savannah.nongnu.org/projects/avrdude/>\n"
           ,progname, version);
-}
-
-
-static void update_progress_tty (int percent, double etime, char *hdr) {
-  static char hashes[51];
-  static char *header;
-  static int last = 0;
-  int i;
-
-  setvbuf(stderr, (char*)NULL, _IONBF, 0);
-
-  hashes[50] = 0;
-
-  memset (hashes, ' ', 50);
-  for (i=0; i<percent; i+=2) {
-    hashes[i/2] = '#';
-  }
-
-  if (hdr) {
-    fprintf (stderr, "\n");
-    last = 0;
-    header = hdr;
-  }
-
-  if (last == 0) {
-    fprintf(stderr, "\r%s | %s | %d%% %0.2fs", 
-            header, hashes, percent, etime);
-  }
-
-  if (percent == 100) {
-    last = 1;
-    fprintf (stderr, "\n\n");
-  }
-
-  setvbuf(stderr, (char*)NULL, _IOLBF, 0);
-}
-
-static void update_progress_no_tty (int percent, double etime, char *hdr) {
-  static int done = 0;
-  static int last = 0;
-  int cnt = (percent>>1)*2;
-
-  setvbuf(stderr, (char*)NULL, _IONBF, 0);
-
-  if (hdr) {
-    fprintf (stderr, "\n%s | ", hdr);
-    last = 0;
-    done = 0;
-  }
-  else {
-    while ((cnt > last) && (done == 0)) {
-      fprintf (stderr, "#");
-      cnt -=  2;
-    }
-  }
-
-  if ((percent == 100) && (done == 0)) {
-    fprintf (stderr, " | 100%% %0.2fs\n\n", etime);
-    last = 0;
-    done = 1;
-  }
-  else
-    last = (percent>>1)*2;    /* Make last a multiple of 2. */
-
-  setvbuf(stderr, (char*)NULL, _IOLBF, 0);
 }
 
 static void list_avrparts_callback(const char *name, const char *desc,
@@ -204,7 +145,6 @@ int main(int argc, char * argv [])
   struct avrpart * p;           /* which avr part we are programming */
   struct avrpart * v;           /* used for verify */
   AVRMEM         * sig;         /* signature data */
-  struct stat      sb;
   UPDATE         * upd;
   LNODEID        * ln;
 
@@ -220,7 +160,6 @@ int main(int argc, char * argv [])
   char  * programmer;  /* programmer id */
   char  * partdesc;    /* part id */
   char    sys_config[PATH_MAX]; /* system wide config file */
-  char    usr_config[PATH_MAX]; /* per-user config file */
   int     cycles;      /* erase-rewrite cycles */
   int     set_cycles;  /* value to set the erase-rewrite cycles to */
   char  * e;           /* for strtol() error checking */
@@ -237,9 +176,6 @@ int main(int argc, char * argv [])
   char * safemode_response;
   int fuses_specified = 0;
   int fuses_updated = 0;
-#if !defined(WIN32NATIVE)
-  char  * homedir;
-#endif
 
   /*
    * Set line buffering for file descriptors so we see stdout and stderr
@@ -291,35 +227,19 @@ int main(int argc, char * argv [])
   safemode      = 1;       /* Safemode on by default */
   silentsafe    = 0;       /* Ask by default */
   is_open       = 0;
-
+  
   if (isatty(STDIN_FILENO) == 0)
       safemode  = 0;       /* Turn off safemode if this isn't a terminal */
 
-
-
 #if defined(WIN32NATIVE)
-
   win_sys_config_set(sys_config);
-  win_usr_config_set(usr_config);
-
 #else
-
+  /* Setting the config file variable */
   strcpy(sys_config, CONFIG_DIR);
   i = strlen(sys_config);
   if (i && (sys_config[i-1] != '/'))
     strcat(sys_config, "/");
   strcat(sys_config, "avrdude.conf");
-
-  usr_config[0] = 0;
-  homedir = getenv("HOME");
-  if (homedir != NULL) {
-    strcpy(usr_config, homedir);
-    i = strlen(usr_config);
-    if (i && (usr_config[i-1] != '/'))
-      strcat(usr_config, "/");
-    strcat(usr_config, ".avrduderc");
-  }
-
 #endif
 
   len = strlen(progname) + 2;
@@ -446,10 +366,7 @@ int main(int argc, char * argv [])
   }
 
   if (quell_progress == 0) {
-    if (isatty (STDERR_FILENO))
-      update_progress = update_progress_tty;
-    else {
-      update_progress = update_progress_no_tty;
+    if (!isatty(STDERR_FILENO)) {
       /* disable all buffering of stderr for compatibility with
          software that captures and redirects output to a GUI
          i.e. Programmers Notepad */
@@ -460,35 +377,7 @@ int main(int argc, char * argv [])
 
   rc = read_config(sys_config);
   if (rc) {
-    /*fprintf(stderr,
-            "%s: error reading system wide configuration file \"%s\"\n",
-            progname, sys_config);*/
-    exit(1);
-  }
-
-  if (usr_config[0] != 0) {
-    /*if (verbose) {
-      fprintf(stderr, "%sUser configuration file is \"%s\"\n",
-              progbuf, usr_config);
-    }*/
-
-    rc = stat(usr_config, &sb);
-    if ((rc < 0) || ((sb.st_mode & S_IFREG) == 0)) {
-      /*if (verbose) {
-        fprintf(stderr,
-                "%sUser configuration file does not exist or is not a "
-                "regular file, skipping\n",
-                progbuf);
-      }*/
-    }
-    else {
-      rc = read_config(usr_config);
-      if (rc) {
-        /*fprintf(stderr, "%s: error reading user configuration file \"%s\"\n",
-                progname, usr_config);*/
-        exit(1);
-      }
-    }
+    exit(ACAD_CONFIG_FILE_PARSE_ERR);
   }
 
   // set bitclock from configuration files unless changed by command line
@@ -496,8 +385,7 @@ int main(int argc, char * argv [])
     bitclock = default_bitclock;
   }
 
-  pgm = pgm_new();
-  usbtiny_initpgm(pgm); 
+  pgm = usbtiny_initpgm(); 
 
   if (pgm->setup) {
     pgm->setup(pgm);
@@ -569,7 +457,7 @@ int main(int argc, char * argv [])
   }
 
   /* indicate ready */
-  /*pgm->rdy_led(pgm, ON);
+  /*pgm->rdy_led(pgm, ON);*/
 
   /*
    * Let's read the signature bytes to make sure there is at least a

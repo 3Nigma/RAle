@@ -427,7 +427,6 @@ static int usbtiny_paged_load (PROGRAMMER * pgm, AVRPART * p, AVRMEM* m,
   int chunk;
   int function;
 
-
   // First determine what we're doing
   if (strcmp( m->desc, "flash" ) == 0) {
     function = USBTINY_FLASH_READ;
@@ -455,9 +454,6 @@ static int usbtiny_paged_load (PROGRAMMER * pgm, AVRPART * p, AVRMEM* m,
                               // usb_in() multiplies this per byte.
       return -1;
     }
-
-    // Tell avrdude how we're doing to provide user feedback
-    report_progress(i + chunk, n_bytes, NULL );
   }
 
   check_retries(pgm, "read");
@@ -525,14 +521,13 @@ static int usbtiny_paged_write(PROGRAMMER * pgm, AVRPART * p, AVRMEM * m,
       // If we're at a page boundary, send the SPI command to flush it.
       avr_write_page(pgm, p, m, (unsigned long) i);
     }
-
-    report_progress( next, n_bytes, NULL );
   }
   return n_bytes;
 }
 
-extern void usbtiny_initpgm ( PROGRAMMER* pgm )
-{
+extern PROGRAMMER *
+usbtiny_initpgm(void) {
+  PROGRAMMER *pgm = pgm_new();
   strcpy(pgm->type, "USBtiny");
 
   /* Mandatory Functions */
@@ -569,11 +564,13 @@ static int usbtiny_nousb_open(struct programmer_t *pgm, char * name)
   return -1;
 }
 
-void usbtiny_initpgm(PROGRAMMER * pgm)
-{
+PROGRAMMER *usbtiny_initpgm(void) {
+  PROGRAMMER *pgm = pgm_new();
+  
   strcpy(pgm->type, "usbtiny");
-
   pgm->open = usbtiny_nousb_open;
+
+  return pgm;
 }
 
 #endif /* HAVE_LIBUSB */

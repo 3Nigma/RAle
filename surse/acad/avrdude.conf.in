@@ -310,16 +310,11 @@ default_parallel   = "@DEFAULT_PAR_PORT@";
 default_serial     = "@DEFAULT_SER_PORT@";
 # default_bitclock = 2.5
 
-
 #
 # PROGRAMMER DEFINITION
 #
 
-programmer
-  id    = "usbtiny";
-  desc  = "USBtiny simple USB programmer, http://www.ladyada.net/make/usbtinyisp/";
-  type  = usbtiny;
-;
+# None, since we only use usbtiny. For other programmers, checke the original 'avrdude' project.
 
 #
 # PART DEFINITIONS

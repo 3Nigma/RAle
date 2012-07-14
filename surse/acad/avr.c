@@ -38,51 +38,7 @@
 #include "update.h"
 #include "tpi.h"
 
-FP_UpdateProgress update_progress;
-
 #define DEBUG 0
-
-/* TPI: returns 1 if NVM controller busy, 0 if free */
-int avr_tpi_poll_nvmbsy(PROGRAMMER *pgm)
-{
-  unsigned char cmd;
-  unsigned char res;
-  int rc = 0;
-
-  cmd = TPI_CMD_SIN | TPI_SIO_ADDR(TPI_IOREG_NVMCSR);
-  rc = pgm->cmd_tpi(pgm, &cmd, 1, &res, 1);
-  return (rc & TPI_IOREG_NVMCSR_NVMBSY);
-}
-
-/* TPI: setup NVMCMD register and pointer register (PR) for read/write/erase */
-static int avr_tpi_setup_rw(PROGRAMMER * pgm, AVRMEM * mem,
-			    unsigned long addr, unsigned char nvmcmd)
-{
-  unsigned char cmd[4];
-  int rc;
-
-  /* set NVMCMD register */
-  cmd[0] = TPI_CMD_SOUT | TPI_SIO_ADDR(TPI_IOREG_NVMCMD);
-  cmd[1] = nvmcmd;
-  rc = pgm->cmd_tpi(pgm, cmd, 2, NULL, 0);
-  if (rc == -1)
-    return -1;
-
-  /* set Pointer Register (PR) */
-  cmd[0] = TPI_CMD_SSTPR | 0;
-  cmd[1] = (mem->offset + addr) & 0xFF;
-  rc = pgm->cmd_tpi(pgm, cmd, 2, NULL, 0);
-  if (rc == -1)
-    return -1;
-
-  cmd[0] = TPI_CMD_SSTPR | 1;
-  cmd[1] = ((mem->offset + addr) >> 8) & 0xFF;
-  rc = pgm->cmd_tpi(pgm, cmd, 2, NULL, 0);
-  if (rc == -1)
-    return -1;
-
-  return 0;
-}
 
 int avr_read_byte_default(PROGRAMMER * pgm, AVRPART * p, AVRMEM * mem, 
                           unsigned long addr, unsigned char * value)
@@ -103,27 +59,6 @@ int avr_read_byte_default(PROGRAMMER * pgm, AVRPART * p, AVRMEM * mem,
 
   pgm->pgm_led(pgm, ON);
   pgm->err_led(pgm, OFF);
-
-  if (p->flags & AVRPART_HAS_TPI) {
-    if (pgm->cmd_tpi == NULL) {
-      fprintf(stderr, "%s: Error: %s programmer does not support TPI\n",
-          progname, pgm->type);
-      return -1;
-    }
-
-    while (avr_tpi_poll_nvmbsy(pgm));
-
-    /* setup for read */
-    avr_tpi_setup_rw(pgm, mem, addr, TPI_NVMCMD_NO_OPERATION);
-
-    /* load byte */
-    cmd[0] = TPI_CMD_SLD;
-    r = pgm->cmd_tpi(pgm, cmd, 1, value, 1);
-    if (r == -1) 
-      return -1;
-
-    return 0;
-  }
 
   /*
    * figure out what opcode to use
@@ -237,29 +172,6 @@ int avr_read(PROGRAMMER * pgm, AVRPART * p, char * memtype, int size,
    */
   memset(buf, 0xff, size);
 
-  /* supports "paged load" thru post-increment */
-  if ((p->flags & AVRPART_HAS_TPI) && mem->page_size != 0 &&
-      pgm->cmd_tpi != NULL) {
-
-    while (avr_tpi_poll_nvmbsy(pgm));
-
-    /* setup for read (NOOP) */
-    avr_tpi_setup_rw(pgm, mem, 0, TPI_NVMCMD_NO_OPERATION);
-
-    /* load bytes */
-    for (i = 0; i < size; i++) {
-      cmd[0] = TPI_CMD_SLD_PI;
-      rc = pgm->cmd_tpi(pgm, cmd, 1, &buf[i], 1);
-      if (rc == -1) {
-        fprintf(stderr, "avr_read(): error reading address 0x%04lx\n", i);
-        return -1;
-      }
-
-      report_progress(i, size, NULL);
-    }
-    return avr_mem_hiaddr(mem);
-  }
-
   if (pgm->paged_load != NULL && mem->page_size != 0) {
     /*
      * the programmer supports a paged mode read, perhaps more
@@ -292,7 +204,6 @@ int avr_read(PROGRAMMER * pgm, AVRPART * p, char * memtype, int size,
       return -2;
     }
     buf[i] = rbyte;
-    report_progress(i, size, NULL);
   }
 
   if (strcasecmp(mem->desc, "flash") == 0)
@@ -390,52 +301,6 @@ int avr_write_byte_default(PROGRAMMER * pgm, AVRPART * p, AVRMEM * mem,
 	    "provide a cmd() method.\n",
 	    progname, pgm->type);
     return -1;
-  }
-
-  if (p->flags & AVRPART_HAS_TPI) {
-    if (pgm->cmd_tpi == NULL) {
-      fprintf(stderr, "%s: Error: %s programmer does not support TPI\n",
-          progname, pgm->type);
-      return -1;
-    }
-
-    if (strcmp(mem->desc, "flash") == 0) {
-      fprintf(stderr, "Writing a byte to flash is not supported for %s\n", p->desc);
-      return -1;
-    } else if ((mem->offset + addr) & 1) {
-      fprintf(stderr, "Writing a byte to an odd location is not supported for %s\n", p->desc);
-      return -1;
-    }
-
-    while (avr_tpi_poll_nvmbsy(pgm));
-
-    /* must erase fuse first */
-    if (strcmp(mem->desc, "fuse") == 0) {
-      /* setup for SECTION_ERASE (high byte) */
-      avr_tpi_setup_rw(pgm, mem, addr | 1, TPI_NVMCMD_SECTION_ERASE);
-
-      /* write dummy byte */
-      cmd[0] = TPI_CMD_SST;
-      cmd[1] = 0xFF;
-      rc = pgm->cmd_tpi(pgm, cmd, 2, NULL, 0);
-
-      while (avr_tpi_poll_nvmbsy(pgm));
-    }
-
-    /* setup for WORD_WRITE */
-    avr_tpi_setup_rw(pgm, mem, addr, TPI_NVMCMD_WORD_WRITE);
-
-    cmd[0] = TPI_CMD_SST_PI;
-    cmd[1] = data;
-    rc = pgm->cmd_tpi(pgm, cmd, 2, NULL, 0);
-    /* dummy high byte to start WORD_WRITE */
-    cmd[0] = TPI_CMD_SST_PI;
-    cmd[1] = data;
-    rc = pgm->cmd_tpi(pgm, cmd, 2, NULL, 0);
-
-    while (avr_tpi_poll_nvmbsy(pgm));
-
-    return 0;
   }
 
   if (!mem->paged &&
@@ -708,35 +573,6 @@ int avr_write(PROGRAMMER * pgm, AVRPART * p, char * memtype, int size,
             progbuf, wsize);
   }
 
-
-  if ((p->flags & AVRPART_HAS_TPI) && m->page_size != 0 &&
-      pgm->cmd_tpi != NULL) {
-
-    while (avr_tpi_poll_nvmbsy(pgm));
-
-    /* setup for WORD_WRITE */
-    avr_tpi_setup_rw(pgm, m, 0, TPI_NVMCMD_WORD_WRITE);
-
-    /* make sure it's aligned to a word boundary */
-    if (wsize & 0x1) {
-      wsize++;
-    }
-
-    /* write words, low byte first */
-    for (i = 0; i < wsize; i++) {
-      cmd[0] = TPI_CMD_SST_PI;
-      cmd[1] = m->buf[i];
-      rc = pgm->cmd_tpi(pgm, cmd, 2, NULL, 0);
-
-      cmd[1] = m->buf[++i];
-      rc = pgm->cmd_tpi(pgm, cmd, 2, NULL, 0);
-
-      while (avr_tpi_poll_nvmbsy(pgm));
-      report_progress(i, wsize, NULL);
-    }
-    return i;
-  }
-
   if (pgm->paged_write != NULL && m->page_size != 0) {
     /*
      * the programmer supports a paged mode write, perhaps more
@@ -753,7 +589,6 @@ int avr_write(PROGRAMMER * pgm, AVRPART * p, char * memtype, int size,
 
   for (i=0; i<wsize; i++) {
     data = m->buf[i];
-    report_progress(i, wsize, NULL);
 
     rc = avr_write_byte(pgm, p, m, i, data);
     if (rc) {
@@ -805,7 +640,6 @@ int avr_signature(PROGRAMMER * pgm, AVRPART * p)
 {
   int rc;
 
-  report_progress (0,1,"Reading");
   rc = avr_read(pgm, p, "signature", 0, 0);
   if (rc < 0) {
     fprintf(stderr,
@@ -813,7 +647,6 @@ int avr_signature(PROGRAMMER * pgm, AVRPART * p)
             progname, p->desc, rc);
     return -1;
   }
-  report_progress (1,1,NULL);
 
   return 0;
 }
@@ -973,55 +806,4 @@ int avr_chip_erase(PROGRAMMER * pgm, AVRPART * p)
   }
 
   return rc;
-}
-
-/*
- * Report the progress of a read or write operation from/to the
- * device.
- *
- * The first call of report_progress() should look like this (for a write op):
- *
- * report_progress (0, 1, "Writing");
- *
- * Then hdr should be passed NULL on subsequent calls while the
- * operation is progressing. Once the operation is complete, a final
- * call should be made as such to ensure proper termination of the
- * progress report:
- *
- * report_progress (1, 1, NULL);
- *
- * It would be nice if we could reduce the usage to one and only one
- * call for each of start, during and end cases. As things stand now,
- * that is not possible and makes maintenance a bit more work.
- */
-void report_progress (int completed, int total, char *hdr)
-{
-  static int last = 0;
-  static double start_time;
-  int percent = (completed * 100) / total;
-  struct timeval tv;
-  double t;
-
-  if (update_progress == NULL)
-    return;
-
-  gettimeofday(&tv, NULL);
-  t = tv.tv_sec + ((double)tv.tv_usec)/1000000;
-
-  if (hdr) {
-    last = 0;
-    start_time = t;
-    update_progress (percent, t - start_time, hdr);
-  }
-
-  if (percent > 100)
-    percent = 100;
-
-  if (percent > last) {
-    last = percent;
-    update_progress (percent, t - start_time, hdr);
-  }
-
-  if (percent == 100)
-    last = 0;                   /* Get ready for next time. */
 }

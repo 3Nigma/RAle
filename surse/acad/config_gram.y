@@ -33,7 +33,6 @@
 #include "lists.h"
 #include "pindefs.h"
 #include "pgm.h"
-#include "usbtiny.h"
 #include "avr.h"
 
 #if defined(WIN32NATIVE)
@@ -83,12 +82,6 @@ static int parse_cmdbits(OPCODE * op);
 %token K_FLASH
 %token K_ID
 %token K_IO
-%token K_JTAG_MKI
-%token K_JTAG_MKII
-%token K_JTAG_MKII_AVR32
-%token K_JTAG_MKII_DW
-%token K_JTAG_MKII_ISP
-%token K_JTAG_MKII_PDI
 %token K_LOADPAGE
 %token K_MAX_WRITE_DELAY
 %token K_MIN_WRITE_DELAY
@@ -98,7 +91,6 @@ static int parse_cmdbits(OPCODE * op);
 %token K_NVM_BASE
 %token K_OFFSET
 %token K_PAGEL
-%token K_PAR
 %token K_PARALLEL
 %token K_PART
 %token K_PGMLED
@@ -111,25 +103,16 @@ static int parse_cmdbits(OPCODE * op);
 %token K_READMEM
 %token K_RESET
 %token K_RETRY_PULSE
-%token K_SERBB
 %token K_SERIAL
 %token K_SCK
 %token K_SIGNATURE
 %token K_SIZE
-%token K_STK600
-%token K_STK600HVSP
-%token K_STK600PP
-%token K_AVR910
-%token K_USBASP
 %token K_USBDEV
 %token K_USBSN
-%token K_USBTINY
 %token K_USBPID
 %token K_USBPRODUCT
 %token K_USBVENDOR
 %token K_USBVID
-%token K_BUTTERFLY
-%token K_BUTTERFLY_MK
 %token K_TYPE
 %token K_VCC
 %token K_VFYLED
@@ -366,12 +349,6 @@ prog_parm :
         ladd(current_prog->id, dup_string(t->value.string));
         free_token(t);
       }
-    }
-  } |
-
-  K_TYPE TKN_EQUAL K_USBTINY {
-    {
-      usbtiny_initpgm(current_prog);
     }
   } |
 

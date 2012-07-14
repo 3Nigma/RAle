@@ -223,14 +223,12 @@ int do_op(PROGRAMMER * pgm, struct avrpart * p, UPDATE * upd, int nowrite,
       fprintf(stderr, "%s: reading %s memory:\n",
             progname, mem->desc);
 	  }
-    report_progress(0,1,"Reading");
     rc = avr_read(pgm, p, upd->memtype, 0, 1);
     if (rc < 0) {
       fprintf(stderr, "%s: failed to read all of %s memory, rc=%d\n",
               progname, mem->desc, rc);
       return -1;
     }
-    report_progress(1,1,NULL);
     size = rc;
 
     if (quell_progress < 2) {
@@ -274,9 +272,7 @@ int do_op(PROGRAMMER * pgm, struct avrpart * p, UPDATE * upd, int nowrite,
 	  }
 
     if (!nowrite) {
-      report_progress(0,1,"Writing");
       rc = avr_write(pgm, p, upd->memtype, size, 1);
-      report_progress(1,1,NULL);
     }
     else {
       /*
@@ -331,7 +327,6 @@ int do_op(PROGRAMMER * pgm, struct avrpart * p, UPDATE * upd, int nowrite,
             progname, mem->desc);
     }
 
-    report_progress (0,1,"Reading");
     rc = avr_read(pgm, v, upd->memtype, size, 1);
     if (rc < 0) {
       fprintf(stderr, "%s: failed to read all of %s memory, rc=%d\n",
@@ -339,9 +334,6 @@ int do_op(PROGRAMMER * pgm, struct avrpart * p, UPDATE * upd, int nowrite,
       pgm->err_led(pgm, ON);
       return -1;
     }
-    report_progress (1,1,NULL);
-
-
 
     if (quell_progress < 2) {
       fprintf(stderr, "%s: verifying ...\n", progname);

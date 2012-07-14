@@ -67,7 +67,7 @@
 extern "C" {
 #endif
 
-void usbtiny_initpgm (PROGRAMMER * pgm);
+PROGRAMMER *usbtiny_initpgm(void);
 
 #ifdef __cplusplus
 }

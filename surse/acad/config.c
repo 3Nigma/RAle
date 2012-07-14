@@ -284,8 +284,7 @@ char * dup_string(const char * str)
   return s;
 }
 
-int read_config(const char * file)
-{
+int read_config(const char * file) {
   FILE * f;
 
   f = fopen(file, "r");
