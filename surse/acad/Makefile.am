@@ -1,5 +1,8 @@
 #
-# avrdude - A Downloader/Uploader for AVR device programmers
+# acad - An avrdude distro adapted for the Ale packet
+# Copyright (C) 2012 Victor ADĂSCĂLIȚEI <admin@tuscale.ro>
+#
+# !!! Original avrdude 5.11 Makefile.am notice follows !!!
 # Copyright (C) 2003, 2004  Theodore A. Roth  <troth@openavr.org>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -22,16 +25,8 @@
 #
 
 EXTRA_DIST   = \
-	ChangeLog \
-	ChangeLog-2001 \
-	ChangeLog-2002 \
-	ChangeLog-2003 \
-	ChangeLog-2004-2006 \
-	ChangeLog-2007 \
-	ChangeLog-2008 \
-	ChangeLog-2009 \
-	avrdude.1 \
-	avrdude.spec \
+	acad.1 \
+	acad.spec \
 	bootstrap
 
 CLEANFILES = \
@@ -50,19 +45,19 @@ DIST_SUBDIRS = @DIST_SUBDIRS_AC@
 
 AM_YFLAGS    = -d
 
-avrdude_CPPFLAGS = -DCONFIG_DIR=\"$(sysconfdir)\"
+acad_CPPFLAGS = -DCONFIG_DIR=\"$(sysconfdir)\"
 
-libavrdude_a_CPPFLAGS = -DCONFIG_DIR=\"$(sysconfdir)\"
+libacad_a_CPPFLAGS = -DCONFIG_DIR=\"$(sysconfdir)\"
 
-avrdude_CFLAGS   = @ENABLE_WARNINGS@
+acad_CFLAGS   = @ENABLE_WARNINGS@
 
-libavrdude_a_CFLAGS   = @ENABLE_WARNINGS@
+libacad_a_CFLAGS   = @ENABLE_WARNINGS@
 
-avrdude_LDADD  = $(top_builddir)/$(noinst_LIBRARIES) @LIBUSB@ @LIBUSB_1_0@ @LIBFTDI@ @LIBHID@ -lm
+acad_LDADD  = $(top_builddir)/$(noinst_LIBRARIES) @LIBUSB@ @LIBUSB_1_0@ @LIBFTDI@ @LIBHID@ -lm
 
-bin_PROGRAMS = avrdude
+bin_PROGRAMS = acad
 
-noinst_LIBRARIES = libavrdude.a
+noinst_LIBRARIES = libacad.a
 
 # automake thinks these generated files should be in the distribution,
 # but this might cause trouble for some users, so we rather don't want
@@ -79,7 +74,7 @@ dist-hook:
 	$(distdir)/config_gram.c \
 	$(distdir)/config_gram.h
 
-libavrdude_a_SOURCES = \
+libacad_a_SOURCES = \
 	config_gram.y \
 	lexer.l \
 	avr.c \
@@ -111,21 +106,21 @@ libavrdude_a_SOURCES = \
 	update.h \
 	update.c
 
-avrdude_SOURCES = main.c
+acad_SOURCES = main.c
 
-man_MANS = avrdude.1
+man_MANS = acad.1
 
-sysconf_DATA = avrdude.conf
+sysconf_DATA = acad.conf
 
-install-exec-local: backup-avrdude-conf
+install-exec-local: backup-acad-conf
 
 distclean-local:
-	rm -f avrdude.conf
+	rm -f acad.conf
 
 # This will get run before the config file is installed.
-backup-avrdude-conf:
-	@echo "Backing up avrdude.conf in ${DESTDIR}${sysconfdir}"
-	@if test -e ${DESTDIR}${sysconfdir}/avrdude.conf; then \
-		cp -pR ${DESTDIR}${sysconfdir}/avrdude.conf \
-			${DESTDIR}${sysconfdir}/avrdude.conf.bak; \
+backup-acad-conf:
+	@echo "Backing up acad.conf in ${DESTDIR}${sysconfdir}"
+	@if test -e ${DESTDIR}${sysconfdir}/acad.conf; then \
+		cp -pR ${DESTDIR}${sysconfdir}/acad.conf \
+			${DESTDIR}${sysconfdir}/acad.conf.bak; \
 	fi

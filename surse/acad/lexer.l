@@ -1,6 +1,9 @@
 /*
- * avrdude - A Downloader/Uploader for AVR device programmers
- * Copyright (C) 2000-2004  Brian S. Dean <bsd@bsdhome.com>
+ * acad - An avrdude distro adapted for the Ale packet
+ * Copyright (C) 2012 Victor ADĂSCĂLIȚEI <admin@tuscale.ro>
+ *
+ * !!! Original avrdude 5.11 Makefile.am notice follows !!!
+ *  Copyright (C) 2000-2004  Brian S. Dean <bsd@bsdhome.com>
  * Copyright (C) 2006 Joerg Wunsch <j@uriah.heep.sax.de>
  *
  * This program is free software; you can redistribute it and/or modify

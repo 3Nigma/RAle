@@ -16,7 +16,10 @@
 @SET_MAKE@
 
 #
-# avrdude - A Downloader/Uploader for AVR device programmers
+# acad - An avrdude distro adapted for the Ale packet
+# Copyright (C) 2012 Victor ADĂSCĂLIȚEI <admin@tuscale.ro>
+#
+# !!! Original avrdude 5.11 Makefile.am notice follows !!!
 # Copyright (C) 2003, 2004  Theodore A. Roth  <troth@openavr.org>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -60,11 +63,11 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-bin_PROGRAMS = avrdude$(EXEEXT)
+bin_PROGRAMS = acad$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/ac_cfg.h.in \
-	$(srcdir)/avrdude.conf.in $(srcdir)/avrdude.spec.in \
+	$(srcdir)/acad.conf.in $(srcdir)/acad.spec.in \
 	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
 	compile config.guess config.sub config_gram.c config_gram.h \
 	depcomp install-sh lexer.c missing ylwrap
@@ -76,30 +79,30 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = ac_cfg.h
-CONFIG_CLEAN_FILES = avrdude.spec avrdude.conf.tmp
+CONFIG_CLEAN_FILES = acad.spec acad.conf.tmp
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 AR = ar
 ARFLAGS = cru
-libavrdude_a_AR = $(AR) $(ARFLAGS)
-libavrdude_a_LIBADD =
-am_libavrdude_a_OBJECTS = libavrdude_a-config_gram.$(OBJEXT) \
-	libavrdude_a-lexer.$(OBJEXT) libavrdude_a-avr.$(OBJEXT) \
-	libavrdude_a-avrpart.$(OBJEXT) libavrdude_a-config.$(OBJEXT) \
-	libavrdude_a-confwin.$(OBJEXT) libavrdude_a-crc16.$(OBJEXT) \
-	libavrdude_a-fileio.$(OBJEXT) libavrdude_a-lists.$(OBJEXT) \
-	libavrdude_a-pgm.$(OBJEXT) libavrdude_a-safemode.$(OBJEXT) \
-	libavrdude_a-usb_libusb.$(OBJEXT) \
-	libavrdude_a-usbtiny.$(OBJEXT) libavrdude_a-update.$(OBJEXT)
-libavrdude_a_OBJECTS = $(am_libavrdude_a_OBJECTS)
+libacad_a_AR = $(AR) $(ARFLAGS)
+libacad_a_LIBADD =
+am_libacad_a_OBJECTS = libacad_a-config_gram.$(OBJEXT) \
+	libacad_a-lexer.$(OBJEXT) libacad_a-avr.$(OBJEXT) \
+	libacad_a-avrpart.$(OBJEXT) libacad_a-config.$(OBJEXT) \
+	libacad_a-confwin.$(OBJEXT) libacad_a-crc16.$(OBJEXT) \
+	libacad_a-fileio.$(OBJEXT) libacad_a-lists.$(OBJEXT) \
+	libacad_a-pgm.$(OBJEXT) libacad_a-safemode.$(OBJEXT) \
+	libacad_a-usb_libusb.$(OBJEXT) libacad_a-usbtiny.$(OBJEXT) \
+	libacad_a-update.$(OBJEXT)
+libacad_a_OBJECTS = $(am_libacad_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" \
 	"$(DESTDIR)$(sysconfdir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_avrdude_OBJECTS = avrdude-main.$(OBJEXT)
-avrdude_OBJECTS = $(am_avrdude_OBJECTS)
-avrdude_DEPENDENCIES = $(top_builddir)/$(noinst_LIBRARIES)
-avrdude_LINK = $(CCLD) $(avrdude_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+am_acad_OBJECTS = acad-main.$(OBJEXT)
+acad_OBJECTS = $(am_acad_OBJECTS)
+acad_DEPENDENCIES = $(top_builddir)/$(noinst_LIBRARIES)
+acad_LINK = $(CCLD) $(acad_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
+	-o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -111,8 +114,8 @@ LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 LEXCOMPILE = $(LEX) $(AM_LFLAGS) $(LFLAGS)
 YLWRAP = $(top_srcdir)/ylwrap
 YACCCOMPILE = $(YACC) $(AM_YFLAGS) $(YFLAGS)
-SOURCES = $(libavrdude_a_SOURCES) $(avrdude_SOURCES)
-DIST_SOURCES = $(libavrdude_a_SOURCES) $(avrdude_SOURCES)
+SOURCES = $(libacad_a_SOURCES) $(acad_SOURCES)
+DIST_SOURCES = $(libacad_a_SOURCES) $(acad_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -314,16 +317,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = \
-	ChangeLog \
-	ChangeLog-2001 \
-	ChangeLog-2002 \
-	ChangeLog-2003 \
-	ChangeLog-2004-2006 \
-	ChangeLog-2007 \
-	ChangeLog-2008 \
-	ChangeLog-2009 \
-	avrdude.1 \
-	avrdude.spec \
+	acad.1 \
+	acad.spec \
 	bootstrap
 
 CLEANFILES = \
@@ -338,13 +333,13 @@ BUILT_SOURCES = $(CLEANFILES)
 SUBDIRS = @SUBDIRS_AC@ @WINDOWS_DIRS@
 DIST_SUBDIRS = @DIST_SUBDIRS_AC@
 AM_YFLAGS = -d
-avrdude_CPPFLAGS = -DCONFIG_DIR=\"$(sysconfdir)\"
-libavrdude_a_CPPFLAGS = -DCONFIG_DIR=\"$(sysconfdir)\"
-avrdude_CFLAGS = @ENABLE_WARNINGS@
-libavrdude_a_CFLAGS = @ENABLE_WARNINGS@
-avrdude_LDADD = $(top_builddir)/$(noinst_LIBRARIES) @LIBUSB@ @LIBUSB_1_0@ @LIBFTDI@ @LIBHID@ -lm
-noinst_LIBRARIES = libavrdude.a
-libavrdude_a_SOURCES = \
+acad_CPPFLAGS = -DCONFIG_DIR=\"$(sysconfdir)\"
+libacad_a_CPPFLAGS = -DCONFIG_DIR=\"$(sysconfdir)\"
+acad_CFLAGS = @ENABLE_WARNINGS@
+libacad_a_CFLAGS = @ENABLE_WARNINGS@
+acad_LDADD = $(top_builddir)/$(noinst_LIBRARIES) @LIBUSB@ @LIBUSB_1_0@ @LIBFTDI@ @LIBHID@ -lm
+noinst_LIBRARIES = libacad.a
+libacad_a_SOURCES = \
 	config_gram.y \
 	lexer.l \
 	avr.c \
@@ -376,9 +371,9 @@ libavrdude_a_SOURCES = \
 	update.h \
 	update.c
 
-avrdude_SOURCES = main.c
-man_MANS = avrdude.1
-sysconf_DATA = avrdude.conf
+acad_SOURCES = main.c
+man_MANS = acad.1
+sysconf_DATA = acad.conf
 all: $(BUILT_SOURCES) ac_cfg.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -433,9 +428,9 @@ $(srcdir)/ac_cfg.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f ac_cfg.h stamp-h1
-avrdude.spec: $(top_builddir)/config.status $(srcdir)/avrdude.spec.in
+acad.spec: $(top_builddir)/config.status $(srcdir)/acad.spec.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-avrdude.conf.tmp: $(top_builddir)/config.status $(srcdir)/avrdude.conf.in
+acad.conf.tmp: $(top_builddir)/config.status $(srcdir)/acad.conf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 clean-noinstLIBRARIES:
@@ -443,10 +438,10 @@ clean-noinstLIBRARIES:
 config_gram.h: config_gram.c
 	@if test ! -f $@; then rm -f config_gram.c; else :; fi
 	@if test ! -f $@; then $(MAKE) $(AM_MAKEFLAGS) config_gram.c; else :; fi
-libavrdude.a: $(libavrdude_a_OBJECTS) $(libavrdude_a_DEPENDENCIES) $(EXTRA_libavrdude_a_DEPENDENCIES) 
-	-rm -f libavrdude.a
-	$(libavrdude_a_AR) libavrdude.a $(libavrdude_a_OBJECTS) $(libavrdude_a_LIBADD)
-	$(RANLIB) libavrdude.a
+libacad.a: $(libacad_a_OBJECTS) $(libacad_a_DEPENDENCIES) $(EXTRA_libacad_a_DEPENDENCIES) 
+	-rm -f libacad.a
+	$(libacad_a_AR) libacad.a $(libacad_a_OBJECTS) $(libacad_a_LIBADD)
+	$(RANLIB) libacad.a
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -484,9 +479,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-avrdude$(EXEEXT): $(avrdude_OBJECTS) $(avrdude_DEPENDENCIES) $(EXTRA_avrdude_DEPENDENCIES) 
-	@rm -f avrdude$(EXEEXT)
-	$(avrdude_LINK) $(avrdude_OBJECTS) $(avrdude_LDADD) $(LIBS)
+acad$(EXEEXT): $(acad_OBJECTS) $(acad_DEPENDENCIES) $(EXTRA_acad_DEPENDENCIES) 
+	@rm -f acad$(EXEEXT)
+	$(acad_LINK) $(acad_OBJECTS) $(acad_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -494,21 +489,21 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/avrdude-main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-avr.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-avrpart.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-config.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-config_gram.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-confwin.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-crc16.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-fileio.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-lexer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-lists.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-pgm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-safemode.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-update.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-usb_libusb.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libavrdude_a-usbtiny.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/acad-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-avr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-avrpart.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-config.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-config_gram.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-confwin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-crc16.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-fileio.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-lexer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-lists.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-pgm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-safemode.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-update.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-usb_libusb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacad_a-usbtiny.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -524,215 +519,215 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
-libavrdude_a-config_gram.o: config_gram.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-config_gram.o -MD -MP -MF $(DEPDIR)/libavrdude_a-config_gram.Tpo -c -o libavrdude_a-config_gram.o `test -f 'config_gram.c' || echo '$(srcdir)/'`config_gram.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-config_gram.Tpo $(DEPDIR)/libavrdude_a-config_gram.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='config_gram.c' object='libavrdude_a-config_gram.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-config_gram.o: config_gram.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-config_gram.o -MD -MP -MF $(DEPDIR)/libacad_a-config_gram.Tpo -c -o libacad_a-config_gram.o `test -f 'config_gram.c' || echo '$(srcdir)/'`config_gram.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-config_gram.Tpo $(DEPDIR)/libacad_a-config_gram.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='config_gram.c' object='libacad_a-config_gram.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-config_gram.o `test -f 'config_gram.c' || echo '$(srcdir)/'`config_gram.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-config_gram.o `test -f 'config_gram.c' || echo '$(srcdir)/'`config_gram.c
 
-libavrdude_a-config_gram.obj: config_gram.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-config_gram.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-config_gram.Tpo -c -o libavrdude_a-config_gram.obj `if test -f 'config_gram.c'; then $(CYGPATH_W) 'config_gram.c'; else $(CYGPATH_W) '$(srcdir)/config_gram.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-config_gram.Tpo $(DEPDIR)/libavrdude_a-config_gram.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='config_gram.c' object='libavrdude_a-config_gram.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-config_gram.obj: config_gram.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-config_gram.obj -MD -MP -MF $(DEPDIR)/libacad_a-config_gram.Tpo -c -o libacad_a-config_gram.obj `if test -f 'config_gram.c'; then $(CYGPATH_W) 'config_gram.c'; else $(CYGPATH_W) '$(srcdir)/config_gram.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-config_gram.Tpo $(DEPDIR)/libacad_a-config_gram.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='config_gram.c' object='libacad_a-config_gram.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-config_gram.obj `if test -f 'config_gram.c'; then $(CYGPATH_W) 'config_gram.c'; else $(CYGPATH_W) '$(srcdir)/config_gram.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-config_gram.obj `if test -f 'config_gram.c'; then $(CYGPATH_W) 'config_gram.c'; else $(CYGPATH_W) '$(srcdir)/config_gram.c'; fi`
 
-libavrdude_a-lexer.o: lexer.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-lexer.o -MD -MP -MF $(DEPDIR)/libavrdude_a-lexer.Tpo -c -o libavrdude_a-lexer.o `test -f 'lexer.c' || echo '$(srcdir)/'`lexer.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-lexer.Tpo $(DEPDIR)/libavrdude_a-lexer.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lexer.c' object='libavrdude_a-lexer.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-lexer.o: lexer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-lexer.o -MD -MP -MF $(DEPDIR)/libacad_a-lexer.Tpo -c -o libacad_a-lexer.o `test -f 'lexer.c' || echo '$(srcdir)/'`lexer.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-lexer.Tpo $(DEPDIR)/libacad_a-lexer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lexer.c' object='libacad_a-lexer.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-lexer.o `test -f 'lexer.c' || echo '$(srcdir)/'`lexer.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-lexer.o `test -f 'lexer.c' || echo '$(srcdir)/'`lexer.c
 
-libavrdude_a-lexer.obj: lexer.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-lexer.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-lexer.Tpo -c -o libavrdude_a-lexer.obj `if test -f 'lexer.c'; then $(CYGPATH_W) 'lexer.c'; else $(CYGPATH_W) '$(srcdir)/lexer.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-lexer.Tpo $(DEPDIR)/libavrdude_a-lexer.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lexer.c' object='libavrdude_a-lexer.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-lexer.obj: lexer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-lexer.obj -MD -MP -MF $(DEPDIR)/libacad_a-lexer.Tpo -c -o libacad_a-lexer.obj `if test -f 'lexer.c'; then $(CYGPATH_W) 'lexer.c'; else $(CYGPATH_W) '$(srcdir)/lexer.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-lexer.Tpo $(DEPDIR)/libacad_a-lexer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lexer.c' object='libacad_a-lexer.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-lexer.obj `if test -f 'lexer.c'; then $(CYGPATH_W) 'lexer.c'; else $(CYGPATH_W) '$(srcdir)/lexer.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-lexer.obj `if test -f 'lexer.c'; then $(CYGPATH_W) 'lexer.c'; else $(CYGPATH_W) '$(srcdir)/lexer.c'; fi`
 
-libavrdude_a-avr.o: avr.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-avr.o -MD -MP -MF $(DEPDIR)/libavrdude_a-avr.Tpo -c -o libavrdude_a-avr.o `test -f 'avr.c' || echo '$(srcdir)/'`avr.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-avr.Tpo $(DEPDIR)/libavrdude_a-avr.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='avr.c' object='libavrdude_a-avr.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-avr.o: avr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-avr.o -MD -MP -MF $(DEPDIR)/libacad_a-avr.Tpo -c -o libacad_a-avr.o `test -f 'avr.c' || echo '$(srcdir)/'`avr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-avr.Tpo $(DEPDIR)/libacad_a-avr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='avr.c' object='libacad_a-avr.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-avr.o `test -f 'avr.c' || echo '$(srcdir)/'`avr.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-avr.o `test -f 'avr.c' || echo '$(srcdir)/'`avr.c
 
-libavrdude_a-avr.obj: avr.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-avr.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-avr.Tpo -c -o libavrdude_a-avr.obj `if test -f 'avr.c'; then $(CYGPATH_W) 'avr.c'; else $(CYGPATH_W) '$(srcdir)/avr.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-avr.Tpo $(DEPDIR)/libavrdude_a-avr.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='avr.c' object='libavrdude_a-avr.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-avr.obj: avr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-avr.obj -MD -MP -MF $(DEPDIR)/libacad_a-avr.Tpo -c -o libacad_a-avr.obj `if test -f 'avr.c'; then $(CYGPATH_W) 'avr.c'; else $(CYGPATH_W) '$(srcdir)/avr.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-avr.Tpo $(DEPDIR)/libacad_a-avr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='avr.c' object='libacad_a-avr.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-avr.obj `if test -f 'avr.c'; then $(CYGPATH_W) 'avr.c'; else $(CYGPATH_W) '$(srcdir)/avr.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-avr.obj `if test -f 'avr.c'; then $(CYGPATH_W) 'avr.c'; else $(CYGPATH_W) '$(srcdir)/avr.c'; fi`
 
-libavrdude_a-avrpart.o: avrpart.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-avrpart.o -MD -MP -MF $(DEPDIR)/libavrdude_a-avrpart.Tpo -c -o libavrdude_a-avrpart.o `test -f 'avrpart.c' || echo '$(srcdir)/'`avrpart.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-avrpart.Tpo $(DEPDIR)/libavrdude_a-avrpart.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='avrpart.c' object='libavrdude_a-avrpart.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-avrpart.o: avrpart.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-avrpart.o -MD -MP -MF $(DEPDIR)/libacad_a-avrpart.Tpo -c -o libacad_a-avrpart.o `test -f 'avrpart.c' || echo '$(srcdir)/'`avrpart.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-avrpart.Tpo $(DEPDIR)/libacad_a-avrpart.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='avrpart.c' object='libacad_a-avrpart.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-avrpart.o `test -f 'avrpart.c' || echo '$(srcdir)/'`avrpart.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-avrpart.o `test -f 'avrpart.c' || echo '$(srcdir)/'`avrpart.c
 
-libavrdude_a-avrpart.obj: avrpart.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-avrpart.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-avrpart.Tpo -c -o libavrdude_a-avrpart.obj `if test -f 'avrpart.c'; then $(CYGPATH_W) 'avrpart.c'; else $(CYGPATH_W) '$(srcdir)/avrpart.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-avrpart.Tpo $(DEPDIR)/libavrdude_a-avrpart.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='avrpart.c' object='libavrdude_a-avrpart.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-avrpart.obj: avrpart.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-avrpart.obj -MD -MP -MF $(DEPDIR)/libacad_a-avrpart.Tpo -c -o libacad_a-avrpart.obj `if test -f 'avrpart.c'; then $(CYGPATH_W) 'avrpart.c'; else $(CYGPATH_W) '$(srcdir)/avrpart.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-avrpart.Tpo $(DEPDIR)/libacad_a-avrpart.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='avrpart.c' object='libacad_a-avrpart.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-avrpart.obj `if test -f 'avrpart.c'; then $(CYGPATH_W) 'avrpart.c'; else $(CYGPATH_W) '$(srcdir)/avrpart.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-avrpart.obj `if test -f 'avrpart.c'; then $(CYGPATH_W) 'avrpart.c'; else $(CYGPATH_W) '$(srcdir)/avrpart.c'; fi`
 
-libavrdude_a-config.o: config.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-config.o -MD -MP -MF $(DEPDIR)/libavrdude_a-config.Tpo -c -o libavrdude_a-config.o `test -f 'config.c' || echo '$(srcdir)/'`config.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-config.Tpo $(DEPDIR)/libavrdude_a-config.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='config.c' object='libavrdude_a-config.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-config.o: config.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-config.o -MD -MP -MF $(DEPDIR)/libacad_a-config.Tpo -c -o libacad_a-config.o `test -f 'config.c' || echo '$(srcdir)/'`config.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-config.Tpo $(DEPDIR)/libacad_a-config.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='config.c' object='libacad_a-config.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-config.o `test -f 'config.c' || echo '$(srcdir)/'`config.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-config.o `test -f 'config.c' || echo '$(srcdir)/'`config.c
 
-libavrdude_a-config.obj: config.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-config.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-config.Tpo -c -o libavrdude_a-config.obj `if test -f 'config.c'; then $(CYGPATH_W) 'config.c'; else $(CYGPATH_W) '$(srcdir)/config.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-config.Tpo $(DEPDIR)/libavrdude_a-config.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='config.c' object='libavrdude_a-config.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-config.obj: config.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-config.obj -MD -MP -MF $(DEPDIR)/libacad_a-config.Tpo -c -o libacad_a-config.obj `if test -f 'config.c'; then $(CYGPATH_W) 'config.c'; else $(CYGPATH_W) '$(srcdir)/config.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-config.Tpo $(DEPDIR)/libacad_a-config.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='config.c' object='libacad_a-config.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-config.obj `if test -f 'config.c'; then $(CYGPATH_W) 'config.c'; else $(CYGPATH_W) '$(srcdir)/config.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-config.obj `if test -f 'config.c'; then $(CYGPATH_W) 'config.c'; else $(CYGPATH_W) '$(srcdir)/config.c'; fi`
 
-libavrdude_a-confwin.o: confwin.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-confwin.o -MD -MP -MF $(DEPDIR)/libavrdude_a-confwin.Tpo -c -o libavrdude_a-confwin.o `test -f 'confwin.c' || echo '$(srcdir)/'`confwin.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-confwin.Tpo $(DEPDIR)/libavrdude_a-confwin.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='confwin.c' object='libavrdude_a-confwin.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-confwin.o: confwin.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-confwin.o -MD -MP -MF $(DEPDIR)/libacad_a-confwin.Tpo -c -o libacad_a-confwin.o `test -f 'confwin.c' || echo '$(srcdir)/'`confwin.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-confwin.Tpo $(DEPDIR)/libacad_a-confwin.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='confwin.c' object='libacad_a-confwin.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-confwin.o `test -f 'confwin.c' || echo '$(srcdir)/'`confwin.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-confwin.o `test -f 'confwin.c' || echo '$(srcdir)/'`confwin.c
 
-libavrdude_a-confwin.obj: confwin.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-confwin.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-confwin.Tpo -c -o libavrdude_a-confwin.obj `if test -f 'confwin.c'; then $(CYGPATH_W) 'confwin.c'; else $(CYGPATH_W) '$(srcdir)/confwin.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-confwin.Tpo $(DEPDIR)/libavrdude_a-confwin.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='confwin.c' object='libavrdude_a-confwin.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-confwin.obj: confwin.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-confwin.obj -MD -MP -MF $(DEPDIR)/libacad_a-confwin.Tpo -c -o libacad_a-confwin.obj `if test -f 'confwin.c'; then $(CYGPATH_W) 'confwin.c'; else $(CYGPATH_W) '$(srcdir)/confwin.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-confwin.Tpo $(DEPDIR)/libacad_a-confwin.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='confwin.c' object='libacad_a-confwin.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-confwin.obj `if test -f 'confwin.c'; then $(CYGPATH_W) 'confwin.c'; else $(CYGPATH_W) '$(srcdir)/confwin.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-confwin.obj `if test -f 'confwin.c'; then $(CYGPATH_W) 'confwin.c'; else $(CYGPATH_W) '$(srcdir)/confwin.c'; fi`
 
-libavrdude_a-crc16.o: crc16.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-crc16.o -MD -MP -MF $(DEPDIR)/libavrdude_a-crc16.Tpo -c -o libavrdude_a-crc16.o `test -f 'crc16.c' || echo '$(srcdir)/'`crc16.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-crc16.Tpo $(DEPDIR)/libavrdude_a-crc16.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crc16.c' object='libavrdude_a-crc16.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-crc16.o: crc16.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-crc16.o -MD -MP -MF $(DEPDIR)/libacad_a-crc16.Tpo -c -o libacad_a-crc16.o `test -f 'crc16.c' || echo '$(srcdir)/'`crc16.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-crc16.Tpo $(DEPDIR)/libacad_a-crc16.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crc16.c' object='libacad_a-crc16.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-crc16.o `test -f 'crc16.c' || echo '$(srcdir)/'`crc16.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-crc16.o `test -f 'crc16.c' || echo '$(srcdir)/'`crc16.c
 
-libavrdude_a-crc16.obj: crc16.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-crc16.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-crc16.Tpo -c -o libavrdude_a-crc16.obj `if test -f 'crc16.c'; then $(CYGPATH_W) 'crc16.c'; else $(CYGPATH_W) '$(srcdir)/crc16.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-crc16.Tpo $(DEPDIR)/libavrdude_a-crc16.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crc16.c' object='libavrdude_a-crc16.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-crc16.obj: crc16.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-crc16.obj -MD -MP -MF $(DEPDIR)/libacad_a-crc16.Tpo -c -o libacad_a-crc16.obj `if test -f 'crc16.c'; then $(CYGPATH_W) 'crc16.c'; else $(CYGPATH_W) '$(srcdir)/crc16.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-crc16.Tpo $(DEPDIR)/libacad_a-crc16.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crc16.c' object='libacad_a-crc16.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-crc16.obj `if test -f 'crc16.c'; then $(CYGPATH_W) 'crc16.c'; else $(CYGPATH_W) '$(srcdir)/crc16.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-crc16.obj `if test -f 'crc16.c'; then $(CYGPATH_W) 'crc16.c'; else $(CYGPATH_W) '$(srcdir)/crc16.c'; fi`
 
-libavrdude_a-fileio.o: fileio.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-fileio.o -MD -MP -MF $(DEPDIR)/libavrdude_a-fileio.Tpo -c -o libavrdude_a-fileio.o `test -f 'fileio.c' || echo '$(srcdir)/'`fileio.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-fileio.Tpo $(DEPDIR)/libavrdude_a-fileio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fileio.c' object='libavrdude_a-fileio.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-fileio.o: fileio.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-fileio.o -MD -MP -MF $(DEPDIR)/libacad_a-fileio.Tpo -c -o libacad_a-fileio.o `test -f 'fileio.c' || echo '$(srcdir)/'`fileio.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-fileio.Tpo $(DEPDIR)/libacad_a-fileio.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fileio.c' object='libacad_a-fileio.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-fileio.o `test -f 'fileio.c' || echo '$(srcdir)/'`fileio.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-fileio.o `test -f 'fileio.c' || echo '$(srcdir)/'`fileio.c
 
-libavrdude_a-fileio.obj: fileio.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-fileio.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-fileio.Tpo -c -o libavrdude_a-fileio.obj `if test -f 'fileio.c'; then $(CYGPATH_W) 'fileio.c'; else $(CYGPATH_W) '$(srcdir)/fileio.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-fileio.Tpo $(DEPDIR)/libavrdude_a-fileio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fileio.c' object='libavrdude_a-fileio.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-fileio.obj: fileio.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-fileio.obj -MD -MP -MF $(DEPDIR)/libacad_a-fileio.Tpo -c -o libacad_a-fileio.obj `if test -f 'fileio.c'; then $(CYGPATH_W) 'fileio.c'; else $(CYGPATH_W) '$(srcdir)/fileio.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-fileio.Tpo $(DEPDIR)/libacad_a-fileio.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fileio.c' object='libacad_a-fileio.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-fileio.obj `if test -f 'fileio.c'; then $(CYGPATH_W) 'fileio.c'; else $(CYGPATH_W) '$(srcdir)/fileio.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-fileio.obj `if test -f 'fileio.c'; then $(CYGPATH_W) 'fileio.c'; else $(CYGPATH_W) '$(srcdir)/fileio.c'; fi`
 
-libavrdude_a-lists.o: lists.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-lists.o -MD -MP -MF $(DEPDIR)/libavrdude_a-lists.Tpo -c -o libavrdude_a-lists.o `test -f 'lists.c' || echo '$(srcdir)/'`lists.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-lists.Tpo $(DEPDIR)/libavrdude_a-lists.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lists.c' object='libavrdude_a-lists.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-lists.o: lists.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-lists.o -MD -MP -MF $(DEPDIR)/libacad_a-lists.Tpo -c -o libacad_a-lists.o `test -f 'lists.c' || echo '$(srcdir)/'`lists.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-lists.Tpo $(DEPDIR)/libacad_a-lists.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lists.c' object='libacad_a-lists.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-lists.o `test -f 'lists.c' || echo '$(srcdir)/'`lists.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-lists.o `test -f 'lists.c' || echo '$(srcdir)/'`lists.c
 
-libavrdude_a-lists.obj: lists.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-lists.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-lists.Tpo -c -o libavrdude_a-lists.obj `if test -f 'lists.c'; then $(CYGPATH_W) 'lists.c'; else $(CYGPATH_W) '$(srcdir)/lists.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-lists.Tpo $(DEPDIR)/libavrdude_a-lists.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lists.c' object='libavrdude_a-lists.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-lists.obj: lists.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-lists.obj -MD -MP -MF $(DEPDIR)/libacad_a-lists.Tpo -c -o libacad_a-lists.obj `if test -f 'lists.c'; then $(CYGPATH_W) 'lists.c'; else $(CYGPATH_W) '$(srcdir)/lists.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-lists.Tpo $(DEPDIR)/libacad_a-lists.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lists.c' object='libacad_a-lists.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-lists.obj `if test -f 'lists.c'; then $(CYGPATH_W) 'lists.c'; else $(CYGPATH_W) '$(srcdir)/lists.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-lists.obj `if test -f 'lists.c'; then $(CYGPATH_W) 'lists.c'; else $(CYGPATH_W) '$(srcdir)/lists.c'; fi`
 
-libavrdude_a-pgm.o: pgm.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-pgm.o -MD -MP -MF $(DEPDIR)/libavrdude_a-pgm.Tpo -c -o libavrdude_a-pgm.o `test -f 'pgm.c' || echo '$(srcdir)/'`pgm.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-pgm.Tpo $(DEPDIR)/libavrdude_a-pgm.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pgm.c' object='libavrdude_a-pgm.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-pgm.o: pgm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-pgm.o -MD -MP -MF $(DEPDIR)/libacad_a-pgm.Tpo -c -o libacad_a-pgm.o `test -f 'pgm.c' || echo '$(srcdir)/'`pgm.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-pgm.Tpo $(DEPDIR)/libacad_a-pgm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pgm.c' object='libacad_a-pgm.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-pgm.o `test -f 'pgm.c' || echo '$(srcdir)/'`pgm.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-pgm.o `test -f 'pgm.c' || echo '$(srcdir)/'`pgm.c
 
-libavrdude_a-pgm.obj: pgm.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-pgm.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-pgm.Tpo -c -o libavrdude_a-pgm.obj `if test -f 'pgm.c'; then $(CYGPATH_W) 'pgm.c'; else $(CYGPATH_W) '$(srcdir)/pgm.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-pgm.Tpo $(DEPDIR)/libavrdude_a-pgm.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pgm.c' object='libavrdude_a-pgm.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-pgm.obj: pgm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-pgm.obj -MD -MP -MF $(DEPDIR)/libacad_a-pgm.Tpo -c -o libacad_a-pgm.obj `if test -f 'pgm.c'; then $(CYGPATH_W) 'pgm.c'; else $(CYGPATH_W) '$(srcdir)/pgm.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-pgm.Tpo $(DEPDIR)/libacad_a-pgm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pgm.c' object='libacad_a-pgm.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-pgm.obj `if test -f 'pgm.c'; then $(CYGPATH_W) 'pgm.c'; else $(CYGPATH_W) '$(srcdir)/pgm.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-pgm.obj `if test -f 'pgm.c'; then $(CYGPATH_W) 'pgm.c'; else $(CYGPATH_W) '$(srcdir)/pgm.c'; fi`
 
-libavrdude_a-safemode.o: safemode.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-safemode.o -MD -MP -MF $(DEPDIR)/libavrdude_a-safemode.Tpo -c -o libavrdude_a-safemode.o `test -f 'safemode.c' || echo '$(srcdir)/'`safemode.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-safemode.Tpo $(DEPDIR)/libavrdude_a-safemode.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='safemode.c' object='libavrdude_a-safemode.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-safemode.o: safemode.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-safemode.o -MD -MP -MF $(DEPDIR)/libacad_a-safemode.Tpo -c -o libacad_a-safemode.o `test -f 'safemode.c' || echo '$(srcdir)/'`safemode.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-safemode.Tpo $(DEPDIR)/libacad_a-safemode.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='safemode.c' object='libacad_a-safemode.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-safemode.o `test -f 'safemode.c' || echo '$(srcdir)/'`safemode.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-safemode.o `test -f 'safemode.c' || echo '$(srcdir)/'`safemode.c
 
-libavrdude_a-safemode.obj: safemode.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-safemode.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-safemode.Tpo -c -o libavrdude_a-safemode.obj `if test -f 'safemode.c'; then $(CYGPATH_W) 'safemode.c'; else $(CYGPATH_W) '$(srcdir)/safemode.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-safemode.Tpo $(DEPDIR)/libavrdude_a-safemode.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='safemode.c' object='libavrdude_a-safemode.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-safemode.obj: safemode.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-safemode.obj -MD -MP -MF $(DEPDIR)/libacad_a-safemode.Tpo -c -o libacad_a-safemode.obj `if test -f 'safemode.c'; then $(CYGPATH_W) 'safemode.c'; else $(CYGPATH_W) '$(srcdir)/safemode.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-safemode.Tpo $(DEPDIR)/libacad_a-safemode.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='safemode.c' object='libacad_a-safemode.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-safemode.obj `if test -f 'safemode.c'; then $(CYGPATH_W) 'safemode.c'; else $(CYGPATH_W) '$(srcdir)/safemode.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-safemode.obj `if test -f 'safemode.c'; then $(CYGPATH_W) 'safemode.c'; else $(CYGPATH_W) '$(srcdir)/safemode.c'; fi`
 
-libavrdude_a-usb_libusb.o: usb_libusb.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-usb_libusb.o -MD -MP -MF $(DEPDIR)/libavrdude_a-usb_libusb.Tpo -c -o libavrdude_a-usb_libusb.o `test -f 'usb_libusb.c' || echo '$(srcdir)/'`usb_libusb.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-usb_libusb.Tpo $(DEPDIR)/libavrdude_a-usb_libusb.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usb_libusb.c' object='libavrdude_a-usb_libusb.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-usb_libusb.o: usb_libusb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-usb_libusb.o -MD -MP -MF $(DEPDIR)/libacad_a-usb_libusb.Tpo -c -o libacad_a-usb_libusb.o `test -f 'usb_libusb.c' || echo '$(srcdir)/'`usb_libusb.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-usb_libusb.Tpo $(DEPDIR)/libacad_a-usb_libusb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usb_libusb.c' object='libacad_a-usb_libusb.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-usb_libusb.o `test -f 'usb_libusb.c' || echo '$(srcdir)/'`usb_libusb.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-usb_libusb.o `test -f 'usb_libusb.c' || echo '$(srcdir)/'`usb_libusb.c
 
-libavrdude_a-usb_libusb.obj: usb_libusb.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-usb_libusb.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-usb_libusb.Tpo -c -o libavrdude_a-usb_libusb.obj `if test -f 'usb_libusb.c'; then $(CYGPATH_W) 'usb_libusb.c'; else $(CYGPATH_W) '$(srcdir)/usb_libusb.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-usb_libusb.Tpo $(DEPDIR)/libavrdude_a-usb_libusb.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usb_libusb.c' object='libavrdude_a-usb_libusb.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-usb_libusb.obj: usb_libusb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-usb_libusb.obj -MD -MP -MF $(DEPDIR)/libacad_a-usb_libusb.Tpo -c -o libacad_a-usb_libusb.obj `if test -f 'usb_libusb.c'; then $(CYGPATH_W) 'usb_libusb.c'; else $(CYGPATH_W) '$(srcdir)/usb_libusb.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-usb_libusb.Tpo $(DEPDIR)/libacad_a-usb_libusb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usb_libusb.c' object='libacad_a-usb_libusb.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-usb_libusb.obj `if test -f 'usb_libusb.c'; then $(CYGPATH_W) 'usb_libusb.c'; else $(CYGPATH_W) '$(srcdir)/usb_libusb.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-usb_libusb.obj `if test -f 'usb_libusb.c'; then $(CYGPATH_W) 'usb_libusb.c'; else $(CYGPATH_W) '$(srcdir)/usb_libusb.c'; fi`
 
-libavrdude_a-usbtiny.o: usbtiny.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-usbtiny.o -MD -MP -MF $(DEPDIR)/libavrdude_a-usbtiny.Tpo -c -o libavrdude_a-usbtiny.o `test -f 'usbtiny.c' || echo '$(srcdir)/'`usbtiny.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-usbtiny.Tpo $(DEPDIR)/libavrdude_a-usbtiny.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usbtiny.c' object='libavrdude_a-usbtiny.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-usbtiny.o: usbtiny.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-usbtiny.o -MD -MP -MF $(DEPDIR)/libacad_a-usbtiny.Tpo -c -o libacad_a-usbtiny.o `test -f 'usbtiny.c' || echo '$(srcdir)/'`usbtiny.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-usbtiny.Tpo $(DEPDIR)/libacad_a-usbtiny.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usbtiny.c' object='libacad_a-usbtiny.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-usbtiny.o `test -f 'usbtiny.c' || echo '$(srcdir)/'`usbtiny.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-usbtiny.o `test -f 'usbtiny.c' || echo '$(srcdir)/'`usbtiny.c
 
-libavrdude_a-usbtiny.obj: usbtiny.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-usbtiny.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-usbtiny.Tpo -c -o libavrdude_a-usbtiny.obj `if test -f 'usbtiny.c'; then $(CYGPATH_W) 'usbtiny.c'; else $(CYGPATH_W) '$(srcdir)/usbtiny.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-usbtiny.Tpo $(DEPDIR)/libavrdude_a-usbtiny.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usbtiny.c' object='libavrdude_a-usbtiny.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-usbtiny.obj: usbtiny.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-usbtiny.obj -MD -MP -MF $(DEPDIR)/libacad_a-usbtiny.Tpo -c -o libacad_a-usbtiny.obj `if test -f 'usbtiny.c'; then $(CYGPATH_W) 'usbtiny.c'; else $(CYGPATH_W) '$(srcdir)/usbtiny.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-usbtiny.Tpo $(DEPDIR)/libacad_a-usbtiny.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usbtiny.c' object='libacad_a-usbtiny.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-usbtiny.obj `if test -f 'usbtiny.c'; then $(CYGPATH_W) 'usbtiny.c'; else $(CYGPATH_W) '$(srcdir)/usbtiny.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-usbtiny.obj `if test -f 'usbtiny.c'; then $(CYGPATH_W) 'usbtiny.c'; else $(CYGPATH_W) '$(srcdir)/usbtiny.c'; fi`
 
-libavrdude_a-update.o: update.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-update.o -MD -MP -MF $(DEPDIR)/libavrdude_a-update.Tpo -c -o libavrdude_a-update.o `test -f 'update.c' || echo '$(srcdir)/'`update.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-update.Tpo $(DEPDIR)/libavrdude_a-update.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='update.c' object='libavrdude_a-update.o' libtool=no @AMDEPBACKSLASH@
+libacad_a-update.o: update.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-update.o -MD -MP -MF $(DEPDIR)/libacad_a-update.Tpo -c -o libacad_a-update.o `test -f 'update.c' || echo '$(srcdir)/'`update.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-update.Tpo $(DEPDIR)/libacad_a-update.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='update.c' object='libacad_a-update.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-update.o `test -f 'update.c' || echo '$(srcdir)/'`update.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-update.o `test -f 'update.c' || echo '$(srcdir)/'`update.c
 
-libavrdude_a-update.obj: update.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -MT libavrdude_a-update.obj -MD -MP -MF $(DEPDIR)/libavrdude_a-update.Tpo -c -o libavrdude_a-update.obj `if test -f 'update.c'; then $(CYGPATH_W) 'update.c'; else $(CYGPATH_W) '$(srcdir)/update.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libavrdude_a-update.Tpo $(DEPDIR)/libavrdude_a-update.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='update.c' object='libavrdude_a-update.obj' libtool=no @AMDEPBACKSLASH@
+libacad_a-update.obj: update.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -MT libacad_a-update.obj -MD -MP -MF $(DEPDIR)/libacad_a-update.Tpo -c -o libacad_a-update.obj `if test -f 'update.c'; then $(CYGPATH_W) 'update.c'; else $(CYGPATH_W) '$(srcdir)/update.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libacad_a-update.Tpo $(DEPDIR)/libacad_a-update.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='update.c' object='libacad_a-update.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libavrdude_a_CPPFLAGS) $(CPPFLAGS) $(libavrdude_a_CFLAGS) $(CFLAGS) -c -o libavrdude_a-update.obj `if test -f 'update.c'; then $(CYGPATH_W) 'update.c'; else $(CYGPATH_W) '$(srcdir)/update.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacad_a_CPPFLAGS) $(CPPFLAGS) $(libacad_a_CFLAGS) $(CFLAGS) -c -o libacad_a-update.obj `if test -f 'update.c'; then $(CYGPATH_W) 'update.c'; else $(CYGPATH_W) '$(srcdir)/update.c'; fi`
 
-avrdude-main.o: main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(avrdude_CPPFLAGS) $(CPPFLAGS) $(avrdude_CFLAGS) $(CFLAGS) -MT avrdude-main.o -MD -MP -MF $(DEPDIR)/avrdude-main.Tpo -c -o avrdude-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/avrdude-main.Tpo $(DEPDIR)/avrdude-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='avrdude-main.o' libtool=no @AMDEPBACKSLASH@
+acad-main.o: main.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(acad_CPPFLAGS) $(CPPFLAGS) $(acad_CFLAGS) $(CFLAGS) -MT acad-main.o -MD -MP -MF $(DEPDIR)/acad-main.Tpo -c -o acad-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/acad-main.Tpo $(DEPDIR)/acad-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='acad-main.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(avrdude_CPPFLAGS) $(CPPFLAGS) $(avrdude_CFLAGS) $(CFLAGS) -c -o avrdude-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(acad_CPPFLAGS) $(CPPFLAGS) $(acad_CFLAGS) $(CFLAGS) -c -o acad-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
 
-avrdude-main.obj: main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(avrdude_CPPFLAGS) $(CPPFLAGS) $(avrdude_CFLAGS) $(CFLAGS) -MT avrdude-main.obj -MD -MP -MF $(DEPDIR)/avrdude-main.Tpo -c -o avrdude-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/avrdude-main.Tpo $(DEPDIR)/avrdude-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='avrdude-main.obj' libtool=no @AMDEPBACKSLASH@
+acad-main.obj: main.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(acad_CPPFLAGS) $(CPPFLAGS) $(acad_CFLAGS) $(CFLAGS) -MT acad-main.obj -MD -MP -MF $(DEPDIR)/acad-main.Tpo -c -o acad-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/acad-main.Tpo $(DEPDIR)/acad-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='acad-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(avrdude_CPPFLAGS) $(CPPFLAGS) $(avrdude_CFLAGS) $(CFLAGS) -c -o avrdude-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(acad_CPPFLAGS) $(CPPFLAGS) $(acad_CFLAGS) $(CFLAGS) -c -o acad-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
 
 .l.c:
 	$(am__skiplex) $(SHELL) $(YLWRAP) $< $(LEX_OUTPUT_ROOT).c $@ -- $(LEXCOMPILE)
@@ -1297,17 +1292,17 @@ dist-hook:
 	$(distdir)/config_gram.c \
 	$(distdir)/config_gram.h
 
-install-exec-local: backup-avrdude-conf
+install-exec-local: backup-acad-conf
 
 distclean-local:
-	rm -f avrdude.conf
+	rm -f acad.conf
 
 # This will get run before the config file is installed.
-backup-avrdude-conf:
-	@echo "Backing up avrdude.conf in ${DESTDIR}${sysconfdir}"
-	@if test -e ${DESTDIR}${sysconfdir}/avrdude.conf; then \
-		cp -pR ${DESTDIR}${sysconfdir}/avrdude.conf \
-			${DESTDIR}${sysconfdir}/avrdude.conf.bak; \
+backup-acad-conf:
+	@echo "Backing up acad.conf in ${DESTDIR}${sysconfdir}"
+	@if test -e ${DESTDIR}${sysconfdir}/acad.conf; then \
+		cp -pR ${DESTDIR}${sysconfdir}/acad.conf \
+			${DESTDIR}${sysconfdir}/acad.conf.bak; \
 	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

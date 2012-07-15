@@ -1,5 +1,8 @@
 #
-# avrdude - A Downloader/Uploader for AVR device programmers
+# acad - An avrdude distro adapted for the Ale packet
+# Copyright (C) 2012 Victor ADĂSCĂLIȚEI <admin@tuscale.ro>
+#
+# !!! Original avrdude 5.11 configure.ac notice follows !!!
 # Copyright (C) 2003, 2004  Theodore A. Roth  <troth@openavr.org>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -24,7 +27,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT(avrdude, 5.11.1, avrdude-dev@nongnu.org)
+AC_INIT(acad, 0.9, admin@tuscale.ro)
 
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
@@ -368,7 +371,7 @@ AC_SUBST(WINDOWS_DIRS,$WINDOWS_DIRS)
 AC_CONFIG_FILES([
        doc/Makefile
        windows/Makefile
-       avrdude.spec
+       acad.spec
        Makefile
 ])
 
@@ -379,7 +382,7 @@ AC_CONFIG_FILES([
 # based on previous configuration results, thereby producing the final
 # avrdude.conf file.
 
-AC_CONFIG_FILES([avrdude.conf.tmp:avrdude.conf.in],
-		[sed $confsubst avrdude.conf.tmp > avrdude.conf])
+AC_CONFIG_FILES([acad.conf.tmp:acad.conf.in],
+		[sed $confsubst acad.conf.tmp > acad.conf])
 
 AC_OUTPUT

@@ -1,4 +1,12 @@
-See the documentation file for the details.
+ACAD - Ale's Custom Avrdude Distro
+
+The project plans on building a static library (lib*.a) that can be used to comunicate with a 'UsbTiny' AVR Programmer.
+Basically, it consists of a stripped AVRDUDE v5.11 project on which an API was added.
+
+More infos will follow ...
+
+---
+The module is build on top of the AVRDUDE project, an OpenSource AVR Programmer
 
 The latest version of AVRDUDE is always available here:
 
