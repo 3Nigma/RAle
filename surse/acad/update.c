@@ -30,7 +30,6 @@
 #include "avr.h"
 #include "config.h"
 #include "confwin.h"
-#include "fileio.h"
 #include "update.h"
 
 UPDATE * parse_op(char * s)
@@ -182,7 +181,7 @@ UPDATE * dup_update(UPDATE * upd)
   return u;
 }
 
-UPDATE * new_update(int op, char * memtype, int filefmt, char * filename)
+UPDATE * new_update(DEVICE_OP_TYPE op, char * memtype, FILEFMT filefmt, char * filename)
 {
   UPDATE * u;
 

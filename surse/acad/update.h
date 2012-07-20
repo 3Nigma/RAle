@@ -23,30 +23,32 @@
 #ifndef update_h
 #define update_h
 
-enum {
+#include "fileio.h"
+
+typedef enum {
   DEVICE_READ,
   DEVICE_WRITE,
   DEVICE_VERIFY
-};
+} DEVICE_OP_TYPE;
 
 
 typedef struct update_t {
-  char * memtype;
-  int    op;
-  char * filename;
-  int    format;
+  char *memtype;
+  DEVICE_OP_TYPE op;
+  char *filename;
+  FILEFMT format;
 } UPDATE;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern UPDATE * parse_op(char * s);
-extern UPDATE * dup_update(UPDATE * upd);
-extern UPDATE * new_update(int op, char * memtype, int filefmt,
-			   char * filename);
-extern int do_op(PROGRAMMER * pgm, struct avrpart * p, UPDATE * upd,
-		 int nowrite, int verify);
+  extern UPDATE *parse_op(char * s);
+  extern UPDATE *dup_update(UPDATE * upd);
+  extern UPDATE *new_update(DEVICE_OP_TYPE op, char * memtype, FILEFMT filefmt,
+			    char * filename);
+  extern int do_op(PROGRAMMER * pgm, struct avrpart * p, UPDATE * upd,
+		   int nowrite, int verify);
 
 #ifdef __cplusplus
 }

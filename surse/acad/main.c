@@ -2,7 +2,7 @@
  * acad - An avrdude distro adapted for the Ale packet
  * Copyright (C) 2012 Victor ADĂSCĂLIȚEI <admin@tuscale.ro>
  *
- * !!! Original avrdude 5.11 Makefile.am notice follows !!!
+ * !!! Original avrdude 5.11 main.c notice follows !!!
  * Copyright (C) 2000-2005  Brian S. Dean <bsd@bsdhome.com>
  * Copyright 2007-2009 Joerg Wunsch <j@uriah.heep.sax.de>
  *
@@ -51,6 +51,7 @@
 /* Set 'main' return value possibilities */
 enum {
   ACAD_OP_OK = 0,               /* The operation was carried out succesfully */
+  ACAD_MEMORY_FAILED_ERR,	/* A memory op failed */
   ACAD_CONFIG_FILE_PARSE_ERR,	/* There was an error in parsing the ".conf" file */
   ACAD_COULDNT_OPEN_PGM_ERR,	/* Couldn't make link with 'usbtiny'. Is it connected ? */
   ACAD_PGM_INIT_ERR,		/* Something went wrong with the initialization of the programmer. Double check connections and try again ... */
@@ -58,7 +59,8 @@ enum {
   ACAD_SIG_BAD_VAL_ERR,		/* An error while reading the signature value occured. The resulting signature has been corupted. */
   ACAD_SIG_MISSMATCH_ERR,	/* The expected signature doesn't match the real one */
   ACAD_UPDATE_ACT_ERR,		/* There was an error in the ubpdate processing stage */
-  ACAD_ERASE_ACT_ERR		/* Signifies the fact that the erase procedure had a problem and didn't ended succesfully */
+  ACAD_ERASE_ACT_ERR,		/* Signifies the fact that the erase procedure had a problem and didn't ended succesfully */
+  ACAD_CYCLCNT_UPD_ERR		/* There was an error in updating the EEPROM programming cycle count value */
 };
 
 /* Get VERSION from ac_cfg.h */
@@ -83,6 +85,8 @@ int    verbose;     /* verbose output */
 int    quell_progress; /* un-verebose output */
 int    ovsigck;     /* 1=override sig check, 0=don't */
 
+char    sys_config[PATH_MAX]; /* system wide config file */
+struct avrpart * p;
 
 /*
  * usage message
@@ -94,7 +98,6 @@ static void usage(void)
  "Options:\n"
  "  -p <partno>                Required. Specify AVR device.\n"
  "  -B <bitclock>              Specify JTAG/STK500v2 bit clock period (us).\n"
- "  -C <config-file>           Specify location of configuration file.\n"
  "  -D                         Disable auto erase for flash memory\n"
  "  -P <port>                  Specify connection port.\n"
  "  -F                         Override invalid signature check.\n"
@@ -139,17 +142,112 @@ static void exithook(void) {
     pgm->teardown(pgm);
 }
 
+extern int 
+acad_init() {
+  int rc = -1;
+  int i = 0;
+
+  init_config();
+
+  updates = lcreat(NULL, 0);
+  if (updates == NULL) {
+    fprintf(stderr, "%s: cannot initialize updater list\n", progname);
+    return ACAD_MEMORY_FAILED_ERR;
+  }
+
+#if defined(WIN32NATIVE)
+  win_sys_config_set(sys_config);
+#else
+  /* Setting the config file variable */
+  strcpy(sys_config, "./");
+  i = strlen(sys_config);
+  if (i && (sys_config[i-1] != '/'))
+    strcat(sys_config, "/");
+  strcat(sys_config, "acad.conf");
+#endif
+
+  rc = read_config(sys_config);
+  if (rc) {
+    return ACAD_CONFIG_FILE_PARSE_ERR;
+  }
+
+  pgm = usbtiny_initpgm(); 
+  if (pgm->setup) {
+    pgm->setup(pgm);
+  }
+  if (pgm->teardown) {
+    atexit(exithook);
+  }
+
+  return ACAD_OP_OK;
+}
+
+extern int 
+acad_erase_chip(void) {
+  int rc = -1;
+
+  rc = avr_chip_erase(pgm, p);
+  if(rc) {
+    return ACAD_ERASE_ACT_ERR;
+  }
+
+  return ACAD_OP_OK;
+}
+
+extern void 
+acad_set_port(const char *portName) {
+  
+}
+
+extern int 
+acad_read_prgcycle(void) {
+  int rc = -1;
+  int cycles = 0;
+
+  rc = avr_get_cycle_count(pgm, p, &cycles);
+  if(rc)
+    return -1;
+
+  return cycles;
+}
+
+extern int 
+acad_set_prgcycle(int newCycleCnt) {
+  int rc = -1;
+
+  rc = avr_put_cycle_count(pgm, p, newCycleCnt);
+  if(rc)
+    return ACAD_CYCLCNT_UPD_ERR;
+
+  return ACAD_OP_OK;
+}
+
+extern int 
+acad_push_memory_action(DEVICE_OP_TYPE op, char *memtype, FILEFMT filefmt, char *filename) {
+  UPDATE *upd = NULL;
+
+  upd = new_update(op, memtype, filefmt, filename);
+  ladd(updates, upd);
+  
+  if (upd->op == DEVICE_WRITE) {
+    upd = dup_update(upd);
+    upd->op = DEVICE_VERIFY;
+    ladd(updates, upd);
+  }
+
+  return ACAD_OP_OK;
+}
+
 /*
  * main routine
  */
 int main(int argc, char * argv [])
 {
-  int              rc;          /* general return code checking */
+  int              rc;          /* general return code checking */ 
   int              exitrc;      /* exit code for main() */
   int              i;           /* general loop counter */
   int              ch;          /* options flag */
   int              len;         /* length for various strings */
-  struct avrpart * p;           /* which avr part we are programming */
   AVRMEM         * sig;         /* signature data */
   UPDATE         * upd;
   LNODEID        * ln;
@@ -163,7 +261,6 @@ int main(int argc, char * argv [])
   int     nowrite;     /* don't actually write anything to the chip */
   int     verify;      /* perform a verify operation */
   char  * partdesc;    /* part id */
-  char    sys_config[PATH_MAX]; /* system wide config file */
   int     cycles;      /* erase-rewrite cycles */
   int     set_cycles;  /* value to set the erase-rewrite cycles to */
   char  * e;           /* for strtol() error checking */
@@ -203,13 +300,9 @@ int main(int argc, char * argv [])
   default_serial[0]   = 0;
   default_bitclock    = 0.0;
 
-  init_config();
-
-  updates = lcreat(NULL, 0);
-  if (updates == NULL) {
-    fprintf(stderr, "%s: cannot initialize updater list\n", progname);
-    exit(1);
-  }
+  rc = acad_init();
+  if(ACAD_OP_OK != rc)
+    exit(rc);
 
   partdesc      = NULL;
   port          = default_parallel;
@@ -220,41 +313,25 @@ int main(int argc, char * argv [])
   nowrite       = 0;
   verify        = 1;        /* on by default */
   quell_progress = 0;
-  pgm           = NULL;
   verbose       = 0;
   do_cycles     = 0;
   set_cycles    = -1;
   bitclock      = 0.0;
   safemode      = 1;       /* Safemode on by default */
   is_open       = 0;
-  
+
+  /* set bitclock from configuration files unless changed by command line */
+  if (default_bitclock > 0 && bitclock == 0.0) {
+    bitclock = default_bitclock;
+  }
+
   if (isatty(STDIN_FILENO) == 0)
       safemode  = 0;       /* Turn off safemode if this isn't a terminal */
-
-#if defined(WIN32NATIVE)
-  win_sys_config_set(sys_config);
-#else
-  /* Setting the config file variable */
-  strcpy(sys_config, CONFIG_DIR);
-  i = strlen(sys_config);
-  if (i && (sys_config[i-1] != '/'))
-    strcat(sys_config, "/");
-  strcat(sys_config, "avrdude.conf");
-#endif
 
   len = strlen(progname) + 2;
   for (i=0; i<len; i++)
     progbuf[i] = ' ';
   progbuf[i] = 0;
-
-  /*
-   * check for no arguments
-   */
-  /*if (argc == 1) {
-    usage();
-    return 0;
-  }*/
-
 
   /* Process command line arguments */
   while ((ch = getopt(argc,argv,"?B:C:De:F:np:P:qstU:uV:yY:")) != -1) {
@@ -266,11 +343,6 @@ int main(int argc, char * argv [])
                   progname, optarg);
           exit(1);
         }
-        break;
-
-      case 'C': /* system wide configuration file */
-        strncpy(sys_config, optarg, PATH_MAX);
-        sys_config[PATH_MAX-1] = 0;
         break;
 
       case 'D': /* disable auto erase */
@@ -364,24 +436,6 @@ int main(int argc, char * argv [])
       setvbuf( stderr, NULL, _IONBF, 0 );
       setvbuf( stdout, NULL, _IONBF, 0 );
     }
-  }
-
-  rc = read_config(sys_config);
-  if (rc) {
-    exit(ACAD_CONFIG_FILE_PARSE_ERR);
-  }
-
-  // set bitclock from configuration files unless changed by command line
-  if (default_bitclock > 0 && bitclock == 0.0) {
-    bitclock = default_bitclock;
-  }
-
-  pgm = usbtiny_initpgm(); 
-  if (pgm->setup) {
-    pgm->setup(pgm);
-  }
-  if (pgm->teardown) {
-    atexit(exithook);
   }
 
   p = locate_part(part_list, partdesc);
@@ -489,7 +543,7 @@ int main(int argc, char * argv [])
     }
   }
 
-  if ((erase == 0) && (auto_erase == 1)) {
+  /*if ((erase == 0) && (auto_erase == 1)) {
     AVRMEM * m;
     for (ln=lfirst(updates); ln; ln=lnext(ln)) {
       upd = ldata(ln);
@@ -500,48 +554,16 @@ int main(int argc, char * argv [])
         erase = 1;
         break;
       }
-    }
-  }
-
-  /*
-   * Display cycle count, if and only if it is not set later on.
-   *
-   * The cycle count will be displayed anytime it will be changed later.
-   */
-  if ((set_cycles == -1) && ((erase == 0) || (do_cycles == 0))) {
-    /*
-     * see if the cycle count in the last four bytes of eeprom seems
-     * reasonable
-     */
-    rc = avr_get_cycle_count(pgm, p, &cycles);
-    if (init_ok && set_cycles != -1) {
-      rc = avr_get_cycle_count(pgm, p, &cycles);
-      if (rc == 0) {
-	/*
-	 * only attempt to update the cycle counter if we can actually
-	 * read the old value
-	 */
-	cycles = set_cycles;
-	rc = avr_put_cycle_count(pgm, p, cycles);
       }
-    }
-  }
+      }*/
+
+  /* Cycle count read/update logic */
   
-  if (erase) {
-    /*
-     * Erase the chip's flash and eeprom memories, this is required
-     * before the chip can accept new programming
-     */
-    if (!nowrite) {
-      exitrc = avr_chip_erase(pgm, p);
-      if(exitrc) {
-	exitrc = ACAD_ERASE_ACT_ERR;
-	goto main_exit;
-      }
-    }
-  }
+  if (erase && 
+      acad_erase_chip() != ACAD_OP_OK)
+    goto main_exit;
 
-  /* Prrfrom the update actions demanded through the '-U' param list */
+  /* Perform the update actions demanded through the '-U' param list */
   for (ln=lfirst(updates); ln; ln=lnext(ln)) {
     upd = ldata(ln);
     rc = do_op(pgm, p, upd, nowrite, verify);
