@@ -1,7 +1,5 @@
 #include "db.h"
 
-#define PSALE_BD_NUME_FIS "date.sqlite"
-
 static sqlite3_value *
 bd_obtine_rezultat_unic(const char *fisBD, const char *com, int colId) {
   sqlite3 *db = NULL;

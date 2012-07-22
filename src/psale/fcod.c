@@ -286,7 +286,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
 
   /* inițializăm bara de stare a formularului */
   lblStareLegatura = gtk_label_new("[Conexiune]");
-  lblStareCod = gtk_label_new("[Dim. Cod]");
+  lblStareCod = gtk_label_new(NULL);
   lblStareNumeSursa = gtk_label_new(denumireSursa);
 
   cadruBaraStare = gtk_hbox_new(TRUE, 5);

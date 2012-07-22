@@ -5,6 +5,8 @@
 #include <string.h>
 #include <sqlite3.h>
 
+#define PSALE_BD_NUME_FIS "date.sqlite"
+
 extern int 
 db_incarca_exemple_carte(GtkListStore *st);
 
