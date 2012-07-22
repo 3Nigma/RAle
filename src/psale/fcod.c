@@ -1,5 +1,4 @@
-#include "fcod.h"
-
+#include <string.h>
 #include <stdlib.h>
 
 #include <glib.h>
@@ -14,6 +13,9 @@
 #include <windows.h>
 #endif
 
+#include "al.h"
+#include "fcod.h"
+
 #define PSALE_CODS_IMPLICIT ".section text\n" \
   ".global main\n\n" \
   "main:\n" \
@@ -26,41 +28,8 @@
   "  return 0;\n" \
   "}\n"
 
-static gboolean placutaConectata;
 static GtkSourceLanguageManager *txtSrcLimbAsignor = NULL;
 static GtkSourceStyleSchemeManager *txtSrcStilAsignor = NULL;
-
-static gboolean 
-este_placuta_conectata() {
-  int avrdudeRet = 0;
-
-#ifdef G_OS_WIN32
-  /* DE FĂCUT : obține același efect pentru windows */
-#elif defined G_OS_UNIX
-  avrdudeRet = system("sudo avrdude -c usbtiny -p t25 -V 2> /dev/null");
-#endif
-  
-  if(WIFEXITED(avrdudeRet))
-    return WEXITSTATUS(avrdudeRet) == 0;
-
-  return FALSE;
-}
-
-static gboolean 
-actualizeaza_stare_placuta(GtkWidget *lblStare) {
-  gboolean placutaOnline = FALSE;
-
-  g_assert(GTK_IS_LABEL(lblStare));
-
-  if(este_placuta_conectata()) {
-    gtk_label_set_markup(GTK_LABEL(lblStare), "<span color=\"#003300\">Am găsit plăcuța!</span>");
-    placutaOnline = TRUE;
-  } else {
-    gtk_label_set_markup(GTK_LABEL(lblStare), "<span color=\"#980000\"><b>NU</b> s-a găsit plăcuța!</span>");
-  }
-
-  return placutaOnline;
-}
 
 static gchar *
 obtine_codul_sursa_curent(GtkTextView *txtView) {
@@ -122,10 +91,11 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   
   system(textComandaGcc);
   system(textComandaObjcopy);
-  if(actualizeaza_stare_placuta(fc->lblStareConex))
+  system(textComandaAvrdude);
+  if(al_este_placuta_conectata())
     system(textComandaAvrdude);
   else
-    placutaConectata = FALSE;
+    if(fc->laDepistare_neprezentaPlacuta_recurenta != NULL) fc->laDepistare_neprezentaPlacuta_recurenta();
 #endif
 
   remove(denFisSursa);
@@ -170,19 +140,6 @@ fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
     break;
   }
   }
-}
-
-static gboolean 
-la_interval_tick(gpointer user_data) {
-  FormularCod *fc = (FormularCod *)user_data;
-
-  if(GTK_IS_WIDGET(fc->frm) == FALSE) return FALSE;
-
-  if(placutaConectata == FALSE && actualizeaza_stare_placuta(fc->lblStareConex)) {
-    placutaConectata = TRUE;
-  }
-  
-  return TRUE;
 }
 
 FormularCod *
@@ -351,17 +308,13 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   deRet->lblStareNSursa = lblStareNumeSursa;
   if(esteExemplu) deRet->vActiuni = VIZIBILE;
   else deRet->vActiuni = ASCUNSE;
-
+  deRet->laDepistare_neprezentaPlacuta_recurenta = NULL;
+  
   /* legăm semnalele de funcțiile recurente */
   g_signal_connect(frm, "delete-event", G_CALLBACK(frmCod_delev), NULL);
   g_signal_connect(btGestioneazaActiuni, "clicked", G_CALLBACK(btExpandatorActiuni_click), (gpointer)deRet);
   g_signal_connect(btIncarcaPeAle, "clicked", G_CALLBACK(btIncarcaPeAle_click), (gpointer)deRet);
   g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(gtk_widget_destroy), frm);
-
-  /* dăm drumul la tick-ul de interval */
-  placutaConectata = FALSE;
-  actualizeaza_stare_placuta(deRet->lblStareConex);
-  g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, 3, la_interval_tick, (gpointer)deRet, NULL);
   
   return deRet;
 }
@@ -369,4 +322,23 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
 FormularCod *
 fc_initializeaza_fara_cod(Limbaj lmDorit) {
   return fc_initializeaza(lmDorit, "", "[Cod Nou]", FALSE);
+}
+
+void 
+fc_actualizeaza_stare_placuta(GtkWidget *lblStare, gboolean online, gboolean primaRulare) {
+  g_assert(GTK_IS_LABEL(lblStare));
+
+  if(primaRulare) {
+    if(online) {
+      gtk_label_set_markup(GTK_LABEL(lblStare), "<span color=\"#003300\">Văd plăcuța!</span>");
+    } else {
+      gtk_label_set_markup(GTK_LABEL(lblStare), "<span color=\"#980000\"><b>NU</b> văd plăcuța!</span>");
+    }
+  } else {
+    if(online) {
+      gtk_label_set_markup(GTK_LABEL(lblStare), "<span color=\"#003300\">Am găsit <b>plăcuța</b>!</span>");
+    } else {
+      gtk_label_set_markup(GTK_LABEL(lblStare), "<span color=\"#980000\">Am pierdut plăcuța!</span>");
+    }
+  }
 }

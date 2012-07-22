@@ -8,7 +8,9 @@
 #include <windows.h>
 #endif
 
+#include "dl.h"
 #include "db.h"
+#include "al.h"
 #include "finfo.h"
 #include "fcod.h"
 
@@ -17,7 +19,15 @@
   #define G_VALUE_INIT { 0, { { 0 } } }
 #endif
 
+static gboolean estePlacutaConectata;
+static gboolean dlgCodForteazaActualizConex;
+static GSList *listaDlgCod = NULL;
 static GtkWidget *dlgInfo = NULL;
+
+static void 
+placuta_sa_deconectat() {
+  dlgCodForteazaActualizConex = TRUE;
+}
 
 static gboolean 
 imgLogo_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
@@ -44,10 +54,13 @@ cmbxCodNou_selectat(GtkComboBox *widget, gpointer user_data) {
       dlgCod = fc_initializeaza_fara_cod(C);
       break;
     }
+    dlgCod->laDepistare_neprezentaPlacuta_recurenta = &placuta_sa_deconectat;
+    listaDlgCod = g_slist_prepend(listaDlgCod, dlgCod);
 
     /* repoziționăm textul afișat */
     gtk_combo_box_set_active(GTK_COMBO_BOX(widget), 0);
 
+    fc_actualizeaza_stare_placuta(dlgCod->lblStareConex, estePlacutaConectata, TRUE);
     fc_modifica_vizibilitate(dlgCod, TRUE);
   }
 }
@@ -69,10 +82,13 @@ cmbxCodCarte_selectat(GtkComboBox *widget, gpointer user_data) {
       g_sprintf(numeExempluAfisat, "Ex: %s", titluLung);
       if(g_str_has_suffix(titluScurt, "s")) dlgCod = fc_initializeaza(ASM, db_obtine_cod_complet(titluScurt), numeExempluAfisat, TRUE);
       else dlgCod = fc_initializeaza(C, db_obtine_cod_complet(titluScurt), numeExempluAfisat, TRUE);
-
+      dlgCod->laDepistare_neprezentaPlacuta_recurenta = &placuta_sa_deconectat;
+      listaDlgCod = g_slist_prepend(listaDlgCod, dlgCod);
+      
       /* repoziționăm textul afișat */
       gtk_combo_box_set_active(GTK_COMBO_BOX(widget), 0);
 
+      fc_actualizeaza_stare_placuta(dlgCod->lblStareConex, estePlacutaConectata, TRUE);
       fc_modifica_vizibilitate(dlgCod, TRUE);
     }
   }
@@ -128,6 +144,32 @@ creeaza_cmbxExemple() {
   gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(deRet), afisorCel1, "text", 1, NULL);
 
   return deRet;
+}
+
+static gboolean 
+la_interval_tick(gpointer user_data) {
+  gboolean stareConexCurenta;
+  
+  if(dlgCodForteazaActualizConex ||
+    (estePlacutaConectata == FALSE && (stareConexCurenta = al_este_placuta_conectata()))) {
+    GSList *elemFCod = listaDlgCod;
+    FormularCod *fc = NULL;
+
+    if(dlgCodForteazaActualizConex)
+      stareConexCurenta = al_este_placuta_conectata();
+    while(NULL != elemFCod) {
+      fc = (FormularCod *)elemFCod->data;
+      if(GTK_IS_WIDGET(fc->frm) != FALSE) {
+        fc_actualizeaza_stare_placuta(fc->lblStareConex, stareConexCurenta, FALSE);
+      }
+      elemFCod = g_slist_next(elemFCod);
+    }
+    
+    estePlacutaConectata = stareConexCurenta;
+    dlgCodForteazaActualizConex = FALSE;
+  }
+  
+  return TRUE;
 }
 
 int main(int argc, char *argv[]) {
@@ -202,6 +244,12 @@ int main(int argc, char *argv[]) {
   /* permite butoanelor să afișeze atât imaginea cât și textul dorit */
   GtkSettings *default_settings = gtk_settings_get_default();
   g_object_set(default_settings, "gtk-button-images", TRUE, NULL); 
+  
+  /* dăm drumul la tick-ul de interval */
+  estePlacutaConectata = FALSE;
+  dlgCodForteazaActualizConex = FALSE;
+  g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, 1, la_interval_tick, NULL, NULL);
+  
   gtk_main();
   dl_curata();
 

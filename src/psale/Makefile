@@ -1,7 +1,7 @@
 PROJ_NAME := psale
 CC := gcc
 CFLAGS := -Wall -g
-OBJS := db.o finfo.o fcod.o dl.o
+OBJS := db.o finfo.o fcod.o dl.o al.o
 
 .c.o :
 	$(CC) $(CFLAGS) `pkg-config --cflags gtk+-2.0 gtksourceview-2.0 sqlite3` -c $< -o $@
