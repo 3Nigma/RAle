@@ -101,7 +101,7 @@ initializeaza_formular_info() {
   incarca_info_general(cadruFrm);
 
   /* inițializăm imaginea de informație */
-  imgInfo = gtk_image_new_from_file("media/info_img.png");
+  imgInfo = gtk_image_new_from_pixbuf(db_obtine_imagine_media_scalata(DB_IMG_INFO, -1, -1));
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo, 0, 1, 0, 1);
 
   /* inițializăm butonul de părăsire a formularului */

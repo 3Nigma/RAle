@@ -22,7 +22,6 @@
 static gboolean estePlacutaConectata;
 static gboolean dlgCodForteazaActualizConex;
 static GSList *listaDlgCod = NULL;
-static GtkWidget *dlgInfo = NULL;
 
 static void 
 placuta_sa_deconectat() {
@@ -96,8 +95,7 @@ cmbxCodCarte_selectat(GtkComboBox *widget, gpointer user_data) {
 
 static void 
 btInfo_click(GtkWidget *widget, gpointer data) {
-  if(dlgInfo == NULL)
-    dlgInfo = initializeaza_formular_info();
+  GtkWidget *dlgInfo = initializeaza_formular_info();
 
   gtk_widget_show_all(dlgInfo);
 }
@@ -202,7 +200,7 @@ fp_initializeaza_formular_principal() {
   gtk_container_add(GTK_CONTAINER(frm), cadruFormPrincipal);
 
   /* inițializăm logoul aplicației */
-  imgLogo = gtk_image_new_from_file("media/tuscale_small_logo_ale.png");
+  imgLogo = gtk_image_new_from_pixbuf(db_obtine_imagine_media_scalata(DB_IMG_TUSCALE_LOGO, -1, -1));
 
   /* inițializăm cadrul pentru logoul aplicației */
   cadruImgLogo = gtk_event_box_new();

@@ -14,6 +14,7 @@
 #endif
 
 #include "al.h"
+#include "db.h"
 #include "fcod.h"
 
 #define PSALE_CODS_IMPLICIT ".section text\n" \
@@ -111,12 +112,12 @@ btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
   switch(fc->vActiuni) {
   case ASCUNSE:
     gtk_widget_show(fc->cadruActiuni);
-    imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size("media/bt_icoana_colapseaza.png", 20, 20, NULL);
+    imgExpandatorPixBuf = db_obtine_imagine_media_scalata(DB_IMG_COLAPSEAZA, 20, 20);
     fc->vActiuni = VIZIBILE;
     break;
   case VIZIBILE:
     gtk_widget_hide(fc->cadruActiuni);
-    imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size("media/bt_icoana_expandeaza.png", 20, 20, NULL);
+    imgExpandatorPixBuf = db_obtine_imagine_media_scalata(DB_IMG_EXPANDEAZA, 20, 20);
     fc->vActiuni = ASCUNSE;
     break;
   }
@@ -226,8 +227,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   btGestioneazaActiuni = gtk_button_new();
   gtk_button_set_relief(GTK_BUTTON(btGestioneazaActiuni), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btGestioneazaActiuni), FALSE);
-  GdkPixbuf *imgExpandatorPixBuf = gdk_pixbuf_new_from_file_at_size(esteExemplu ? "media/bt_icoana_colapseaza.png" : "media/bt_icoana_expandeaza.png", 
-								    20, 20, NULL);
+  GdkPixbuf *imgExpandatorPixBuf = db_obtine_imagine_media_scalata(esteExemplu ? DB_IMG_COLAPSEAZA : DB_IMG_EXPANDEAZA, 20, 20);
   GtkWidget *imgExpandatorActiuni = gtk_image_new_from_pixbuf(imgExpandatorPixBuf);
   gtk_button_set_image(GTK_BUTTON(btGestioneazaActiuni), imgExpandatorActiuni);
   gtk_table_attach(GTK_TABLE(cadruFrm), btGestioneazaActiuni, 1, 2, 0, 2, GTK_SHRINK, GTK_FILL, 0, 0);
@@ -236,7 +236,8 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   btIncarcaPeAle = gtk_button_new_with_label("Încarcă pe Ale");
   gtk_button_set_focus_on_click(GTK_BUTTON(btIncarcaPeAle), FALSE);
   gtk_widget_set_size_request(GTK_WIDGET(btIncarcaPeAle), -1, 60);
-  GtkWidget *imgIncarcaPeAle = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_trimite_la_ale.png", 16, 16, NULL));
+  GdkPixbuf *imgIncarcaPeAlePixBuf = db_obtine_imagine_media_scalata(DB_IMG_TRIMITE_LA_ALE, 16, 16);
+  GtkWidget *imgIncarcaPeAle = gtk_image_new_from_pixbuf(imgIncarcaPeAlePixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btIncarcaPeAle), GTK_POS_RIGHT);
   gtk_button_set_image(GTK_BUTTON(btIncarcaPeAle), imgIncarcaPeAle);
 
@@ -244,7 +245,8 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_button_set_relief(GTK_BUTTON(btSalveazaLucrul), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btSalveazaLucrul), FALSE);
   gtk_widget_set_size_request(GTK_WIDGET(btSalveazaLucrul), -1, 50);
-  GtkWidget *imgSalveazaLucrul = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_salveaza.png", 16, 16, NULL));
+  GdkPixbuf *imgSalveazaLucrulPixBuf = db_obtine_imagine_media_scalata(DB_IMG_SALVEAZA_COD, 16, 16);
+  GtkWidget *imgSalveazaLucrul = gtk_image_new_from_pixbuf(imgSalveazaLucrulPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btSalveazaLucrul), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btSalveazaLucrul), imgSalveazaLucrul);
 
@@ -252,7 +254,8 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_button_set_relief(GTK_BUTTON(btReiaLucrul), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btReiaLucrul), FALSE);
   gtk_widget_set_size_request(GTK_WIDGET(btReiaLucrul), -1, 40);
-  GtkWidget *imgReiaLucrul = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_reia.png", 16, 16, NULL));
+  GdkPixbuf *imgReiaLucrulPixBuf = db_obtine_imagine_media_scalata(DB_IMG_REIA_COD, 16, 16);
+  GtkWidget *imgReiaLucrul = gtk_image_new_from_pixbuf(imgReiaLucrulPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btReiaLucrul), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btReiaLucrul), imgReiaLucrul);
 
@@ -260,7 +263,8 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_button_set_relief(GTK_BUTTON(btCitesteEEPROM), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btCitesteEEPROM), FALSE);
   gtk_widget_set_size_request(GTK_WIDGET(btCitesteEEPROM), -1, 35);
-  GtkWidget *imgCitesteEEPROM = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_eeprom.png", 16, 16, NULL));
+  GdkPixbuf *imgCitesteEEPROMPixBuf = db_obtine_imagine_media_scalata(DB_IMG_EEPROM, 16, 16);
+  GtkWidget *imgCitesteEEPROM = gtk_image_new_from_pixbuf(imgCitesteEEPROMPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btCitesteEEPROM), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btCitesteEEPROM), imgCitesteEEPROM);
 
@@ -268,7 +272,8 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
   gtk_button_set_focus_on_click(GTK_BUTTON(btParasesteFrm), FALSE);
   gtk_widget_set_size_request(GTK_WIDGET(btParasesteFrm), -1, 30);
-  GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(gdk_pixbuf_new_from_file_at_size("media/bt_icoana_paraseste.png", 16, 16, NULL));
+  GdkPixbuf *imgParasesteFrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PARASESTE, 16, 16);
+  GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(imgParasesteFrmPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btParasesteFrm), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btParasesteFrm), imgParasesteFrm);
 
