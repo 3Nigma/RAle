@@ -250,3 +250,8 @@ fp_initializeaza_formular_principal() {
   
   return frm;
 }
+
+void 
+fp_curata() {
+  g_slist_free(listaDlgCod);
+}

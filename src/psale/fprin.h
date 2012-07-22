@@ -6,4 +6,7 @@
 extern GtkWidget *
 fp_initializeaza_formular_principal();
 
+extern void 
+fp_curata();
+
 #endif

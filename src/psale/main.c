@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
   gtk_widget_show_all(formPrincipal);
   
   gtk_main();
+  fp_curata();
   dl_curata();
 
   return 0;
