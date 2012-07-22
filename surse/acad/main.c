@@ -60,12 +60,13 @@ enum {
   ACAD_SIG_MISSMATCH_ERR,	/* The expected signature doesn't match the real one */
   ACAD_UPDATE_ACT_ERR,		/* There was an error in the ubpdate processing stage */
   ACAD_ERASE_ACT_ERR,		/* Signifies the fact that the erase procedure had a problem and didn't ended succesfully */
-  ACAD_CYCLCNT_UPD_ERR		/* There was an error in updating the EEPROM programming cycle count value */
+  ACAD_CYCLCNT_UPD_ERR,		/* There was an error in updating the EEPROM programming cycle count value */
+  ACAD_MCU_NOT_FOUND_ERR	/* The requested MCU was not found */
 };
 
 /* Get VERSION from ac_cfg.h */
-char * version      = VERSION;
-char * progname;
+const char *version = PACKAGE_VERSION;
+const char *progname = PACKAGE;
 char   progbuf[PATH_MAX]; /* temporary buffer of spaces the same
                              length as progname; used for lining up
                              multiline messages */
@@ -200,6 +201,26 @@ acad_set_port(const char *portName) {
 }
 
 extern int 
+acad_load_mcu(const char *partName) {
+  p = locate_part(part_list, partdesc);
+  if (p == NULL) {
+    /*fprintf(stderr,
+            "%s: AVR Part \"%s\" not found.\n\n",
+            progname, partdesc);
+    fprintf(stderr,"Valid parts are:\n");
+    list_parts(stderr, "  ", part_list);
+    fprintf(stderr, "\n");*/
+    return ACAD_MCU_NOT_FOUND_ERR;
+  }
+
+  if(p->flags & (AVRPART_HAS_PDI | AVRPART_HAS_TPI)) {
+    safemode = 0;
+  }
+
+  return ACAD_OP_OK;
+}
+
+extern int 
 acad_read_prgcycle(void) {
   int rc = -1;
   int cycles = 0;
@@ -277,32 +298,17 @@ int main(int argc, char * argv [])
   int fuses_specified = 0;
   int fuses_updated = 0;
 
-  /*
-   * Set line buffering for file descriptors so we see stdout and stderr
-   * properly interleaved.
-   */
-  setvbuf(stdout, (char*)NULL, _IOLBF, 0);
-  setvbuf(stderr, (char*)NULL, _IOLBF, 0);
-
-  progname = strrchr(argv[0],'/');
-
-#if defined (WIN32NATIVE)
-  /* take care of backslash as dir sep in W32 */
-  if (!progname) progname = strrchr(argv[0],'\\');
-#endif /* WIN32NATIVE */
-
-  if (progname)
-    progname++;
-  else
-    progname = argv[0];
-
-  default_parallel[0] = 0;
+  /*default_parallel[0] = 0;
   default_serial[0]   = 0;
-  default_bitclock    = 0.0;
+  default_bitclock    = 0.0;*/
 
   rc = acad_init();
   if(ACAD_OP_OK != rc)
     exit(rc);
+
+  default_parallel[0] = 0;
+  default_serial[0]   = 0;
+  default_bitclock    = 0.0;
 
   partdesc      = NULL;
   port          = default_parallel;
@@ -428,31 +434,10 @@ int main(int argc, char * argv [])
     }
   }
 
-  if (quell_progress == 0) {
-    if (!isatty(STDERR_FILENO)) {
-      /* disable all buffering of stderr for compatibility with
-         software that captures and redirects output to a GUI
-         i.e. Programmers Notepad */
-      setvbuf( stderr, NULL, _IONBF, 0 );
-      setvbuf( stdout, NULL, _IONBF, 0 );
-    }
+  rc = acad_load_mcu("t25");
+  if(ACAD_OP_OK != rc) {
+    exit(rc);
   }
-
-  p = locate_part(part_list, partdesc);
-  if (p == NULL) {
-    fprintf(stderr,
-            "%s: AVR Part \"%s\" not found.\n\n",
-            progname, partdesc);
-    fprintf(stderr,"Valid parts are:\n");
-    list_parts(stderr, "  ", part_list);
-    fprintf(stderr, "\n");
-    exit(1);
-  }
-
-  if(p->flags & (AVRPART_HAS_PDI | AVRPART_HAS_TPI)) {
-    safemode = 0;
-  }
-
   /*
    * set up seperate instances of the avr part, one for use in
    * programming, one for use in verifying.  These are separate

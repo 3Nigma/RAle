@@ -30,7 +30,7 @@ imgLogo_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
   return TRUE;
 }
 
-static void 
+static void
 cmbxCodNou_selectat(GtkComboBox *widget, gpointer user_data) {
   /* interpretăm selecția doar dacă ea este una validă (se dorește un limbaj valid) */
   if(gtk_combo_box_get_active(widget) != 0) {
