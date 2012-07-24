@@ -18,7 +18,9 @@ typedef enum {
   DB_IMG_SALVEAZA_COD,
   DB_IMG_TRIMITE_LA_ALE,
   DB_IMG_LICENTA,
-  DB_IMG_INFO
+  DB_IMG_INFO,
+  DB_IMG_PAG_PREC,
+  DB_IMG_PAG_URM
 } db_media_type;
 
 extern int 

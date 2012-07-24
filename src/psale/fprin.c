@@ -10,6 +10,7 @@
 
 #include "db.h"
 #include "al.h"
+#include "vc.h"
 #include "finfo.h"
 #include "fcod.h"
 #include "fprin.h"
@@ -21,6 +22,7 @@
 
 static gboolean estePlacutaConectata;
 static gboolean dlgCodForteazaActualizConex;
+static VizualizatorCartulie *vizAle;
 static GSList *listaDlgCod = NULL;
 
 static void 
@@ -90,6 +92,20 @@ cmbxCodCarte_selectat(GtkComboBox *widget, gpointer user_data) {
       fc_actualizeaza_stare_placuta(dlgCod->lblStareConex, estePlacutaConectata, TRUE);
       fc_modifica_vizibilitate(dlgCod, TRUE);
     }
+  }
+}
+
+static void 
+btCartulie_click(GtkWidget *widget, GtkWindow *fereastraParinte) {
+  if(NULL == vizAle) {
+    vizAle = vc_initializeaza();
+
+    if(NULL != vizAle) {
+      vc_sari_la_pagina(vizAle, 0);
+      gtk_widget_show_all(vizAle->frm);
+    }
+  } else {
+    gtk_widget_show(GTK_WIDGET(vizAle->frm));
   }
 }
 
@@ -178,6 +194,7 @@ fp_initializeaza_formular_principal() {
   GtkWidget *imgLogo = NULL;
   GtkWidget *cmbxCodNou = NULL;
   GtkWidget *cmbxCodCarte = NULL;
+  GtkWidget *btCartulie = NULL;
   GtkWidget *btInfo = NULL;
   GtkWidget *btIesire = NULL;
 
@@ -222,6 +239,13 @@ fp_initializeaza_formular_principal() {
   cmbxCodCarte = creeaza_cmbxExemple();
   g_signal_connect(cmbxCodCarte, "changed", G_CALLBACK(cmbxCodCarte_selectat), NULL);
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), cmbxCodCarte);
+
+  /* inițializăm butonul de citire a cărțuliei */
+  btCartulie = gtk_button_new_with_label("Vizitează cărțulia");
+  gtk_button_set_relief(GTK_BUTTON(btCartulie), GTK_RELIEF_HALF);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btCartulie), FALSE);
+  g_signal_connect(btCartulie, "clicked", G_CALLBACK(btCartulie_click), (gpointer)frm);
+  gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), btCartulie);
 
   /* inițializăm butonul de informații */
   btInfo = gtk_button_new_with_label("Ce avem aici?");

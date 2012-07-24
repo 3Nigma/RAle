@@ -155,6 +155,12 @@ db_obtine_imagine_media_scalata(db_media_type tp, gint w, gint h) {
   case DB_IMG_INFO:
     vMem = db_obtine_img_info_aleatoare(TB_NUME_TABEL_MEDIA, &dimMem);
     break;
+  case DB_IMG_PAG_PREC:
+    vMem = db_obtine_blob(TB_NUME_TABEL_MEDIA, "vc_img_bt_pag_prec", &dimMem);
+    break;
+  case DB_IMG_PAG_URM:
+    vMem = db_obtine_blob(TB_NUME_TABEL_MEDIA, "vc_img_bt_pag_urm", &dimMem);
+    break;
   default:
     /* nu ar trebui să ajungem aici */
     break;
