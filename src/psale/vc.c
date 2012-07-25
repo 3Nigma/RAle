@@ -348,6 +348,14 @@ vc_sari_la_pagina(VizualizatorCartulie *vc, int nrPag)  {
   cairo_scale(cr, vc->x_pag_scale, vc->y_pag_scale);
   poppler_page_render(ppage, cr);
   adauga_salturi_cuprins(vc, cr);
+  
+  /* adaugă chenar (issue #10) la pagina curentă */
+  cairo_set_line_width (cr, 0.1);
+  cairo_set_source_rgb (cr, 0, 0, 0);
+  cairo_rectangle (cr, 0.25, 0.25, (gdouble)w - 0.25, (gdouble)h - 0.25);
+  cairo_stroke (cr);
+  
+  /* operațiuni de curățire și înștiințare a formularului */
   cairo_destroy(cr);
   gtk_widget_set_size_request(vc->pdfviz, w, h);
   gtk_widget_queue_draw(vc->pdfviz);
