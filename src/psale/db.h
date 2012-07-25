@@ -20,7 +20,8 @@ typedef enum {
   DB_IMG_LICENTA,
   DB_IMG_INFO,
   DB_IMG_PAG_PREC,
-  DB_IMG_PAG_URM
+  DB_IMG_PAG_URM,
+  DB_IMG_PAG_SALT_CUPRINS
 } db_media_type;
 
 extern int 

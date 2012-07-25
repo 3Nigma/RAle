@@ -161,6 +161,9 @@ db_obtine_imagine_media_scalata(db_media_type tp, gint w, gint h) {
   case DB_IMG_PAG_URM:
     vMem = db_obtine_blob(TB_NUME_TABEL_MEDIA, "vc_img_bt_pag_urm", &dimMem);
     break;
+  case DB_IMG_PAG_SALT_CUPRINS:
+    vMem = db_obtine_blob(TB_NUME_TABEL_MEDIA, "vc_img_bt_pag_cuprins", &dimMem);
+    break;
   default:
     /* nu ar trebui să ajungem aici */
     break;
