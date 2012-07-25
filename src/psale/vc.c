@@ -263,14 +263,16 @@ vc_sari_la_pagina(VizualizatorCartulie *vc, int nrPag)  {
   cairo_t *cr = NULL;
 
   /* validăm parametrii */
-  if(nrPag < 0 || nrPag > vc->nr_pag_totale) return;
+  if(nrPag < 0 || nrPag > vc->nr_pag_totale - 1) return;
   else vc->nr_pag_curenta = nrPag;
   
-  /* navigăm la pagina dorită */
+  /* accesăm pagina dorită + dimensiunile ei */
   ppage = poppler_document_get_page(vc->doc, nrPag);
   poppler_page_get_size(ppage, &vc->pag_width, &vc->pag_height);
   w = (int)ceil(vc->pag_width) * vc->x_pag_scale;
   h = (int)ceil(vc->pag_height) * vc->y_pag_scale;
+  
+  /* navigăm la pagina dorită */
   if(NULL != vc->suprafataPag) cairo_surface_destroy(vc->suprafataPag);
   vc->suprafataPag = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h);
   cr = cairo_create(vc->suprafataPag);
@@ -280,6 +282,7 @@ vc_sari_la_pagina(VizualizatorCartulie *vc, int nrPag)  {
   gtk_widget_set_size_request(vc->pdfviz, w, h);
   gtk_widget_queue_draw(vc->pdfviz);
   
+  /* obținem lista de salturi(linkuri) de pe pagina curentă */
   if(NULL != vc->salturi_curente) poppler_page_free_link_mapping(vc->salturi_curente);
   vc->salturi_curente = poppler_page_get_link_mapping(ppage);
 }
