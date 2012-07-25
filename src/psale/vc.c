@@ -268,7 +268,7 @@ vc_initializeaza() {
   
   /* inițializează formularul principal */
   deRet->frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(deRet->frm), "~electro~ cărțulia");
+  gtk_window_set_title(GTK_WINDOW(deRet->frm), TEXT_FACTOR_TITLU);
   gtk_window_set_default_size(GTK_WINDOW(deRet->frm), 800, 600);
   gtk_window_maximize(GTK_WINDOW(deRet->frm));
   
@@ -324,8 +324,9 @@ vc_initializeaza() {
 void 
 vc_sari_la_pagina(VizualizatorCartulie *vc, int nrPag)  {
   PopplerPage *ppage = NULL;
-  int w, h;
   cairo_t *cr = NULL;
+  GString *strBuf = NULL; 
+  int w, h;
   
   /* validăm parametrii */
   if(nrPag < 0 || nrPag > vc->nr_pag_totale - 1) return;
@@ -355,7 +356,13 @@ vc_sari_la_pagina(VizualizatorCartulie *vc, int nrPag)  {
   cairo_rectangle (cr, 0.25, 0.25, (gdouble)w - 0.25, (gdouble)h - 0.25);
   cairo_stroke (cr);
   
+  /* actualizăm titlul vizualizatorului pentru a reflecta numărul noii pagini */
+  strBuf = g_string_sized_new(30);
+  g_string_printf(strBuf, "{ pagina %d din %d } %s", vc->nr_pag_curenta + 1, vc->nr_pag_totale, TEXT_FACTOR_TITLU);
+  gtk_window_set_title(GTK_WINDOW(vc->frm), strBuf->str);
+  
   /* operațiuni de curățire și înștiințare a formularului */
+  g_string_free(strBuf, TRUE);
   cairo_destroy(cr);
   gtk_widget_set_size_request(vc->pdfviz, w, h);
   gtk_widget_queue_draw(vc->pdfviz);

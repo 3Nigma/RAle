@@ -14,6 +14,7 @@
 #include <gtk/gtk.h>
 #include <poppler.h>
 
+#define TEXT_FACTOR_TITLU ".electro:cărțulia"
 #define SCROLURI_PER_PAG 20
 #define INCREMENT_MARIRE 0.05
 #define PAGINA_CUPRINS 3
