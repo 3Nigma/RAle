@@ -9,6 +9,8 @@
  */
 
 #include <stdlib.h>
+
+#include "db.h"
 #include "dl.h"
 
 #include "finfo.h"
