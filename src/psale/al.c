@@ -10,20 +10,32 @@
 
 #include <stdlib.h>
 
+#include <glib/gprintf.h>
+
 #include "al.h"
 
 gboolean 
 al_este_placuta_conectata() {
   int avrdudeRet = 0;
-
+  gchar *cDir = g_get_current_dir();
+  gchar com[255];
+  
+  if(NULL != cDir) {
 #ifdef G_OS_WIN32
-  /* DE FĂCUT : obține același efect pentru windows */
+  g_sprintf(com, "%s\\avrdude.exe -c usbtiny -p t25 -V", cDir);
+  g_print("%s", com);
+  avrdudeRet = system(com);
+  
+  return avrdudeRet == 0;
 #elif defined G_OS_UNIX
-  avrdudeRet = system("sudo avrdude -c usbtiny -p t25 -V 2> /dev/null");
-#endif
+  g_sprintf(com, "sudo %s/avrdude -c usbtiny -p t25 -V 2> /dev/null", cDir);
+  avrdudeRet = system(com);
   
   if(WIFEXITED(avrdudeRet))
     return WEXITSTATUS(avrdudeRet) == 0;
-
+#endif
+    g_free(cDir);
+  }
+  
   return FALSE;
 }

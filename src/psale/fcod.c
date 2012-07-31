@@ -91,10 +91,6 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
  
   ShellExecute(NULL, "open", "winavr/bin/avr-gcc.exe", textComandaGcc, NULL, SW_SHOWNORMAL);
   ShellExecute(NULL, "open", "winavr/bin/avr-objcopy.exe", textComandaObjcopy, NULL, SW_SHOWNORMAL);
-  if(actualizeaza_stare_placuta(fc->lblStareConex))
-    ShellExecute(NULL, "open", "avrdude.exe", textComandaAvrdude, NULL, SW_SHOWNORMAL);
-  else
-    placutaConectata = FALSE;
 #elif defined G_OS_UNIX
   g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
   g_sprintf(textComandaObjcopy, "avr-objcopy -j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
@@ -102,13 +98,18 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   
   system(textComandaGcc);
   system(textComandaObjcopy);
-  system(textComandaAvrdude);
-  if(al_este_placuta_conectata())
-    system(textComandaAvrdude);
-  else
-    if(fc->laDepistare_neprezentaPlacuta_recurenta != NULL) fc->laDepistare_neprezentaPlacuta_recurenta();
 #endif
 
+  if(al_este_placuta_conectata()) {
+    #ifdef G_OS_WIN32
+    ShellExecute(NULL, "open", "avrdude.exe", textComandaAvrdude, NULL, SW_SHOWNORMAL);
+    #elif defined G_OS_UNIX
+	system(textComandaAvrdude);
+	#endif
+  } else {
+    if(fc->laDepistare_neprezentaPlacuta_recurenta != NULL) fc->laDepistare_neprezentaPlacuta_recurenta();
+  }
+  
   remove(denFisSursa);
   remove(denObiectRezultat);
   remove(denHexRezultat);

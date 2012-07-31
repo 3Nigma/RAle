@@ -15,12 +15,17 @@
 
 #include "finfo.h"
 
+/* ATENȚIE: a nu se muta această incluziune în altă parte pentru că G_OS_WIN32 se definește în gtk/gtk.h care este inclus în 'finfo.h' */
+#if defined(G_OS_WIN32) && !defined(_WINDOWS_H)
+#include <windows.h>
+#endif
+
 static gboolean 
 imgLicenta_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
 #ifdef G_OS_WIN32
   ShellExecute(NULL, "open", "http://creativecommons.org/licenses/by-nc-sa/3.0/", NULL, NULL, SW_SHOWNORMAL);
 #elif defined G_OS_UNIX
-    system("xdg-open 'http://creativecommons.org/licenses/by-nc-sa/3.0/' &");
+  system("xdg-open 'http://creativecommons.org/licenses/by-nc-sa/3.0/' &");
 #endif
 
   return TRUE;
