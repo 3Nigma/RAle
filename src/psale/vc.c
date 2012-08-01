@@ -129,6 +129,7 @@ pdfviz_vscrol_modif_event(GtkWidget *widget, GdkEventScroll  *e, VizualizatorCar
     /* redesenează pagina */
     vc_sari_la_pagina(vc, vc->nr_pag_curenta);
   } else {
+    /* doar rotița a fost învârtită -> avansează chenarul de vizualizare sus/jos */
     switch(e->direction) {
     case GDK_SCROLL_UP:
       if(pozCurentaVScrol < 1e-7) {
@@ -142,8 +143,10 @@ pdfviz_vscrol_modif_event(GtkWidget *widget, GdkEventScroll  *e, VizualizatorCar
       break;
     case GDK_SCROLL_DOWN:
       if(dimPagina + pozCurentaVScrol >= inaltimePdfReala) {
-        vc_sari_la_pagina(vc, vc->nr_pag_curenta + 1);
-        gtk_adjustment_set_value(vc->pdfScrolBVertical, 0);
+        if(vc->nr_pag_curenta + 1 < vc->nr_pag_totale) {
+          vc_sari_la_pagina(vc, vc->nr_pag_curenta + 1);
+          gtk_adjustment_set_value(vc->pdfScrolBVertical, 0);
+        }
       } else {
         gtk_adjustment_set_value(vc->pdfScrolBVertical, pozCurentaVScrol + navIncrement);
       }
@@ -275,20 +278,25 @@ vc_initializeaza() {
   frmVbox = gtk_vbox_new(FALSE, 0);
   gtk_container_add(GTK_CONTAINER(deRet->frm), frmVbox);
 
+  /* adaugă butonul de navigare la pagina precedentă */
   btPrecPag = gtk_button_new();
+  gtk_widget_set_can_focus(btPrecPag, FALSE);
   gtk_button_set_relief(GTK_BUTTON(btPrecPag), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btPrecPag), FALSE);
   GdkPixbuf *imgPagPrecPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PAG_PREC, 28, 28);
   GtkWidget *imgPagPrec = gtk_image_new_from_pixbuf(imgPagPrecPixBuf);
   gtk_button_set_image(GTK_BUTTON(btPrecPag), imgPagPrec);
   
+  /* adaugă butonul de navigare la pagina următoare */
   btUrmPag = gtk_button_new();
+  gtk_widget_set_can_focus(btUrmPag, FALSE);
   gtk_button_set_relief(GTK_BUTTON(btUrmPag), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btUrmPag), FALSE);
   GdkPixbuf *imgPagUrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PAG_URM, 28, 28);
   GtkWidget *imgPagUrm = gtk_image_new_from_pixbuf(imgPagUrmPixBuf);
   gtk_button_set_image(GTK_BUTTON(btUrmPag), imgPagUrm);
 
+  /* adaugă regiunea centrală a formularului cu pânza de imprimare a cărțuliei */
   pdfHVbox = gtk_hbox_new(FALSE, 0);
   cadruPdfViz = gtk_scrolled_window_new(NULL, NULL);
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(cadruPdfViz),
