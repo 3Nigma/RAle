@@ -141,16 +141,67 @@
 
                 <!-- Keywords -->
                 <context id="keywords" style-ref="keyword" class="keyword">
+                    <keyword>SREG</keyword>
+                    <keyword>SP</keyword>
+                    <keyword>SPH</keyword>
+                    <keyword>SPL</keyword>
+                    <keyword>GIMSK</keyword>
+                    <keyword>GIFR</keyword>
+                    <keyword>TIMSK</keyword>
+                    <keyword>TIFR</keyword>
+                    <keyword>SPMCSR</keyword>
+                    <keyword>MCUCR</keyword>
+                    <keyword>MCUSR</keyword>
+                    <keyword>TCCR0B</keyword>
+                    <keyword>TCNT0</keyword>
+                    <keyword>OSCCAL</keyword>
+                    <keyword>TCCR1</keyword>
+                    <keyword>TCNT1</keyword>
+                    <keyword>OCR1A</keyword>
+                    <keyword>OCR1B</keyword>
+                    <keyword>TCCR0A</keyword>
+                    <keyword>OCR0A</keyword>
+                    <keyword>OCR0B</keyword>
+                    <keyword>PLLCSR</keyword>
+                    <keyword>CLKPR</keyword>
+                    <keyword>DT1A</keyword>
+                    <keyword>DT1B</keyword>
+                    <keyword>DTPS1</keyword>
+                    <keyword>DWDR</keyword>
+                    <keyword>WDTCR</keyword>
+                    <keyword>PRR</keyword>
+                    <keyword>EEAR</keyword>
+                    <keyword>EEARH</keyword>
+                    <keyword>EEARL</keyword>
+                    <keyword>EEDR</keyword>
+                    <keyword>EECR</keyword>
+                    <keyword>PORTA</keyword>
+                    <keyword>DDRA</keyword>
+                    <keyword>PINA</keyword>
                     <keyword>PORTB</keyword>
                     <keyword>DDRB</keyword>
                     <keyword>PINB</keyword>
-                    <keyword>SREG</keyword>
-                    <keyword>SP</keyword>
-                    <keyword>TIMSK</keyword>
-                    <keyword>GIMSK</keyword>
-                    <keyword>SREG</keyword>
-                    <keyword>GIFR</keyword>
-                    <keyword>TIFR</keyword>
+                    <keyword>PORTC</keyword>
+                    <keyword>DDRC</keyword>
+                    <keyword>PINC</keyword>
+                    <keyword>PORTD</keyword>
+                    <keyword>DDRD</keyword>
+                    <keyword>PIND</keyword>
+                    <keyword>PCMSK</keyword>
+                    <keyword>DIDR0</keyword>
+                    <keyword>GPIOR2</keyword>
+                    <keyword>GPIOR1</keyword>
+                    <keyword>GPIOR0</keyword>
+                    <keyword>USIBR</keyword>
+                    <keyword>USIDR</keyword>
+                    <keyword>USISR</keyword>
+                    <keyword>USICR</keyword>
+                    <keyword>ACSR</keyword>
+                    <keyword>ADMUX</keyword>
+                    <keyword>ADCSRA</keyword>
+                    <keyword>ADCH</keyword>
+                    <keyword>ADCL</keyword>
+                    <keyword>ADCSRB</keyword>
                 </context>
 
                 <context id="types" style-ref="type" class="type">
