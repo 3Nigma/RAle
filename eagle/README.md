@@ -13,6 +13,6 @@ Pe acest nivel se găsesc 2 directoare :
 
 ## Legalități ##
 * Circuitul electric *USBTinyISP* se distribuie sub o variațiune a [*Creative Commons License*](http://creativecommons.org/): *BY - SA*, dar mai multe detalii în acest sens le puteți găsi pe [pagina proiectului](http://www.ladyada.net/make/usbtinyisp/).
-* Plăcuța Ale folosește de asemeni o licență permisivă orientată pe circuite de tip [*CERN OHL v1.1](http://www.ohwr.org/projects/cernohl/wiki/). Mai multe informații le puteți găsi direct în directorul rezervat ei.
+* Plăcuța Ale folosește de asemeni o licență permisivă orientată pe circuite de tip [*CERN OHL v1.1*](http://www.ohwr.org/projects/cernohl/wiki/). Mai multe informații le puteți găsi direct în directorul rezervat ei.
 
 Toate fișierele electrice se pot deschide cu o versiune *gratuită* a aplicației [Eagle Cadsoft](http://www.cadsoftusa.com/).
