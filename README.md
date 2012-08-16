@@ -21,5 +21,5 @@ Fiind alcătuit din 3 elemente, vom necesita 3 acțiuni pentru a transpune pache
 
 ## Informații adiționale ##
 >Autor principal : **Victor ADĂSCĂLIȚEI**  
->Licență         : [**Creative Commons License**] (http://creativecommons.org/) de tip [BY-NC-SA] (http://creativecommons.org/licenses/by-nc-sa/3.0/) pentru cărțulie și aplicația _psAle_, iar [CERN OHL v1.1] (http://www.ohwr.org/projects/cernohl/wiki/) pentru plăcuță  
+>Licență         : [**Creative Commons License**] (http://creativecommons.org/) de tip [BY-NC-SA] (http://creativecommons.org/licenses/by-nc-sa/3.0/) pentru cărțulie și aplicația _psAle_, iar [**CERN OHL v1.1**] (http://www.ohwr.org/projects/cernohl/wiki/) pentru plăcuță. Datorită faptului că **Ale** utilizează și înglobează și alte librării/proiecte *open source*, licențele proiectelor respective vor fi menționate la momentul oportun.  
 >Email           : admin@tuscale.ro  
