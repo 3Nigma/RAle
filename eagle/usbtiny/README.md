@@ -1,5 +1,5 @@
 ## Ce avem noi aici ? ##
-![Conținut director 'RAle/eagle/usbtiny'](http://i45.tinypic.com/wtxi6r.png)
+<center>![Info Conținut Director Curent](http://i45.tinypic.com/2434u3p.png)</center>
 
 ## De unde până unde ? ##
 În acest director se găsesc fișierele electrice (circuitul logic - *sch* și amplasarea fizică a componentelor - *brd*) a proiectului [USBTinyISP versiune 2.0](http://www.ladyada.net/make/usbtinyisp/index.html).  

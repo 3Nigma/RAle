@@ -1,5 +1,5 @@
 ## Vedere Generală ##
-![Ansamblu RAle] (http://i48.tinypic.com/a3cvgg.png)
+<center>![Ansamblu RAle] (http://i48.tinypic.com/a3cvgg.png)</center>
 
 ## Ce avem aici ? ##
 **RAle** ["*Romanian Ale*" pentru străini, iar "*Ale*", pentru noi] este un **pachet educațional complet**, **dezvoltat sub licență gratuită**, menit să-i învețe pe oricine dorește, chiar și pe școlari, tainele lucrului cu circuite electronice inteligente/programabile. _Licența gratuită_ permite oricui să folosească materialul proiectului în scopuri personale, necomerciale, **în mod gratuit** prin simpla păstrarea a informațiilor referitoare la autorul de drept intelectual al proiectului (vedeți tipul complet de licență folosit mai jos în pagină).  

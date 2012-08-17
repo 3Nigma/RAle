@@ -1,5 +1,5 @@
 ## Ce avem noi aici ? ##
-![Conținut director 'RAle/eagle'](http://i49.tinypic.com/ejygbn.png)
+<center>![Conținut director 'RAle/eagle'](http://i49.tinypic.com/ejygbn.png)</center>
 
 ## Puțin mai multe detalii ##
 Pe acest nivel se găsesc 2 directoare :
