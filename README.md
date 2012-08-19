@@ -15,7 +15,7 @@ Alături de **Ale** vom intra într-o lume a tuturor posibilităților și vom v
 Fiind alcătuit din 3 elemente, vom necesita 3 acțiuni pentru a transpune pachetul *Ale* din sfera virtuală în lumea reală și anume :
 * tipărirea cărțuliei dacă ea este dificilă de urmărit în format electronic (_aproximativ 200 de pagini_)
 * construirea plăcuței folosind **noțiuni de electronică** și *disponibilitatea unui programator inițial pentru a o configura*
-  * proiectul electric (fișierele *sch* și *brd*) le puteți găsi [aici](eagle/v0.9/)
+  * proiectul electric (fișierele *sch* și *brd*) le puteți găsi [aici](RAle/tree/master/eagle/v0.9)
 * construirea aplicației principale _psAle_ sau descărcarea unei versiuni gata construite *[în curând]*
 
 **Dacă aceste etape vi se par dificil de urmat și/sau implementat, mai există posibilitatea achiziționării, prin plata unei sume modice, a unui _pachet complet construit_ de pe saitul www.tuscale.ro .**
