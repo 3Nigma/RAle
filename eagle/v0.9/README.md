@@ -4,7 +4,6 @@ Plăcuța *pachetului Ale* are următoarea dispunere modulară a funcționalită
 
 ## Acum că suntem curioși ##
 Dintre toate fișierele ce se găsesc în acest director, doar două au o importanță deosebită pentru proiect. Este vorba despre fișierele
-
 * **v0.9.sch** care prezintă dispunerea logică a componentelor *și*
 * **v0.9.brd** care arată dispunerea fizică a pieselor
 
@@ -23,8 +22,8 @@ Ambele fișiere, *sch* și *brd*, se pot deschide cu aplicația [Eagle Electrica
 * *Attiny*-ul în cauză, dar și oricare din microcontrollere amintite, dispune de facilități interne numite *module* prin care se pot realiza aplicații dintre cele mai complexe.
 
 ## Și restul de fișiere ? ##
-... sunt o *consecință* a apartenenței plăcuței la *licența gratuită* de tip [CERN OHL v1.1]( http://www.ohwr.org/cernohl/). Datorită faptului că licența este concepută în limba engleză, următoarele fișiere care sunt folosite de această licență sunt scrise de asemenea în această limbă. Acestea fișiere sunt :
-
+... sunt o *consecință* a apartenenței plăcuței la *licența gratuită* de tip [CERN OHL v1.1]( http://www.ohwr.org/cernohl/). Datorită faptului că licența este concepută în limba engleză, următoarele fișiere care sunt folosite de această licență sunt scrise de asemenea în această limbă.  
+Aceste fișiere sunt :
 * **LICENSE.pdf** care conține textul integral al licenței alese, de la facilități la responsabilități,
 * **HOWTO.pdf** - prezintă informații mai ușoare despre licență și cum se poate folosi acest tip în alte circuite electrice,
 * **CHANCES.TXT** - fișierul se va completa cu modificările realizate de alte persoane care doresc să folosească plăcuța,
