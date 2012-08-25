@@ -12,7 +12,7 @@ Fiind un _pachet_ el este alcătuit din următoarele elemente:
 Alături de **Ale** vom intra într-o lume a tuturor posibilităților și vom vedea, totodată, cum _funcționează_ viața noastră modernă.
 
 ## Construirea pachetului ##
-Fiind alcătuit din 3 elemente, vom necesita 3 acțiuni pentru a transpune pachetul *Ale* din sfera virtuală în lumea reală și anume :
+Fiind alcătuit din trei elemente, vom necesita trei acțiuni pentru a transpune pachetul *Ale* din sfera virtuală în lumea reală și anume :
 * tipărirea cărțuliei dacă ea este dificilă de urmărit în format electronic (_aproximativ 200 de pagini_)
 * construirea plăcuței folosind **noțiuni de electronică** și *disponibilitatea unui programator inițial pentru a o configura*
   * proiectul electric (fișierele *sch* și *brd*) îl puteți găsi [aici](RAle/tree/master/egl/v0.9)
