@@ -20,6 +20,9 @@ Fiind alcătuit din trei elemente, vom necesita trei acțiuni pentru a transpune
 
 **Dacă aceste etape vi se par dificil de urmat și/sau implementat, mai există posibilitatea achiziționării, prin plata unei sume modice, a unui _pachet complet construit_ de pe saitul www.tuscale.ro .**
 
+## Vreau să particip ##
+**Fantastic!** Contactează-ne la adresa admin@tuscale.ro și vedem de unde pornim!
+
 ## Informații adiționale ##
 >Autor principal : **Victor ADĂSCĂLIȚEI**  
 >Licență         : [**Creative Commons License**] (http://creativecommons.org/) de tip [BY-NC-SA] (http://creativecommons.org/licenses/by-nc-sa/3.0/ro/) pentru cărțulie și aplicația _psAle_, iar [**CERN OHL v1.1**] (http://www.ohwr.org/projects/cernohl/wiki/) pentru plăcuță. Datorită faptului că **Ale** utilizează și înglobează și alte librării/proiecte *open source*, licențele proiectelor respective vor fi menționate la momentul oportun.  
