@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.2">
+<eagle version="6.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -8,20 +8,20 @@
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
-<layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
-<layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="no"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="no"/>
-<layer number="21" name="tPlace" color="7" fill="1" visible="no" active="no"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="no"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="no" active="no"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="no" active="no"/>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="no"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="no"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="no"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="no"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="no"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="no"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="no"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="no"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="no"/>
@@ -30,8 +30,8 @@
 <layer number="34" name="bFinish" color="6" fill="6" visible="no" active="no"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="no"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="no"/>
-<layer number="37" name="tTest" color="7" fill="1" visible="no" active="no"/>
-<layer number="38" name="bTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="yes" active="no"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="yes" active="no"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="no"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="no"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="no"/>
@@ -39,12 +39,12 @@
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="no"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="no"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="no"/>
-<layer number="46" name="Milling" color="3" fill="1" visible="no" active="no"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
-<layer number="48" name="Document" color="7" fill="1" visible="no" active="no"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="no"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="yes" active="no"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="no"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="no"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="no"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="no"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="no"/>
 <layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
@@ -14386,10 +14386,10 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <part name="LED1" library="led" deviceset="LED" device="3MM" value="Rosu"/>
 <part name="LED2" library="led" deviceset="LED" device="3MM" value="Verde"/>
 <part name="X2" library="con-berg" deviceset="PN61729" device="" value="USBB-G"/>
-<part name="D1" library="diode" deviceset="ZENER-DIODE" device="ZD-7.5" value="3v3"/>
-<part name="D2" library="diode" deviceset="ZENER-DIODE" device="ZD-7.5" value="3v3"/>
-<part name="Q2" library="murata-resonators" deviceset="CSTLS_X" device="" value="12Mhz"/>
-<part name="R7" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
+<part name="DZ1" library="diode" deviceset="ZENER-DIODE" device="ZD-7.5" value="3v3"/>
+<part name="DZ2" library="diode" deviceset="ZENER-DIODE" device="ZD-7.5" value="3v3"/>
+<part name="X1" library="murata-resonators" deviceset="CSTLS_X" device="" value="12Mhz"/>
+<part name="R7" library="rcl" deviceset="R-EU_" device="0204/7" value="10k"/>
 <part name="C6" library="rcl" deviceset="C-EU" device="050-025X075" value="100nF"/>
 <part name="S1" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
 <part name="IC1" library="74xx-eu" deviceset="74*125" device="N" technology="AC" value="74HC125N"/>
@@ -14400,7 +14400,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <part name="V1" library="74ttl-din" deviceset="74*164" device="N"/>
 <part name="V2" library="74ttl-din" deviceset="74*165" device="N"/>
 <part name="R11" library="rcl" deviceset="R-EU_" device="0207/15" value="10k"/>
-<part name="LED3" library="led" deviceset="LED" device="3MM" value="Verde"/>
+<part name="Q0" library="led" deviceset="LED" device="3MM" value="Verde"/>
 <part name="R12" library="rcl" deviceset="R-EU_" device="0207/10" value="1k"/>
 <part name="R13" library="rcl" deviceset="R-EU_" device="0207/10" value="1k"/>
 <part name="R14" library="rcl" deviceset="R-EU_" device="0207/10" value="1k"/>
@@ -14409,25 +14409,25 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <part name="R17" library="rcl" deviceset="R-EU_" device="0207/10" value="1k"/>
 <part name="R18" library="rcl" deviceset="R-EU_" device="0207/10" value="1k"/>
 <part name="R19" library="rcl" deviceset="R-EU_" device="0207/10" value="1k"/>
-<part name="LED4" library="led" deviceset="LED" device="3MM" value="Verde"/>
-<part name="LED5" library="led" deviceset="LED" device="3MM" value="Verde"/>
-<part name="LED6" library="led" deviceset="LED" device="3MM" value="Verde"/>
-<part name="LED7" library="led" deviceset="LED" device="3MM" value="Verde"/>
-<part name="LED8" library="led" deviceset="LED" device="3MM" value="Verde"/>
-<part name="LED9" library="led" deviceset="LED" device="3MM" value="Verde"/>
-<part name="LED10" library="led" deviceset="LED" device="3MM" value="Verde"/>
-<part name="S3" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
-<part name="S4" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
-<part name="S5" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
-<part name="S6" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
-<part name="S7" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
-<part name="S8" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
-<part name="S9" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
-<part name="S10" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
+<part name="Q1" library="led" deviceset="LED" device="3MM" value="Verde"/>
+<part name="Q2" library="led" deviceset="LED" device="3MM" value="Verde"/>
+<part name="Q3" library="led" deviceset="LED" device="3MM" value="Verde"/>
+<part name="Q4" library="led" deviceset="LED" device="3MM" value="Verde"/>
+<part name="Q5" library="led" deviceset="LED" device="3MM" value="Verde"/>
+<part name="Q6" library="led" deviceset="LED" device="3MM" value="Verde"/>
+<part name="Q7" library="led" deviceset="LED" device="3MM" value="Verde"/>
+<part name="D0" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
+<part name="D1" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
+<part name="D2" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
+<part name="D3" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
+<part name="D4" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
+<part name="D5" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
+<part name="D6" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
+<part name="D7" library="switch-omron" deviceset="10-XX" device="" value="TACT-64N"/>
 <part name="R20" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
 <part name="R21" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
-<part name="R22" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
-<part name="R23" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
+<part name="R22" library="rcl" deviceset="R-EU_" device="0204/7" value="10k"/>
+<part name="R23" library="rcl" deviceset="R-EU_" device="0204/7" value="10k"/>
 <part name="R24" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
 <part name="R25" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
 <part name="R26" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
@@ -14453,9 +14453,9 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <instance part="LED1" gate="G$1" x="101.6" y="134.62" rot="R90"/>
 <instance part="LED2" gate="G$1" x="109.22" y="127" rot="R90"/>
 <instance part="X2" gate="G$1" x="124.46" y="111.76"/>
-<instance part="D1" gate="G$1" x="91.44" y="104.14" rot="R90"/>
-<instance part="D2" gate="G$1" x="101.6" y="104.14" rot="R90"/>
-<instance part="Q2" gate="G$1" x="20.32" y="142.24" smashed="yes" rot="R270">
+<instance part="DZ1" gate="G$1" x="91.44" y="104.14" rot="R90"/>
+<instance part="DZ2" gate="G$1" x="101.6" y="104.14" rot="R90"/>
+<instance part="X1" gate="G$1" x="20.32" y="142.24" smashed="yes" rot="R270">
 <attribute name="NAME" x="23.622" y="146.812" size="1.27" layer="94" rot="R270"/>
 <attribute name="VALUE" x="23.622" y="143.002" size="1.27" layer="94" rot="R270"/>
 </instance>
@@ -14478,7 +14478,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <instance part="V2" gate="/-UB" x="116.84" y="71.12"/>
 <instance part="V2" gate="1" x="137.16" y="58.42" rot="MR0"/>
 <instance part="R11" gate="G$1" x="88.9" y="81.28" rot="R90"/>
-<instance part="LED3" gate="G$1" x="35.56" y="58.42" rot="R270"/>
+<instance part="Q0" gate="G$1" x="35.56" y="58.42" rot="R270"/>
 <instance part="R12" gate="G$1" x="53.34" y="58.42"/>
 <instance part="R13" gate="G$1" x="48.26" y="50.8"/>
 <instance part="R14" gate="G$1" x="53.34" y="45.72"/>
@@ -14487,21 +14487,21 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <instance part="R17" gate="G$1" x="48.26" y="30.48"/>
 <instance part="R18" gate="G$1" x="53.34" y="25.4"/>
 <instance part="R19" gate="G$1" x="48.26" y="20.32"/>
-<instance part="LED4" gate="G$1" x="27.94" y="50.8" rot="R270"/>
-<instance part="LED5" gate="G$1" x="35.56" y="45.72" rot="R270"/>
-<instance part="LED6" gate="G$1" x="27.94" y="40.64" rot="R270"/>
-<instance part="LED7" gate="G$1" x="35.56" y="35.56" rot="R270"/>
-<instance part="LED8" gate="G$1" x="27.94" y="30.48" rot="R270"/>
-<instance part="LED9" gate="G$1" x="35.56" y="25.4" rot="R270"/>
-<instance part="LED10" gate="G$1" x="27.94" y="20.32" rot="R270"/>
-<instance part="S3" gate="1" x="226.06" y="68.58" rot="R270"/>
-<instance part="S4" gate="1" x="213.36" y="63.5" rot="R270"/>
-<instance part="S5" gate="1" x="226.06" y="58.42" rot="R270"/>
-<instance part="S6" gate="1" x="213.36" y="53.34" rot="R270"/>
-<instance part="S7" gate="1" x="226.06" y="48.26" rot="R270"/>
-<instance part="S8" gate="1" x="213.36" y="43.18" rot="R270"/>
-<instance part="S9" gate="1" x="226.06" y="38.1" rot="R270"/>
-<instance part="S10" gate="1" x="213.36" y="30.48" rot="R270"/>
+<instance part="Q1" gate="G$1" x="27.94" y="50.8" rot="R270"/>
+<instance part="Q2" gate="G$1" x="35.56" y="45.72" rot="R270"/>
+<instance part="Q3" gate="G$1" x="27.94" y="40.64" rot="R270"/>
+<instance part="Q4" gate="G$1" x="35.56" y="35.56" rot="R270"/>
+<instance part="Q5" gate="G$1" x="27.94" y="30.48" rot="R270"/>
+<instance part="Q6" gate="G$1" x="35.56" y="25.4" rot="R270"/>
+<instance part="Q7" gate="G$1" x="27.94" y="20.32" rot="R270"/>
+<instance part="D0" gate="1" x="226.06" y="68.58" rot="R270"/>
+<instance part="D1" gate="1" x="213.36" y="63.5" rot="R270"/>
+<instance part="D2" gate="1" x="226.06" y="58.42" rot="R270"/>
+<instance part="D3" gate="1" x="213.36" y="53.34" rot="R270"/>
+<instance part="D4" gate="1" x="226.06" y="48.26" rot="R270"/>
+<instance part="D5" gate="1" x="213.36" y="43.18" rot="R270"/>
+<instance part="D6" gate="1" x="226.06" y="38.1" rot="R270"/>
+<instance part="D7" gate="1" x="213.36" y="30.48" rot="R270"/>
 <instance part="R20" gate="G$1" x="198.12" y="83.82" rot="R90"/>
 <instance part="R21" gate="G$1" x="190.5" y="83.82" rot="R90"/>
 <instance part="R22" gate="G$1" x="182.88" y="83.82" rot="R90"/>
@@ -14552,15 +14552,15 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="121.92" y="109.22"/>
 <junction x="101.6" y="99.06"/>
 <label x="121.92" y="99.06" size="1.778" layer="95"/>
-<pinref part="D1" gate="G$1" pin="A"/>
-<pinref part="D2" gate="G$1" pin="A"/>
+<pinref part="DZ1" gate="G$1" pin="A"/>
+<pinref part="DZ2" gate="G$1" pin="A"/>
 <pinref part="X2" gate="G$1" pin="4"/>
 </segment>
 <segment>
 <wire x1="12.7" y1="142.24" x2="10.16" y2="142.24" width="0.1524" layer="91"/>
 <junction x="12.7" y="142.24"/>
 <label x="10.16" y="142.24" size="1.778" layer="95" rot="R270"/>
-<pinref part="Q2" gate="G$1" pin="VSS"/>
+<pinref part="X1" gate="G$1" pin="VSS"/>
 </segment>
 <segment>
 <wire x1="177.8" y1="177.8" x2="180.34" y2="177.8" width="0.1524" layer="91"/>
@@ -14617,14 +14617,14 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="20.32" y="35.56"/>
 <junction x="20.32" y="30.48"/>
 <label x="12.7" y="38.1" size="1.778" layer="95"/>
-<pinref part="LED3" gate="G$1" pin="C"/>
-<pinref part="LED4" gate="G$1" pin="C"/>
-<pinref part="LED5" gate="G$1" pin="C"/>
-<pinref part="LED6" gate="G$1" pin="C"/>
-<pinref part="LED7" gate="G$1" pin="C"/>
-<pinref part="LED8" gate="G$1" pin="C"/>
-<pinref part="LED9" gate="G$1" pin="C"/>
-<pinref part="LED10" gate="G$1" pin="C"/>
+<pinref part="Q0" gate="G$1" pin="C"/>
+<pinref part="Q1" gate="G$1" pin="C"/>
+<pinref part="Q2" gate="G$1" pin="C"/>
+<pinref part="Q3" gate="G$1" pin="C"/>
+<pinref part="Q4" gate="G$1" pin="C"/>
+<pinref part="Q5" gate="G$1" pin="C"/>
+<pinref part="Q6" gate="G$1" pin="C"/>
+<pinref part="Q7" gate="G$1" pin="C"/>
 </segment>
 <segment>
 <wire x1="152.4" y1="83.82" x2="157.48" y2="83.82" width="0.1524" layer="91"/>
@@ -14682,22 +14682,22 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="238.76" y="58.42"/>
 <junction x="238.76" y="63.5"/>
 <label x="243.84" y="50.8" size="1.778" layer="95"/>
-<pinref part="S3" gate="1" pin="S1"/>
-<pinref part="S3" gate="1" pin="S"/>
-<pinref part="S4" gate="1" pin="S1"/>
-<pinref part="S4" gate="1" pin="S"/>
-<pinref part="S5" gate="1" pin="S1"/>
-<pinref part="S5" gate="1" pin="S"/>
-<pinref part="S6" gate="1" pin="S1"/>
-<pinref part="S6" gate="1" pin="S"/>
-<pinref part="S7" gate="1" pin="S1"/>
-<pinref part="S7" gate="1" pin="S"/>
-<pinref part="S8" gate="1" pin="S1"/>
-<pinref part="S8" gate="1" pin="S"/>
-<pinref part="S9" gate="1" pin="S1"/>
-<pinref part="S9" gate="1" pin="S"/>
-<pinref part="S10" gate="1" pin="S"/>
-<pinref part="S10" gate="1" pin="S1"/>
+<pinref part="D0" gate="1" pin="S1"/>
+<pinref part="D0" gate="1" pin="S"/>
+<pinref part="D1" gate="1" pin="S1"/>
+<pinref part="D1" gate="1" pin="S"/>
+<pinref part="D2" gate="1" pin="S1"/>
+<pinref part="D2" gate="1" pin="S"/>
+<pinref part="D3" gate="1" pin="S1"/>
+<pinref part="D3" gate="1" pin="S"/>
+<pinref part="D4" gate="1" pin="S1"/>
+<pinref part="D4" gate="1" pin="S"/>
+<pinref part="D5" gate="1" pin="S1"/>
+<pinref part="D5" gate="1" pin="S"/>
+<pinref part="D6" gate="1" pin="S1"/>
+<pinref part="D6" gate="1" pin="S"/>
+<pinref part="D7" gate="1" pin="S"/>
+<pinref part="D7" gate="1" pin="S1"/>
 </segment>
 <segment>
 <wire x1="109.22" y1="210.82" x2="114.3" y2="210.82" width="0.1524" layer="91"/>
@@ -14837,7 +14837,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="101.6" y="121.92"/>
 <pinref part="R3" gate="G$1" pin="1"/>
 <pinref part="R4" gate="G$1" pin="2"/>
-<pinref part="D2" gate="G$1" pin="C"/>
+<pinref part="DZ2" gate="G$1" pin="C"/>
 <pinref part="X2" gate="G$1" pin="2"/>
 </segment>
 </net>
@@ -14850,7 +14850,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="91.44" y="106.68"/>
 <junction x="121.92" y="111.76"/>
 <junction x="91.44" y="111.76"/>
-<pinref part="D1" gate="G$1" pin="C"/>
+<pinref part="DZ1" gate="G$1" pin="C"/>
 <pinref part="R5" gate="G$1" pin="2"/>
 <pinref part="X2" gate="G$1" pin="3"/>
 </segment>
@@ -14974,7 +14974,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <wire x1="33.02" y1="147.32" x2="33.02" y2="144.78" width="0.1524" layer="91"/>
 <wire x1="33.02" y1="144.78" x2="35.56" y2="144.78" width="0.1524" layer="91"/>
 <junction x="20.32" y="147.32"/>
-<pinref part="Q2" gate="G$1" pin="1"/>
+<pinref part="X1" gate="G$1" pin="1"/>
 <pinref part="IC3" gate="G$1" pin="XTAL2"/>
 </segment>
 </net>
@@ -14985,7 +14985,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <wire x1="33.02" y1="137.16" x2="20.32" y2="137.16" width="0.1524" layer="91"/>
 <junction x="20.32" y="137.16"/>
 <pinref part="IC3" gate="G$1" pin="XTAL1"/>
-<pinref part="Q2" gate="G$1" pin="3"/>
+<pinref part="X1" gate="G$1" pin="3"/>
 </segment>
 </net>
 <net name="UCSCK" class="0">
@@ -15211,7 +15211,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <wire x1="38.1" y1="58.42" x2="48.26" y2="58.42" width="0.1524" layer="91"/>
 <junction x="38.1" y="58.42"/>
 <junction x="48.26" y="58.42"/>
-<pinref part="LED3" gate="G$1" pin="A"/>
+<pinref part="Q0" gate="G$1" pin="A"/>
 <pinref part="R12" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15220,7 +15220,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <wire x1="30.48" y1="50.8" x2="43.18" y2="50.8" width="0.1524" layer="91"/>
 <junction x="43.18" y="50.8"/>
 <junction x="30.48" y="50.8"/>
-<pinref part="LED4" gate="G$1" pin="A"/>
+<pinref part="Q1" gate="G$1" pin="A"/>
 <pinref part="R13" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15229,7 +15229,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <wire x1="38.1" y1="45.72" x2="48.26" y2="45.72" width="0.1524" layer="91"/>
 <junction x="48.26" y="45.72"/>
 <junction x="38.1" y="45.72"/>
-<pinref part="LED5" gate="G$1" pin="A"/>
+<pinref part="Q2" gate="G$1" pin="A"/>
 <pinref part="R14" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15238,7 +15238,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <wire x1="30.48" y1="40.64" x2="43.18" y2="40.64" width="0.1524" layer="91"/>
 <junction x="43.18" y="40.64"/>
 <junction x="30.48" y="40.64"/>
-<pinref part="LED6" gate="G$1" pin="A"/>
+<pinref part="Q3" gate="G$1" pin="A"/>
 <pinref part="R15" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15247,7 +15247,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <wire x1="38.1" y1="35.56" x2="48.26" y2="35.56" width="0.1524" layer="91"/>
 <junction x="48.26" y="35.56"/>
 <junction x="38.1" y="35.56"/>
-<pinref part="LED7" gate="G$1" pin="A"/>
+<pinref part="Q4" gate="G$1" pin="A"/>
 <pinref part="R16" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15256,7 +15256,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <wire x1="30.48" y1="30.48" x2="43.18" y2="30.48" width="0.1524" layer="91"/>
 <junction x="43.18" y="30.48"/>
 <junction x="30.48" y="30.48"/>
-<pinref part="LED8" gate="G$1" pin="A"/>
+<pinref part="Q5" gate="G$1" pin="A"/>
 <pinref part="R17" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15265,7 +15265,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <wire x1="38.1" y1="25.4" x2="48.26" y2="25.4" width="0.1524" layer="91"/>
 <junction x="48.26" y="25.4"/>
 <junction x="38.1" y="25.4"/>
-<pinref part="LED9" gate="G$1" pin="A"/>
+<pinref part="Q6" gate="G$1" pin="A"/>
 <pinref part="R18" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15274,7 +15274,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <wire x1="30.48" y1="20.32" x2="43.18" y2="20.32" width="0.1524" layer="91"/>
 <junction x="43.18" y="20.32"/>
 <junction x="30.48" y="20.32"/>
-<pinref part="LED10" gate="G$1" pin="A"/>
+<pinref part="Q7" gate="G$1" pin="A"/>
 <pinref part="R19" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15362,8 +15362,8 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="175.26" y="78.74"/>
 <junction x="175.26" y="66.04"/>
 <pinref part="V2" gate="1" pin="A"/>
-<pinref part="S3" gate="1" pin="P1"/>
-<pinref part="S3" gate="1" pin="P"/>
+<pinref part="D0" gate="1" pin="P1"/>
+<pinref part="D0" gate="1" pin="P"/>
 <pinref part="R23" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15379,8 +15379,8 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="182.88" y="78.74"/>
 <junction x="182.88" y="60.96"/>
 <pinref part="V2" gate="1" pin="B"/>
-<pinref part="S4" gate="1" pin="P1"/>
-<pinref part="S4" gate="1" pin="P"/>
+<pinref part="D1" gate="1" pin="P1"/>
+<pinref part="D1" gate="1" pin="P"/>
 <pinref part="R22" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15396,8 +15396,8 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="190.5" y="78.74"/>
 <junction x="190.5" y="55.88"/>
 <pinref part="V2" gate="1" pin="C"/>
-<pinref part="S5" gate="1" pin="P1"/>
-<pinref part="S5" gate="1" pin="P"/>
+<pinref part="D2" gate="1" pin="P1"/>
+<pinref part="D2" gate="1" pin="P"/>
 <pinref part="R21" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15413,8 +15413,8 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="198.12" y="78.74"/>
 <junction x="198.12" y="50.8"/>
 <pinref part="V2" gate="1" pin="D"/>
-<pinref part="S6" gate="1" pin="P1"/>
-<pinref part="S6" gate="1" pin="P"/>
+<pinref part="D3" gate="1" pin="P1"/>
+<pinref part="D3" gate="1" pin="P"/>
 <pinref part="R20" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -15430,8 +15430,8 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="175.26" y="25.4"/>
 <junction x="175.26" y="45.72"/>
 <pinref part="V2" gate="1" pin="E"/>
-<pinref part="S7" gate="1" pin="P1"/>
-<pinref part="S7" gate="1" pin="P"/>
+<pinref part="D4" gate="1" pin="P1"/>
+<pinref part="D4" gate="1" pin="P"/>
 <pinref part="R27" gate="G$1" pin="2"/>
 </segment>
 </net>
@@ -15447,8 +15447,8 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="182.88" y="40.64"/>
 <junction x="182.88" y="25.4"/>
 <pinref part="V2" gate="1" pin="F"/>
-<pinref part="S8" gate="1" pin="P1"/>
-<pinref part="S8" gate="1" pin="P"/>
+<pinref part="D5" gate="1" pin="P1"/>
+<pinref part="D5" gate="1" pin="P"/>
 <pinref part="R26" gate="G$1" pin="2"/>
 </segment>
 </net>
@@ -15464,8 +15464,8 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="190.5" y="35.56"/>
 <junction x="190.5" y="25.4"/>
 <pinref part="V2" gate="1" pin="G"/>
-<pinref part="S9" gate="1" pin="P1"/>
-<pinref part="S9" gate="1" pin="P"/>
+<pinref part="D6" gate="1" pin="P1"/>
+<pinref part="D6" gate="1" pin="P"/>
 <pinref part="R25" gate="G$1" pin="2"/>
 </segment>
 </net>
@@ -15481,8 +15481,8 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <junction x="198.12" y="27.94"/>
 <junction x="198.12" y="25.4"/>
 <pinref part="V2" gate="1" pin="H"/>
-<pinref part="S10" gate="1" pin="P1"/>
-<pinref part="S10" gate="1" pin="P"/>
+<pinref part="D7" gate="1" pin="P1"/>
+<pinref part="D7" gate="1" pin="P"/>
 <pinref part="R24" gate="G$1" pin="2"/>
 </segment>
 </net>
