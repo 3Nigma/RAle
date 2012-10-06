@@ -91,8 +91,8 @@ cmbxCodCarte_selectat(GtkComboBox *widget, gpointer user_data) {
 
     if(g_strcmp0(titluScurt, "") != 0) {
       g_sprintf(numeExempluAfisat, "Ex: %s", titluLung);
-      if(g_str_has_suffix(titluScurt, "s")) dlgCod = fc_initializeaza(ASM, db_obtine_cod_complet(titluScurt), numeExempluAfisat, TRUE);
-      else dlgCod = fc_initializeaza(C, db_obtine_cod_complet(titluScurt), numeExempluAfisat, TRUE);
+      if(g_str_has_suffix(titluScurt, "s")) dlgCod = fc_initializeaza(ASM, db_obtine_cod_complet(titluLung), numeExempluAfisat, TRUE);
+      else dlgCod = fc_initializeaza(C, db_obtine_cod_complet(titluLung), numeExempluAfisat, TRUE);
       dlgCod->laDepistare_neprezentaPlacuta_recurenta = &placuta_sa_deconectat;
       listaDlgCod = g_slist_prepend(listaDlgCod, dlgCod);
       

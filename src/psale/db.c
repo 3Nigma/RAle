@@ -78,10 +78,10 @@ db_incarca_exemple_carte(GtkListStore *st) {
 }
 
 const char *
-db_obtine_cod_complet(gchar *titluScurt) {
+db_obtine_cod_complet(gchar *titluLung) {
   char sintaxaInterogare[124];
 
-  sprintf(sintaxaInterogare, "select TextCod from exemple where Sectiune = '%s'", titluScurt);
+  sprintf(sintaxaInterogare, "select TextCod from exemple where Titlu = '%s'", titluLung);
   sqlite3_value *rez = bd_obtine_rezultat_unic(PSALE_BD_NUME_FIS, sintaxaInterogare, 0);
 
   return (const char *)sqlite3_value_text(rez);
