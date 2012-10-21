@@ -10,6 +10,7 @@
  
 #include <string.h>
 #include <sqlite3.h>
+#include <glib/gprintf.h>
 
 #include "db.h"
 
@@ -62,19 +63,21 @@ bd_executa_comanda(const char *fisBD, const char *com, int (*frecurenta)(void *,
 
 static int 
 db_incarca_exemplu_recurent(void *userArg, int nrOfCols, char **colTxts, char **colNames) {
-  /* Legendă : [0] = Secțiune, [1] = Titlu */
+  /* Legendă : [0] = IndiceCarte, [1] = TipSursa, [2] = Titlu */
   GtkListStore *magazie = (GtkListStore *)userArg;
   GtkTreeIter iter;
-
+  gchar sectiuneCompacta[6];
+  
+  g_sprintf(sectiuneCompacta, "%s%s", colTxts[0], colTxts[1]);
   gtk_list_store_append(magazie, &iter);
-  gtk_list_store_set(magazie, &iter, 0, colTxts[0], 1, colTxts[1], -1);
+  gtk_list_store_set(magazie, &iter, 0, sectiuneCompacta, 1, colTxts[2], -1);
 
   return 0;
 }
 
 int 
 db_incarca_exemple_carte(GtkListStore *st) {
-  return bd_executa_comanda(PSALE_BD_NUME_FIS, "select Sectiune, Titlu from exemple", db_incarca_exemplu_recurent, (void *)st);
+  return bd_executa_comanda(PSALE_BD_NUME_FIS, "select IndiceCarte, TipSursa, Titlu from exemple order by OrdineAfis asc", db_incarca_exemplu_recurent, (void *)st);
 }
 
 const char *
