@@ -13,6 +13,8 @@
 
 #include <gtk/gtk.h>
 
+#include "bic.h"
+
 typedef enum {C, ASM} Limbaj;
 typedef enum {ASCUNSE, VIZIBILE} VizActiuni;
 
@@ -23,6 +25,7 @@ typedef struct {
   GtkWidget *btExpandator;
   GtkWidget *cadruActiuni;
   GtkWidget *lblStareConex, *lblStareDCod, *lblStareNSursa;
+  BaraInfoCod bInfo;
   VizActiuni vActiuni;
   
   void (*laDepistare_neprezentaPlacuta_recurenta)();

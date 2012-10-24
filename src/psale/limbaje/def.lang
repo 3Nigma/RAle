@@ -103,7 +103,6 @@
             (see http://docs.python.org/lib/built-in-funcs.html) -->
         <style id="builtin" _name="Built-in identifier" map-to="def:identifier"/>
 
-
         <!-- Statement group -->
 
         <!-- Any statement -->

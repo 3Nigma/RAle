@@ -1,149 +1,179 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<language id="asm" _name="ASM" version="2.0" _section="Sources">
-    <metadata>
-      <property name="mimetypes">text/x-asm</property>
-      <property name="globs">*.s</property>
-      <property name="line-comment-start">;</property>
-    </metadata>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language _name="asm" version="1.0" _section="Sources" mimetypes="text/plain">
+	
+	<escape-char>\</escape-char>
 
-    <styles>
-        <style id="comment"           _name="Comment"             map-to="def:comment"/>
-        <style id="error"             _name="Error"               map-to="def:error"/>
-        <style id="string"            _name="String"              map-to="def:string"/>
-        <style id="preprocessor"      _name="Preprocessor"        map-to="def:preprocessor"/>
-        <style id="common-defines"    _name="Common Defines"      map-to="def:special-constant"/>
-        <style id="included-file"     _name="Included File"       map-to="def:string"/>
-        <style id="char"              _name="Character"           map-to="def:character"/>
-        <style id="keyword"           _name="Keyword"             map-to="def:keyword"/>
-        <style id="type"              _name="Data Type"           map-to="def:type"/>
-        <style id="storage-class"     _name="Storage Class"       map-to="def:type"/>
-        <style id="printf"            _name="printf Conversion"   map-to="def:special-char"/>
-        <style id="escaped-character" _name="Escaped Character"   map-to="def:special-char"/>
-        <style id="floating-point"    _name="Floating point number" map-to="def:floating-point"/>
-        <style id="decimal"           _name="Decimal number"      map-to="def:decimal"/>
-        <style id="octal"             _name="Octal number"        map-to="def:base-n-integer"/>
-        <style id="hexadecimal"       _name="Hexadecimal number"  map-to="def:base-n-integer"/>
-        <style id="boolean"           _name="Boolean value"       map-to="def:boolean"/>
-    </styles>
+	<line-comment _name = "Line Comment" style= "Comment">
+		<start-regex>;</start-regex>
+	</line-comment>
 
-    <definitions>
-        <define-regex id="escaped-character" extended="true">
-            \\(                   # leading backslash
-            [\\\"\'nrbtfav\?] |   # escaped character
-            [0-7]{1,3} |          # one, two, or three octal digits
-            x[0-9A-Fa-f]+         # 'x' followed by hex digits
-            )
-        </define-regex>
+	<line-comment _name = "Label" style = "Comment">
+		<start-regex>^\s*\b(\w)+\b\s*:\s*$</start-regex>
+	</line-comment>
 
-        <context id="asm" class="no-spell-check">
-            <include>
-                <!-- Comments -->
-                <context id="comment" style-ref="comment" end-at-line-end="true" class="comment" class-disabled="no-spell-check">
-                    <start>;</start>
+	<block-comment _name = "Block Comment" style = "Comment">
+		<start-regex>/\*</start-regex>
+        <end-regex>\*/</end-regex>
+	</block-comment>
 
-                    <include>
-                      <context ref="def:in-line-comment"/>
-                    </include>
-                </context>
+	<block-comment _name = "'#if 0' Comment" style = "Comment">
+		<start-regex>^[ \t]*#[ \t]*if[ \t]*0</start-regex>
+        <end-regex>[ \t]*#[ \t]*(endif|else)</end-regex>
+	</block-comment>
 
-                <!-- Preprocessor -->
-                <define-regex id="preproc-start">^\s*#\s*</define-regex>
+	<string _name = "String" style = "String" end-at-line-end = "TRUE">
+		<start-regex>&quot;</start-regex>
+		<end-regex>&quot;</end-regex>
+	</string>
 
-                <context id="if0-comment" style-ref="comment">
-                    <start>\%{preproc-start}if\b\s*0\b</start>
-                    <end>\%{preproc-start}(endif|else|elif)\b</end>
-                    <include>
-                        <context id="if-in-if0">
-                            <start>\%{preproc-start}if(n?def)?\b</start>
-                            <end>\%{preproc-start}endif\b</end>
-                            <include>
-                                <context ref="if-in-if0"/>
-                                <context ref="def:in-comment"/>
-                            </include>
-                        </context>
-                        <context ref="def:in-comment"/>
-                    </include>
-                </context>
+	<syntax-item _name = "Include/Pragma" style = "Preprocessor">
+		<start-regex>^#[ \t]*(include|pragma)</start-regex>
+	         <end-regex>\n</end-regex>
+	</syntax-item>
 
-                <context id="include" style-ref="preprocessor">
-                    <match extended="true">
-                            \%{preproc-start}
-                            (include|import)\s*
-                            (".*?"|&lt;.*&gt;)
-                    </match>
-                    <include>
-                        <context id="included-file" sub-pattern="2" style-ref="included-file"/>
-                    </include>
-                </context>
+	<keyword-list _name = "Instructions" style = "Keyword" case-sensitive="FALSE">
+		<keyword>add</keyword>
+		<keyword>adc</keyword>
+		<keyword>adiw</keyword>
+		<keyword>sub</keyword>
+		<keyword>subi</keyword>
+		<keyword>sbc</keyword>
+		<keyword>sbci</keyword>
+		<keyword>sbiw</keyword>
+		<keyword>and</keyword>
+		<keyword>andi</keyword>
+		<keyword>or</keyword>
+		<keyword>ori</keyword>
+		<keyword>eor</keyword>
+		<keyword>com</keyword>
+		<keyword>neg</keyword>
+		<keyword>sbr</keyword>
+		<keyword>cbr</keyword>
+		<keyword>inc</keyword>
+		<keyword>dec</keyword>
+		<keyword>tst</keyword>
+		<keyword>clr</keyword>
+		<keyword>ser</keyword>
+		<keyword>mul</keyword>
+		<keyword>muls</keyword>
+		<keyword>mulsu</keyword>
+		<keyword>fmul</keyword>
+		<keyword>fmuls</keyword>
+		<keyword>fmulsu</keyword>
+		<keyword>rjmp</keyword>
+		<keyword>ijmp</keyword>
+		<keyword>eijmp</keyword>
+		<keyword>jmp</keyword>
+		<keyword>rcall</keyword>
+		<keyword>icall</keyword>
+		<keyword>eicall</keyword>
+		<keyword>call</keyword>
+		<keyword>ret</keyword>
+		<keyword>reti</keyword>
+		<keyword>cpse</keyword>
+		<keyword>cp</keyword>
+		<keyword>cpc</keyword>
+		<keyword>cpi</keyword>
+		<keyword>sbrc</keyword>
+		<keyword>sbrs</keyword>
+		<keyword>sbic</keyword>
+		<keyword>sbis</keyword>
+		<keyword>brbs</keyword>
+		<keyword>brbc</keyword>
+		<keyword>breq</keyword>
+		<keyword>brne</keyword>
+		<keyword>brcs</keyword>
+		<keyword>brcc</keyword>
+		<keyword>brsh</keyword>
+		<keyword>brlo</keyword>
+		<keyword>brmi</keyword>
+		<keyword>brpl</keyword>
+		<keyword>brge</keyword>
+		<keyword>brlt</keyword>
+		<keyword>brhs</keyword>
+		<keyword>brhc</keyword>
+		<keyword>brts</keyword>
+		<keyword>brtc</keyword>
+		<keyword>brvs</keyword>
+		<keyword>brvc</keyword>
+		<keyword>brie</keyword>
+		<keyword>brid</keyword>
+		<keyword>mov</keyword>
+		<keyword>movw</keyword>
+		<keyword>ldi</keyword>
+		<keyword>lds</keyword>
+		<keyword>ld</keyword>
+		<keyword>ldd</keyword>
+		<keyword>sts</keyword>
+		<keyword>st</keyword>
+		<keyword>std</keyword>
+		<keyword>lpm</keyword>
+		<keyword>elpm</keyword>
+		<keyword>spm</keyword>
+		<keyword>in</keyword>
+		<keyword>out</keyword>
+		<keyword>push</keyword>
+		<keyword>pop</keyword>
+		<keyword>lsl</keyword>
+		<keyword>lsr</keyword>
+		<keyword>rol</keyword>
+		<keyword>ror</keyword>
+		<keyword>asr</keyword>
+		<keyword>swap</keyword>
+		<keyword>bset</keyword>
+		<keyword>bclr</keyword>
+		<keyword>sbi</keyword>
+		<keyword>cbi</keyword>
+		<keyword>bst</keyword>
+		<keyword>bld</keyword>
+		<keyword>sec</keyword>
+		<keyword>clc</keyword>
+		<keyword>sen</keyword>
+		<keyword>cln</keyword>
+		<keyword>sez</keyword>
+		<keyword>clz</keyword>
+		<keyword>sei</keyword>
+		<keyword>cli</keyword>
+		<keyword>ses</keyword>
+		<keyword>cls</keyword>
+		<keyword>sev</keyword>
+		<keyword>clv</keyword>
+		<keyword>set</keyword>
+		<keyword>clt</keyword>
+		<keyword>seh</keyword>
+		<keyword>clh</keyword>
+		<keyword>break</keyword>
+		<keyword>nop</keyword>
+		<keyword>sleep</keyword>
+		<keyword>wdr</keyword>
+	</keyword-list>
 
-                <context id="preprocessor" style-ref="preprocessor" end-at-line-end="true">
-                    <start extended="true">
-                            \%{preproc-start}
-                            (define|undef|error|pragma|ident|if(n?def)?|else|elif|endif|line|warning)
-                            \b
-                    </start>
-                    <include>
-                        <context ref="def:line-continue" ignore-style="true"/>
-                        <context ref="string" ignore-style="true"/>
-                        <context ref="comment"/>
-                    </include>
-                </context>
+	<string _name = "Character Constant" style = "String" end-at-line-end = "TRUE">
+		<start-regex>&apos;</start-regex>
+		<end-regex>&apos;</end-regex>
+	</string>
 
-                <context id="string" style-ref="string" end-at-line-end="true" class="string" class-disabled="no-spell-check">
-                    <start>L?"</start>
-                    <end>"</end>
-                    <include>
-                        <context id="escaped-character" style-ref="escaped-character">
-                            <match>\%{escaped-character}</match>
-                        </context>
-                        <context ref="def:line-continue"/>
-                    </include>
-                </context>
+	<pattern-item _name = "Decimal" style = "Decimal">
+		<regex>\b([1-9][0-9]*|0)([Uu]([Ll]|LL|ll)?|([Ll]|LL|ll)[Uu]?)?\b</regex>
+	</pattern-item>
 
-                <context id="char" style-ref="char">
-                    <match>L?'(\%{escaped-character}|.)'</match>
-                </context>
+	<pattern-item _name = "Floating Point Number" style = "Floating Point">
+		<regex>\b([0-9]+[Ee][-]?[0-9]+|([0-9]*\.[0-9]+|[0-9]+\.)([Ee][-]?[0-9]+)?)[fFlL]?</regex>
+	</pattern-item>
 
-                <!-- http://www.lysator.liu.se/c/ANSI-C-grammar-l.html -->
-                <context id="float" style-ref="floating-point">
-                    <match extended="true">
-                        (?&lt;![\w\.])
-                        ((\.[0-9]+ | [0-9]+\.[0-9]*) ([Ee][+-]?[0-9]*)? |
-                         ([0-9]+[Ee][+-]?[0-9]*))
-                        [fFlL]?
-                        (?![\w\.])
-                    </match>
-                </context>
+	<pattern-item _name = "Octal Number" style = "Base-N Integer">
+		<regex>\b0[0-7]+([Uu]([Ll]|LL|ll)?|([Ll]|LL|ll)[Uu]?)?\b</regex>
+	</pattern-item>
 
-                <context id="hexadecimal" style-ref="hexadecimal">
-                    <match extended="true">
-                        (?&lt;![\w\.])
-                        0[xX][a-fA-F0-9]+[uUlL]*
-                        (?![\w\.])
-                    </match>
-                </context>
+	<pattern-item _name = "Hex Number" style = "Base-N Integer">
+		<regex>\b0[xX][0-9a-fA-F]+([Uu]([Ll]|LL|ll)?|([Ll]|LL|ll)[Uu]?)?\b</regex>
+	</pattern-item>
 
-                <context id="octal" style-ref="octal">
-                    <match extended="true">
-                        (?&lt;![\w\.])
-                        0[0-7]+[uUlL]*
-                        (?![\w\.])
-                    </match>
-                </context>
-
-                <context id="decimal" style-ref="decimal">
-                    <match extended="true">
-                        (?&lt;![\w\.])
-                        [0-9]+[uUlL]*
-                        (?![\w\.])
-                    </match>
-                </context>
-
-                <!-- Keywords -->
-                <context id="keywords" style-ref="keyword" class="keyword">
-                    <keyword>SREG</keyword>
-                    <keyword>SP</keyword>
-                    <keyword>SPH</keyword>
+    <keyword-list name="Registers" style = "Keyword" case-sensitive="FALSE">
+        <keyword>SREG</keyword>
+        <keyword>SP</keyword>
+        <keyword>SPH</keyword>
                     <keyword>SPL</keyword>
                     <keyword>GIMSK</keyword>
                     <keyword>GIFR</keyword>
@@ -202,57 +232,89 @@
                     <keyword>ADCH</keyword>
                     <keyword>ADCL</keyword>
                     <keyword>ADCSRB</keyword>
-                </context>
+                </keyword-list>
 
-                <context id="types" style-ref="type" class="type">
-                    <keyword>_Bool</keyword>
-                    <keyword>_Complex</keyword>
-                    <keyword>_Imaginary</keyword>
-                    <keyword>bool</keyword>
-                    <keyword>char</keyword>
-                    <keyword>double</keyword>
-                    <keyword>float</keyword>
-                    <keyword>int</keyword>
-                    <keyword>long</keyword>
-                    <keyword>short</keyword>
-                    <keyword>signed</keyword>
-                    <keyword>size_t</keyword>
-                    <keyword>unsigned</keyword>
-                    <keyword>void</keyword>
-                </context>
+	<keyword-list _name = "directives" style = "Data Type" case-sensitive="FALSE"
+		match-empty-string-at-beginning = "FALSE"
+		match-empty-string-at-end = "TRUE"
+		beginning-regex = "^[ \t]*.[ \t]*">
+		<keyword>abort</keyword>
+		<keyword>align</keyword>
+		<keyword>arch</keyword>
+		<keyword>ascii</keyword>
+		<keyword>asciz</keyword>
+		<keyword>byte</keyword>
+		<keyword>comm</keyword>
+		<keyword>data</keyword>
+		<keyword>desc</keyword>
+		<keyword>dim</keyword>
+		<keyword>eject</keyword>
+		<keyword>else</keyword>
+		<keyword>endef</keyword>
+		<keyword>endif</keyword>
+		<keyword>equ</keyword>
+		<keyword>equiv</keyword>
+		<keyword>err</keyword>
+		<keyword>extern</keyword>
+		<keyword>file</keyword>
+		<keyword>fill</keyword>
+		<keyword>float</keyword>
+		<keyword>global</keyword>
+		<keyword>hword</keyword>
+		<keyword>ident</keyword>
+		<keyword>if</keyword>
+		<keyword>include</keyword>
+		<keyword>int</keyword>
+		<keyword>irp</keyword>
+		<keyword>irpc</keyword>
+		<keyword>lcomm</keyword>
+		<keyword>lflags</keyword>
+		<keyword>line</keyword>
+		<keyword>linkonce</keyword>
+		<keyword>ln</keyword>
+		<keyword>list</keyword>
+		<keyword>long</keyword>
+		<keyword>macro</keyword>
+		<keyword>mri</keyword>
+		<keyword>nolist</keyword>
+		<keyword>octa</keyword>
+		<keyword>org</keyword>
+		<keyword>p2align</keyword>
+		<keyword>psize</keyword>
+		<keyword>quad</keyword>
+		<keyword>rept</keyword>
+		<keyword>sbttl</keyword>
+		<keyword>scl</keyword>
+		<keyword>section</keyword>
+		<keyword>set</keyword>
+		<keyword>short</keyword>
+		<keyword>single</keyword>
+		<keyword>size</keyword>
+		<keyword>skip</keyword>
+		<keyword>space</keyword>
+		<keyword>string</keyword>
+		<keyword>tag</keyword>
+		<keyword>text</keyword>
+		<keyword>title</keyword>
+		<keyword>type</keyword>
+		<keyword>word</keyword>
+	</keyword-list>
 
-                <context id="storage-class" style-ref="storage-class" class="storage-class">
-                    <keyword>auto</keyword>
-                    <keyword>const</keyword>
-                    <keyword>extern</keyword>
-                    <keyword>inline</keyword>
-                    <keyword>register</keyword>
-                    <keyword>restrict</keyword>
-                    <keyword>static</keyword>
-                    <keyword>volatile</keyword>
-                </context>
+	<keyword-list _name = "Preprocessor Definitions" style = "Preprocessor" case-sensitive="TRUE"
+		match-empty-string-at-beginning = "FALSE"
+		match-empty-string-at-end = "TRUE"
+		beginning-regex = "^[ \t]*#[ \t]*">
+		<keyword>if</keyword>
+		<keyword>ifdef</keyword>
+		<keyword>ifndef</keyword>
+		<keyword>else</keyword>
+		<keyword>elif</keyword>
+		<keyword>define</keyword>
+		<keyword>endif</keyword>
+		<keyword>undef</keyword>
+		<keyword>error</keyword>
+		<keyword>pragma</keyword>
+		<keyword>line</keyword>
+	</keyword-list>
 
-                <context id="common-defines" style-ref="common-defines" class="common-defines">
-                    <keyword>NULL</keyword>
-                    <keyword>MAX</keyword>
-                    <keyword>MIN</keyword>
-                    <keyword>TRUE</keyword>
-                    <keyword>FALSE</keyword>
-                    <keyword>__LINE__</keyword>
-                    <keyword>__DATA__</keyword>
-                    <keyword>__FILE__</keyword>
-                    <keyword>__func__</keyword>
-                    <keyword>__TIME__</keyword>
-                    <keyword>__STDC__</keyword>
-                </context>
-
-                <!-- C99 booleans -->
-                <context id="boolean" style-ref="boolean" class="boolean">
-                    <keyword>true</keyword>
-                    <keyword>false</keyword>
-                </context>
-
-            </include>
-        </context>
-    </definitions>
 </language>

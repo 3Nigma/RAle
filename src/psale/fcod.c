@@ -39,6 +39,8 @@
   "  return 0;\n" \
   "}\n"
 
+static void laClickPeCorectieLinie(GtkSourceBuffer *bcod, GtkSourceView *vcod, gint nrLinie);
+
 static GtkSourceLanguageManager *txtSrcLimbAsignor = NULL;
 static GtkSourceStyleSchemeManager *txtSrcStilAsignor = NULL;
 
@@ -69,6 +71,7 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   FILE *fs = NULL;
   gchar *codPrezent = NULL;
 
+  /* depozitează sursa curentă într-un fișier temporar pentru a putea fi procesat mai departe */
   sprintf(denFisSursa, "%s%s", tmpnam(NULL), fc->lmFolosit == C ? ".c" : ".s");
   fs = fopen(denFisSursa, "w");
   codPrezent = obtine_codul_sursa_curent(GTK_TEXT_VIEW(fc->txtVizCod));
@@ -78,12 +81,14 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   gchar textComandaGcc[256];
   gchar textComandaObjcopy[256];
   gchar textComandaAvrdude[256];
+  BaraInfoCod *bInfoFormularCurent;
   char denObiectRezultat[L_tmpnam];
   char denHexRezultat[L_tmpnam];
 
   tmpnam(denObiectRezultat);
   tmpnam(denHexRezultat);
-
+  bInfoFormularCurent = &fc->bInfo;
+  
 #ifdef G_OS_WIN32
   g_sprintf(textComandaGcc, "-Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
   g_sprintf(textComandaObjcopy, "-j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
@@ -92,12 +97,35 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   ShellExecute(NULL, "open", "winavr/bin/avr-gcc.exe", textComandaGcc, NULL, SW_SHOWNORMAL);
   ShellExecute(NULL, "open", "winavr/bin/avr-objcopy.exe", textComandaObjcopy, NULL, SW_SHOWNORMAL);
 #elif defined G_OS_UNIX
-  g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
+  /* Construiește instrucțiunile ce vor fi executate pe cod, prin sistemul de operare.
+   * Redirecționarea de tip stderr > stdout ('2>&1') se realizează pentru a ajuta funcția popen care nu știe 
+   * să lucreze decât cu stdout!*/
+  g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 %s -o %s 2>&1", denFisSursa, denObiectRezultat);
   g_sprintf(textComandaObjcopy, "avr-objcopy -j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
   g_sprintf(textComandaAvrdude, "sudo avrdude -c usbtiny -p t25 -U flash:w:%s 2> /dev/null", denHexRezultat);
   
-  system(textComandaGcc);
-  system(textComandaObjcopy);
+  /* încearcă să compilezi sursa curentă */
+  FILE *fGCCOut = NULL;
+  char lineBuff[512];
+  
+  if((fGCCOut = popen(textComandaGcc, "r")) == NULL) {
+	  /* TODO: s-a întâmplat ceva cu execuția compilatorului */
+  } else {
+	bic_text_initializeaza(bInfoFormularCurent);
+	while(fgets(lineBuff, 4096, fGCCOut) != NULL) {
+      bic_text_adauga_linie(bInfoFormularCurent, lineBuff);
+    }
+	pclose(fGCCOut);
+	
+	/* încearcă extragerea secțiunilor necesare pentru programator */
+	if(bic_text_contine_informatii_utile(bInfoFormularCurent) == FALSE) {
+      /* totul este bine, mergi mai departe cu compilarea */
+      system(textComandaObjcopy);
+    } else {
+	  /* au existat mesaje din partea compilatorului. Afișează-le, dar nu mergi mai departe cu compilarea! */
+	  bic_arata(bInfoFormularCurent);
+	}
+  }
 #endif
 
   if(al_este_placuta_conectata()) {
@@ -137,6 +165,11 @@ btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
   gtk_button_set_image(GTK_BUTTON(fc->btExpandator), imgExpandatorActiuni);
 }
 
+static void 
+laClickPeCorectieLinie(GtkSourceBuffer *bcod, GtkSourceView *vcod, gint nrLinie) {
+  
+}
+
 void 
 fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
   if(NULL != fc) {
@@ -151,6 +184,8 @@ fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
     gtk_widget_show(fc->cadruActiuni);
     break;
   }
+  
+  bic_ascunde(&fc->bInfo);
   }
 }
 
@@ -185,7 +220,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_window_set_position(GTK_WINDOW(frm), GTK_WIN_POS_CENTER);
 
   /* inițializăm cadrul formularului de cod */
-  cadruFrm = gtk_table_new(2, 3, FALSE);
+  cadruFrm = gtk_table_new(3, 3, FALSE);
   gtk_container_add(GTK_CONTAINER(frm), cadruFrm);
 
   /* inițializăm entități ajutătoare pentru elementul de cod */
@@ -232,7 +267,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
 
   GtkWidget *txtSrcScroll = gtk_scrolled_window_new(NULL, NULL);
   gtk_container_add(GTK_CONTAINER(txtSrcScroll), txtSrc);
-  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), txtSrcScroll, 0, 1, 0, 1);
+  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), txtSrcScroll, 0, 1, 1, 2);
 
   /* inițializăm butonul de afișare/ascundere acțiuni */
   btGestioneazaActiuni = gtk_button_new();
@@ -241,7 +276,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   GdkPixbuf *imgExpandatorPixBuf = db_obtine_imagine_media_scalata(esteExemplu ? DB_IMG_COLAPSEAZA : DB_IMG_EXPANDEAZA, 20, 20);
   GtkWidget *imgExpandatorActiuni = gtk_image_new_from_pixbuf(imgExpandatorPixBuf);
   gtk_button_set_image(GTK_BUTTON(btGestioneazaActiuni), imgExpandatorActiuni);
-  gtk_table_attach(GTK_TABLE(cadruFrm), btGestioneazaActiuni, 1, 2, 0, 2, GTK_SHRINK, GTK_FILL, 0, 0);
+  gtk_table_attach(GTK_TABLE(cadruFrm), btGestioneazaActiuni, 1, 2, 0, 3, GTK_SHRINK, GTK_FILL, 0, 0);
 
   /* inițializează acțiunile speciale ale formularului de cod */  
   btIncarcaPeAle = gtk_button_new_with_label("Încarcă pe Ale");
@@ -298,7 +333,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btReiaLucrul, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btCitesteEEPROM, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btParasesteFrm, FALSE, FALSE, 0);
-  gtk_table_attach(GTK_TABLE(cadruFrm), cadruBxActiuni, 2, 3, 0, 2, GTK_SHRINK, GTK_FILL, 0, 0);
+  gtk_table_attach(GTK_TABLE(cadruFrm), cadruBxActiuni, 2, 3, 0, 3, GTK_SHRINK, GTK_FILL, 0, 0);
 
   /* inițializăm bara de stare a formularului */
   lblStareLegatura = gtk_label_new("[Conexiune]");
@@ -310,7 +345,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_box_pack_start(GTK_BOX(cadruBaraStare), lblStareLegatura, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(cadruBaraStare), lblStareCod, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(cadruBaraStare), lblStareNumeSursa, FALSE, FALSE, 0);
-  gtk_table_attach(GTK_TABLE(cadruFrm), cadruBaraStare, 0, 1, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(GTK_TABLE(cadruFrm), cadruBaraStare, 0, 1, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
 
   /* împachetăm elementele esențiale pentru a le returna */
   deRet = g_slice_new(FormularCod);
@@ -325,6 +360,14 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   if(esteExemplu) deRet->vActiuni = VIZIBILE;
   else deRet->vActiuni = ASCUNSE;
   deRet->laDepistare_neprezentaPlacuta_recurenta = NULL;
+  
+  /* inițializăm bara de stare */
+  bic_initializeaza(&deRet->bInfo);
+  deRet->bInfo.parentBuff = txtSrcBuf;
+  deRet->bInfo.parentView = GTK_SOURCE_VIEW(txtSrc);
+  deRet->bInfo.cereRepozitionareaCursorului = &laClickPeCorectieLinie;
+  gtk_table_attach(GTK_TABLE(cadruFrm), deRet->bInfo.wid, 0, 1, 0, 1, GTK_FILL, GTK_SHRINK, 3, 3);
+  bic_ascunde(&deRet->bInfo);
   
   /* legăm semnalele de funcțiile recurente */
   g_signal_connect(frm, "delete-event", G_CALLBACK(frmCod_delev), NULL);
