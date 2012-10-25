@@ -121,6 +121,7 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
 	if(bic_text_contine_informatii_utile(bInfoFormularCurent) == FALSE) {
       /* totul este bine, mergi mai departe cu compilarea */
       system(textComandaObjcopy);
+      bic_ascunde(bInfoFormularCurent);
     } else {
 	  /* au existat mesaje din partea compilatorului. Afișează-le, dar nu mergi mai departe cu compilarea! */
 	  bic_arata(bInfoFormularCurent);

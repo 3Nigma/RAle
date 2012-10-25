@@ -91,9 +91,17 @@ transformaMesajulCompilatorului(const gchar *textOriginal) {
   GMatchInfo *infoTipar = NULL;
   
   textRezultat = g_new0(gchar, 256);
-  /* regiune în care se ignoră unele formate de mesaje */
-  if(NULL != g_strstr_len(textOriginal, -1, "Assembler messages")) {
-    
+
+  if(aplicaTiparPrezent("Assembler messages", textOriginal) != NULL ||
+     aplicaTiparPrezent("ld returned 1 exit status", textOriginal) != NULL ||
+     aplicaTiparPrezent("\\.o: In function `", textOriginal) != NULL ) {
+     /* ignorăm unele formate de mesaje */    
+  } else if((infoTipar = aplicaTiparPrezent("\\): undefined reference to `([\\w]+)",
+                                            textOriginal)) != NULL) {
+	  /* [0] = referința lipsă */
+	  g_snprintf(textRezultat, 256, "\nNu cunosc adresa '%s'.", 
+	             g_match_info_fetch(infoTipar, 1));
+	  g_match_info_free(infoTipar);
   } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: junk at end of line, first unrecognized character is `(\\w)",
                                             textOriginal)) != NULL) {
 	  /* [0] = nr. linie, [1] = primul caracter problematic */
@@ -115,14 +123,58 @@ transformaMesajulCompilatorului(const gchar *textOriginal) {
 	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1), 
 	             g_match_info_fetch(infoTipar, 2));
 	  g_match_info_free(infoTipar);
+  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: unknown pseudo-op: `(.[\\w]+)",
+                                            textOriginal)) != NULL) {
+	  /* [0] = nr. linie, [1] = directiva necunoscută */
+	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Nu recunosc directiva '%s'.", 
+	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1), 
+	             g_match_info_fetch(infoTipar, 2));
+	  g_match_info_free(infoTipar);
+  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: garbage at end of line",
+                                            textOriginal)) != NULL) {
+	  /* [0] = nr. linie */
+	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Linia se termină prin caractere invalide.", 
+	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1));
+	  g_match_info_free(infoTipar);
   } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: register name or number from 0 to 31 required",
                                             textOriginal)) != NULL) {
 	  /* [0] = nr. linie */
 	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Registrul general nu este cunoscut! Alegeți unul din domeniul {0-31}.", 
 	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1));
 	  g_match_info_free(infoTipar);
+  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: `(.)' required",
+                                            textOriginal)) != NULL) {
+	  /* [0] = nr. linie, [1] = caracterul ce lipsește */
+	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Necesită caracterul '%s'", 
+	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1),
+	             g_match_info_fetch(infoTipar, 2));
+	  g_match_info_free(infoTipar);
+  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: constant value required",
+                                            textOriginal)) != NULL) {
+	  /* [0] = nr. linie */
+	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Necesită o valoare constantă.", 
+	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1));
+	  g_match_info_free(infoTipar);
+  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: pointer register (.) required",
+                                            textOriginal)) != NULL) {
+	  /* [0] = nr. linie, [1] = registrul ce lipsește */
+	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Necesită registrul '%s'.", 
+	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1),
+	             g_match_info_fetch(infoTipar, 2));
+	  g_match_info_free(infoTipar);
+  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: missing operand",
+                                            textOriginal)) != NULL) {
+	  /* [0] = nr. linie */
+	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Nu are operand.", 
+	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1));
+	  g_match_info_free(infoTipar);
+  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: (.+)",
+                                            textOriginal)) != NULL) {
+    /* nu am recunoscut mesajul curent, încearcă o procesare generică */
+    g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "%s", 
+	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1),
+	             g_match_info_fetch(infoTipar, 2));
   } else {
-    /* nu am recunoscut mesajul curent. Lasă-l nemodificat */
     g_snprintf(textRezultat, 256, "%s", textOriginal);
   }
   
