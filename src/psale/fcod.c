@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include <glib.h>
+#include <gdk/gdkkeysyms.h>
 #include <glib/gprintf.h>
 #include <gtksourceview/gtksourcelanguagemanager.h>
 #include <gtksourceview/gtksourcelanguage.h>
@@ -43,7 +44,8 @@
   "}\n"
 
 static FormularCod *fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, gboolean esteExemplu);
-static void laModificareCod (GtkTextBuffer *textbuffer, FormularCod *fc);
+static void laModificareCod(GtkTextBuffer *textbuffer, FormularCod *fc);
+static gboolean laDezapasareTasteInCod(GtkWidget *widget, GdkEventKey *ke, FormularCod *fc);
 
 static void btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc);
 static void btReiaLucrul_click(GtkWidget *bt, FormularCod *fc);
@@ -313,7 +315,24 @@ laModificareCod(GtkTextBuffer *textbuffer, FormularCod *fc) {
     actualizeaza_stare_nume_sursa(fc, TRUE);
   }
 }
-                                                        
+
+static gboolean 
+laDezapasareTasteInCod(GtkWidget *widget, GdkEventKey *ke, FormularCod *fc) {
+  gboolean keyHandled = FALSE;
+  
+  if((ke->state & GDK_CONTROL_MASK) != 0 && 
+     (ke->keyval == GDK_KEY_S || ke->keyval == GDK_KEY_s)) {
+    /* realizează o salvarea rapidă o salvare rapidă */
+    if(strlen(fc->caleCurentaSursa) != 0) {
+	  salveaza_continut_in_fisier(obtine_codul_sursa_curent(GTK_TEXT_VIEW(fc->txtVizCod)) , fc->caleCurentaSursa);
+	  actualizeaza_stare_nume_sursa(fc, FALSE);
+	}
+    keyHandled = TRUE;
+  }
+  
+  return keyHandled;
+}
+                                                      
 static void 
 btSalveazaLucrul_click(GtkWidget *bt, FormularCod *fc) {
   GtkWidget *dlgSalveazaSursa = NULL;
@@ -609,6 +628,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   g_signal_connect(btReiaLucrul, "clicked", G_CALLBACK(btReiaLucrul_click), (gpointer)deRet);
   g_signal_connect(btParasesteFrm, "clicked", G_CALLBACK(btParasesteFrm_click), (gpointer)deRet);
   g_signal_connect(txtSrcBuf, "changed", G_CALLBACK(laModificareCod), (gpointer)deRet);
+  g_signal_connect(txtSrc, "key-release-event", G_CALLBACK(laDezapasareTasteInCod), (gpointer)deRet);
   
   return deRet;
 }
