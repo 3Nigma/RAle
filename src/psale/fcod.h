@@ -17,11 +17,15 @@
 
 typedef enum {C, ASM} Limbaj;
 typedef enum {ASCUNSE, VIZIBILE} VizActiuni;
+typedef enum {DESCHIDE, SALVEAZA} TipDialogFisier;
 
 typedef struct {
   GtkWidget *frm;
   Limbaj lmFolosit;
   GtkWidget *txtVizCod;
+  gboolean esteExempluIncarcat;
+  gchar numeSimpluAfisat[128];
+  gchar caleCurentaSursa[256];
   GtkWidget *btExpandator;
   GtkWidget *cadruActiuni;
   GtkWidget *lblStareConex, *lblStareDCod, *lblStareNSursa;
@@ -30,9 +34,6 @@ typedef struct {
   
   void (*laDepistare_neprezentaPlacuta_recurenta)();
 } FormularCod;
-
-extern FormularCod *
-fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, gboolean esteExemplu);
 
 extern FormularCod *
 fc_initializeaza_fara_cod(Limbaj lmDorit);

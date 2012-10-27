@@ -25,7 +25,7 @@ bic_initializeaza(BaraInfoCod *bicStructure) {
   GtkWidget *baraInfoContent = NULL;
   
   /* inițializează câmpurile structurii */
-  bicStructure->wid = gtk_info_bar_new_with_buttons("Ascunde înștiințarea");
+  bicStructure->wid = gtk_info_bar_new_with_buttons("Ascunde înștiințarea", GTK_RESPONSE_CLOSE, NULL);
   bicStructure->text = gtk_label_new(NULL);
   bicStructure->cereRepozitionareaCursorului = NULL;
   bicStructure->nrLiniiUtileAfisate = 0;
