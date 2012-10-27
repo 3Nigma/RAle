@@ -39,7 +39,8 @@
   "  return 0;\n" \
   "}\n"
 
-static void laClickPeCorectieLinie(GtkSourceBuffer *bcod, GtkSourceView *vcod, gint nrLinie);
+static void btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc);
+static void btReiaLucrul_click(GtkWidget *bt, FormularCod *fc);
 
 static GtkSourceLanguageManager *txtSrcLimbAsignor = NULL;
 static GtkSourceStyleSchemeManager *txtSrcStilAsignor = NULL;
@@ -54,6 +55,56 @@ obtine_codul_sursa_curent(GtkTextView *txtView) {
   gtk_text_buffer_get_end_iter(txtBuf, &csFinal);
 
   return gtk_text_buffer_get_text(txtBuf, &csStart, &csFinal, FALSE);
+}
+
+static void 
+seteaza_codul_sursa_curent(GtkTextView *txtView, const gchar *txt) {
+  GtkTextBuffer *codBuff = NULL;
+  
+  codBuff = gtk_text_view_get_buffer(txtView);
+  gtk_text_buffer_set_text(codBuff, txt, strlen(txt));
+}
+
+static gchar *
+obtine_doar_nume_fisier_prefixat(const gchar *numeFis) {
+  GRegex *tiparNumeFis = NULL;
+  GMatchInfo *rezultatTipar = NULL;
+  gchar *nFisier = NULL;
+  
+  tiparNumeFis = g_regex_new("([\\w]+)[\\.]([\\w]+)", 0, 0, NULL);
+  nFisier = g_new(gchar, 64);
+    
+  g_regex_match(tiparNumeFis, numeFis, 0, &rezultatTipar);
+  if(g_match_info_matches(rezultatTipar)) {
+    // [1] = nume mare, [2] = extensia
+    g_sprintf(nFisier, "<i>SM</i> : %s.%s", g_match_info_fetch(rezultatTipar, 1), g_match_info_fetch(rezultatTipar, 2));
+  } else {
+    /* numeFis nu a avut formatul necesar */
+    g_sprintf(nFisier, "<b>Nume invalid!</b>");
+  }
+    
+  g_regex_unref(tiparNumeFis);
+  return nFisier;
+}
+
+static gchar *
+incarca_continut_din_fisier(const gchar *numeFis) {
+  gchar *continut = NULL;
+  FILE *pFile = NULL;
+  int fileSize = 0;
+
+  /* deschide fișierul și calculează dimensiunea sa */
+  pFile = fopen(numeFis, "r");
+  fseek(pFile, 0, SEEK_END);
+  fileSize = ftell(pFile);
+  rewind(pFile);
+    
+  /* încarcă conținutul fișierului într-o variabilă alocată dinamic */
+  continut = g_new0(gchar, fileSize + 20);
+  fread(continut, sizeof(gchar), fileSize, pFile);
+  fclose(pFile);
+    
+  return continut;
 }
 
 static gboolean 
@@ -145,6 +196,55 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
 }
 
 static void 
+btReiaLucrul_click(GtkWidget *bt, FormularCod *fc) {
+  GtkWidget *dlgDeschideSursa = NULL;
+  gchar titluDialog[32];
+  GtkFileFilter *filtruFisSursa = NULL;
+  
+  filtruFisSursa = gtk_file_filter_new();
+  switch(fc->lmFolosit) {
+  case C:
+    g_sprintf(titluDialog, "[C] Alegeți sursa dorită ...");
+    gtk_file_filter_set_name(filtruFisSursa, "Fișier C(*.c)");
+    gtk_file_filter_add_pattern(filtruFisSursa, "*.c");
+    break;
+  case ASM:
+    g_sprintf(titluDialog, "[ASM] Alegeți sursa dorită ...");
+    gtk_file_filter_set_name(filtruFisSursa, "Fișier ASM(*.s)");
+    gtk_file_filter_add_pattern(filtruFisSursa, "*.s");
+    break;
+  }
+  
+  dlgDeschideSursa = gtk_file_chooser_dialog_new (NULL,
+				     GTK_WINDOW(fc->frm),
+				     GTK_FILE_CHOOSER_ACTION_OPEN,
+				     "Renunță", GTK_RESPONSE_CANCEL,
+				     "Deschide", GTK_RESPONSE_ACCEPT,
+				     NULL);			  
+  gtk_window_set_title(GTK_WINDOW(dlgDeschideSursa), titluDialog);
+  gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(dlgDeschideSursa), FALSE);
+  gtk_file_chooser_set_filter(GTK_FILE_CHOOSER(dlgDeschideSursa), filtruFisSursa);
+  gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlgDeschideSursa), "sursele mele");
+  
+  if(gtk_dialog_run(GTK_DIALOG(dlgDeschideSursa)) == GTK_RESPONSE_ACCEPT) {
+    gchar *caleSursa = NULL;
+    gchar *continutSursa = NULL;
+    gchar *numeSimpluSursa = NULL;
+    
+    caleSursa = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlgDeschideSursa));
+    continutSursa = incarca_continut_din_fisier(caleSursa);
+    seteaza_codul_sursa_curent(GTK_TEXT_VIEW(fc->txtVizCod), continutSursa);
+    numeSimpluSursa = obtine_doar_nume_fisier_prefixat(caleSursa);
+    gtk_label_set_markup(GTK_LABEL(fc->lblStareNSursa), numeSimpluSursa);
+    
+    g_free(caleSursa);
+    g_free(continutSursa);
+    g_free(numeSimpluSursa);
+  }
+  gtk_widget_destroy(dlgDeschideSursa);
+}
+
+static void 
 btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
   GdkPixbuf *imgExpandatorPixBuf = NULL;
   GtkWidget *imgExpandatorActiuni = NULL;
@@ -164,11 +264,6 @@ btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
 
   imgExpandatorActiuni = gtk_image_new_from_pixbuf(imgExpandatorPixBuf);
   gtk_button_set_image(GTK_BUTTON(fc->btExpandator), imgExpandatorActiuni);
-}
-
-static void 
-laClickPeCorectieLinie(GtkSourceBuffer *bcod, GtkSourceView *vcod, gint nrLinie) {
-  
 }
 
 void 
@@ -246,9 +341,10 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   }
   GtkSourceBuffer *txtSrcBuf = gtk_source_buffer_new_with_language(txtSrcLimb);
   gtk_source_buffer_set_style_scheme(txtSrcBuf, gtk_source_style_scheme_manager_get_scheme(txtSrcStilAsignor, "kate"));
-  if(esteExemplu)
+  if(esteExemplu) {
     gtk_text_buffer_set_text(GTK_TEXT_BUFFER(txtSrcBuf), codInitial, -1);
-  else switch(lmDorit) {
+  } else {
+    switch(lmDorit) {
     case C:
       gtk_text_buffer_set_text(GTK_TEXT_BUFFER(txtSrcBuf), PSALE_CODC_IMPLICIT, -1);
       break;
@@ -256,6 +352,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
       gtk_text_buffer_set_text(GTK_TEXT_BUFFER(txtSrcBuf), PSALE_CODS_IMPLICIT, -1);
       break;
     }
+  }
 
   /* inițializăm elementul central care va găzdui codul utilizatorului */
   txtSrc = gtk_source_view_new_with_buffer(txtSrcBuf);
@@ -339,7 +436,8 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   /* inițializăm bara de stare a formularului */
   lblStareLegatura = gtk_label_new("[Conexiune]");
   lblStareCod = gtk_label_new(NULL);
-  lblStareNumeSursa = gtk_label_new(denumireSursa);
+  lblStareNumeSursa = gtk_label_new(NULL);
+  gtk_label_set_markup(GTK_LABEL(lblStareNumeSursa), denumireSursa);
 
   cadruBaraStare = gtk_hbox_new(TRUE, 5);
   gtk_container_set_border_width(GTK_CONTAINER(cadruBaraStare), 3);
@@ -366,7 +464,6 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   bic_initializeaza(&deRet->bInfo);
   deRet->bInfo.parentBuff = txtSrcBuf;
   deRet->bInfo.parentView = GTK_SOURCE_VIEW(txtSrc);
-  deRet->bInfo.cereRepozitionareaCursorului = &laClickPeCorectieLinie;
   gtk_table_attach(GTK_TABLE(cadruFrm), deRet->bInfo.wid, 0, 1, 0, 1, GTK_FILL, GTK_SHRINK, 3, 3);
   bic_ascunde(&deRet->bInfo);
   
@@ -374,6 +471,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   g_signal_connect(frm, "delete-event", G_CALLBACK(frmCod_delev), NULL);
   g_signal_connect(btGestioneazaActiuni, "clicked", G_CALLBACK(btExpandatorActiuni_click), (gpointer)deRet);
   g_signal_connect(btIncarcaPeAle, "clicked", G_CALLBACK(btIncarcaPeAle_click), (gpointer)deRet);
+  g_signal_connect(btReiaLucrul, "clicked", G_CALLBACK(btReiaLucrul_click), (gpointer)deRet);
   g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(gtk_widget_destroy), frm);
   
   return deRet;
@@ -382,6 +480,18 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
 FormularCod *
 fc_initializeaza_fara_cod(Limbaj lmDorit) {
   return fc_initializeaza(lmDorit, "", "[Cod Nou]", FALSE);
+}
+
+FormularCod *
+fc_initializeaza_cu_exemplu(const gchar *titluScurt, const gchar *titluLung) {
+  gchar numeExempluAfisat[256];
+  FormularCod *dlgCodRezultat = NULL;
+  
+  g_sprintf(numeExempluAfisat, "<i>Ex</i> : %s", titluLung);
+  if(g_str_has_suffix(titluScurt, "s")) dlgCodRezultat = fc_initializeaza(ASM, db_obtine_cod_complet(titluLung), numeExempluAfisat, TRUE);
+  else dlgCodRezultat = fc_initializeaza(C, db_obtine_cod_complet(titluLung), numeExempluAfisat, TRUE);
+  
+  return dlgCodRezultat;
 }
 
 void 

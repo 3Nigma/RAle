@@ -37,6 +37,9 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
 extern FormularCod *
 fc_initializeaza_fara_cod(Limbaj lmDorit);
 
+extern FormularCod *
+fc_initializeaza_cu_exemplu(const gchar *titluScurt, const gchar *titluLung);
+
 extern void 
 fc_actualizeaza_stare_placuta(GtkWidget *lblStare, gboolean online, gboolean primaRulare);
 

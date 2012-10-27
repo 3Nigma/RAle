@@ -36,7 +36,7 @@ extern int
 db_incarca_exemple_carte(GtkListStore *st);
 
 extern const char *
-db_obtine_cod_complet(gchar *titluLung);
+db_obtine_cod_complet(const gchar *titluLung);
 
 extern const char *
 db_obtine_adresa_actualizare();

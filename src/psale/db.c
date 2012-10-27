@@ -81,7 +81,7 @@ db_incarca_exemple_carte(GtkListStore *st) {
 }
 
 const char *
-db_obtine_cod_complet(gchar *titluLung) {
+db_obtine_cod_complet(const gchar *titluLung) {
   char sintaxaInterogare[124];
 
   sprintf(sintaxaInterogare, "select TextCod from exemple where Titlu = '%s'", titluLung);

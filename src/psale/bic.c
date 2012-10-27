@@ -2,8 +2,17 @@
 
 #include <string.h>
 
-#define MAX_SHOWN_IBLINES_CNT 5
-#define LINE_PART_REFORMULATION_FORMAT "\n<b><a href=\"%s\" title=\"Sari la respectiva linia\">Linia %s</a></b>: "
+#define MAX_SHOWN_IBLINES_CNT          5
+#define LINE_PART_REFORMULATION_FORMAT "\n<b><a href=\"%s\" title=\"Sari la respectiva linie\">Linia %s</a></b>: "
+
+struct {
+  const gchar *tiparGcc;
+  const gchar *tiparInlocuire;
+  gint nrParsariInlocuire;
+} InlocuiriMesajeGcc[] = {
+  /* TODO: adaugă formate și interpretări pentru mesaje GCC-ului aici */
+  {NULL, NULL, 0}
+};
 
 static gchar *transformaMesajulCompilatorului(const gchar *textOriginal);
 static GMatchInfo *aplicaTiparPrezent(const gchar *txtTipar, const gchar *txtPropriu);

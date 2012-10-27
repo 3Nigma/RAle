@@ -83,16 +83,13 @@ cmbxCodCarte_selectat(GtkComboBox *widget, gpointer user_data) {
   GtkTreeModel *model = NULL;
   gchar *titluScurt = NULL;
   gchar *titluLung;
-  gchar numeExempluAfisat[256];
 
   if(gtk_combo_box_get_active_iter(widget, &iter)) {
     model = gtk_combo_box_get_model(widget);
     gtk_tree_model_get(model, &iter, 0, &titluScurt, 1, &titluLung, -1);
 
     if(g_strcmp0(titluScurt, "") != 0) {
-      g_sprintf(numeExempluAfisat, "Ex: %s", titluLung);
-      if(g_str_has_suffix(titluScurt, "s")) dlgCod = fc_initializeaza(ASM, db_obtine_cod_complet(titluLung), numeExempluAfisat, TRUE);
-      else dlgCod = fc_initializeaza(C, db_obtine_cod_complet(titluLung), numeExempluAfisat, TRUE);
+      dlgCod = fc_initializeaza_cu_exemplu(titluScurt, titluLung);
       dlgCod->laDepistare_neprezentaPlacuta_recurenta = &placuta_sa_deconectat;
       listaDlgCod = g_slist_prepend(listaDlgCod, dlgCod);
       
