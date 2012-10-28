@@ -7,16 +7,27 @@
  * COPYING file that resides in the same directory as this file does or send a letter to 
  * Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  */
-
-#ifndef _AL_H_
-#define _AL_H_
+ 
+#ifndef _FEEPROM_H_
+#define _FEEPROM_H_
 
 #include <gtk/gtk.h>
 
-extern gboolean 
-al_este_placuta_conectata();
+#include "al.h"
 
-extern void
-al_citeste_eeprom(GtkListStore *lm);
+#define FME_CITESTE_EEPROM 1
+#define FME_SCRIE_EEPROM   2
+#define FME_PARASESTE_FRM  3
+
+typedef struct {
+  GtkWidget *frm;
+  GtkWidget *tvEEPROM;
+} FormularEEPROM;
+
+extern FormularEEPROM *
+fme_initializeaza(GtkWindow *parinte);
+
+extern void 
+fme_afiseaza(FormularEEPROM *fe);
 
 #endif

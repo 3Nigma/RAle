@@ -20,6 +20,48 @@
 #include <windows.h>
 #endif
 
+static void incarca_info_general(GtkWidget *cadruFrm);
+static gboolean frmInfo_delev(GtkWidget *widget, GdkEvent *event, gpointer data);
+
+GtkWidget *
+finfo_initializeaza(GtkWindow *parinte) {
+  GtkWidget *frm = NULL;
+  GtkWidget *cadruFrm = NULL;
+  GtkWidget *imgInfo = NULL;
+  GtkWidget *btParasesteFrm = NULL;
+
+  /* inițializăm formularul de informații */
+  frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title(GTK_WINDOW(frm), "Despre aplicație ...");
+  gtk_window_set_transient_for(GTK_WINDOW(frm), parinte);
+  gtk_window_set_position(GTK_WINDOW(frm), GTK_WIN_POS_CENTER_ON_PARENT);
+  gtk_container_set_border_width(GTK_CONTAINER(frm), 5);
+  gtk_window_set_modal(GTK_WINDOW(frm), FALSE);
+  gtk_window_set_resizable(GTK_WINDOW(frm), FALSE);
+  g_signal_connect(frm, "delete-event", G_CALLBACK(frmInfo_delev), NULL);
+
+  /* inițializăm cadrul formularului */
+  cadruFrm = gtk_table_new(4, 4, FALSE);
+  gtk_table_set_row_spacings(GTK_TABLE(cadruFrm), 3);
+  gtk_table_set_col_spacings(GTK_TABLE(cadruFrm), 2);
+  gtk_container_add(GTK_CONTAINER(frm), cadruFrm);
+
+  incarca_info_general(cadruFrm);
+
+  /* inițializăm imaginea de informație */
+  imgInfo = gtk_image_new_from_pixbuf(db_obtine_imagine_media_scalata(DB_IMG_INFO, -1, -1));
+  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo, 0, 1, 0, 1);
+
+  /* inițializăm butonul de părăsire a formularului */
+  btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
+  gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btParasesteFrm), FALSE);
+  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), btParasesteFrm, 3, 4, 3, 4);
+  g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(frmInfo_delev), frm);
+
+  return frm;
+}
+
 static gboolean 
 imgLicenta_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
 #ifdef G_OS_WIN32
@@ -91,42 +133,4 @@ incarca_info_general(GtkWidget *cadruFrm) {
   gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(txtView), GTK_WRAP_WORD);
   gtk_text_view_set_editable(GTK_TEXT_VIEW(txtView), FALSE);
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), txtView, 2, 4, 1, 2);
-}
-
-GtkWidget *
-initializeaza_formular_info() {
-  GtkWidget *frm = NULL;
-  GtkWidget *cadruFrm = NULL;
-  GtkWidget *imgInfo = NULL;
-  GtkWidget *btParasesteFrm = NULL;
-
-  /* inițializăm formularul de informații */
-  frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_position(GTK_WINDOW(frm), GTK_WIN_POS_CENTER_ON_PARENT);
-  gtk_window_set_title(GTK_WINDOW(frm), "Despre aplicație ...");
-  gtk_container_set_border_width(GTK_CONTAINER(frm), 5);
-  gtk_window_set_modal(GTK_WINDOW(frm), FALSE);
-  gtk_window_set_resizable(GTK_WINDOW(frm), FALSE);
-  g_signal_connect(frm, "delete-event", G_CALLBACK(frmInfo_delev), NULL);
-
-  /* inițializăm cadrul formularului */
-  cadruFrm = gtk_table_new(4, 4, FALSE);
-  gtk_table_set_row_spacings(GTK_TABLE(cadruFrm), 3);
-  gtk_table_set_col_spacings(GTK_TABLE(cadruFrm), 2);
-  gtk_container_add(GTK_CONTAINER(frm), cadruFrm);
-
-  incarca_info_general(cadruFrm);
-
-  /* inițializăm imaginea de informație */
-  imgInfo = gtk_image_new_from_pixbuf(db_obtine_imagine_media_scalata(DB_IMG_INFO, -1, -1));
-  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo, 0, 1, 0, 1);
-
-  /* inițializăm butonul de părăsire a formularului */
-  btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
-  gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
-  gtk_button_set_focus_on_click(GTK_BUTTON(btParasesteFrm), FALSE);
-  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), btParasesteFrm, 3, 4, 3, 4);
-  g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(frmInfo_delev), frm);
-
-  return frm;
 }

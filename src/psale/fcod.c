@@ -26,6 +26,7 @@
 
 #include "al.h"
 #include "db.h"
+#include "feeprom.h"
 #include "fcod.h"
 
 #define PSALE_PREFIX_MODIFICARE_COD_TEXT "*"
@@ -50,6 +51,7 @@ static gboolean laDezapasareTasteInCod(GtkWidget *widget, GdkEventKey *ke, Formu
 static void btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc);
 static void btReiaLucrul_click(GtkWidget *bt, FormularCod *fc);
 static void btSalveazaLucrul_click(GtkWidget *bt, FormularCod *fc);
+static void btEEPROM_click(GtkWidget *bt, FormularCod *fc);
 static void btParasesteFrm_click(GtkWidget *bt, FormularCod *fc);
 
 static gboolean este_sursa_modificata(FormularCod *fc);
@@ -247,7 +249,7 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   
   /* încearcă să compilezi sursa curentă */
   FILE *fGCCOut = NULL;
-  char lineBuff[512];
+  char lineBuff[4096];
   
   if((fGCCOut = popen(textComandaGcc, "r")) == NULL) {
 	  /* TODO: s-a întâmplat ceva cu execuția compilatorului */
@@ -359,6 +361,14 @@ btSalveazaLucrul_click(GtkWidget *bt, FormularCod *fc) {
 }
 
 static void 
+btEEPROM_click(GtkWidget *bt, FormularCod *fc) {
+  FormularEEPROM *fe = NULL;
+  
+  fe = fme_initializeaza(GTK_WINDOW(fc->frm));
+  fme_afiseaza(fe);
+}
+
+static void 
 btReiaLucrul_click(GtkWidget *bt, FormularCod *fc) {
   GtkWidget *dlgDeschideSursa = NULL;
   
@@ -443,7 +453,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   GtkWidget *btIncarcaPeAle = NULL;
   GtkWidget *btSalveazaLucrul = NULL;
   GtkWidget *btReiaLucrul = NULL;
-  GtkWidget *btCitesteEEPROM = NULL;
+  GtkWidget *btEEPROM = NULL;
   GtkWidget *btParasesteFrm = NULL;
   GtkWidget *cadruBxActiuni = NULL;
   GtkWidget *cadruBaraStare = NULL;
@@ -551,14 +561,14 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_button_set_image_position(GTK_BUTTON(btReiaLucrul), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btReiaLucrul), imgReiaLucrul);
 
-  btCitesteEEPROM = gtk_button_new_with_label("Citește EEPROM");
-  gtk_button_set_relief(GTK_BUTTON(btCitesteEEPROM), GTK_RELIEF_NONE);
-  gtk_button_set_focus_on_click(GTK_BUTTON(btCitesteEEPROM), FALSE);
-  gtk_widget_set_size_request(GTK_WIDGET(btCitesteEEPROM), -1, 35);
-  GdkPixbuf *imgCitesteEEPROMPixBuf = db_obtine_imagine_media_scalata(DB_IMG_EEPROM, 16, 16);
-  GtkWidget *imgCitesteEEPROM = gtk_image_new_from_pixbuf(imgCitesteEEPROMPixBuf);
-  gtk_button_set_image_position(GTK_BUTTON(btCitesteEEPROM), GTK_POS_LEFT);
-  gtk_button_set_image(GTK_BUTTON(btCitesteEEPROM), imgCitesteEEPROM);
+  btEEPROM = gtk_button_new_with_label("Acțiuni EEPROM");
+  gtk_button_set_relief(GTK_BUTTON(btEEPROM), GTK_RELIEF_NONE);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btEEPROM), FALSE);
+  gtk_widget_set_size_request(GTK_WIDGET(btEEPROM), -1, 35);
+  GdkPixbuf *imgEEPROMPixBuf = db_obtine_imagine_media_scalata(DB_IMG_EEPROM, 16, 16);
+  GtkWidget *imgEEPROM = gtk_image_new_from_pixbuf(imgEEPROMPixBuf);
+  gtk_button_set_image_position(GTK_BUTTON(btEEPROM), GTK_POS_LEFT);
+  gtk_button_set_image(GTK_BUTTON(btEEPROM), imgEEPROM);
 
   btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
   gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
@@ -577,7 +587,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btIncarcaPeAle, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btSalveazaLucrul, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btReiaLucrul, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btCitesteEEPROM, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btEEPROM, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(cadruBxActiuni), btParasesteFrm, FALSE, FALSE, 0);
   gtk_table_attach(GTK_TABLE(cadruFrm), cadruBxActiuni, 2, 3, 0, 3, GTK_SHRINK, GTK_FILL, 0, 0);
 
@@ -626,6 +636,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   g_signal_connect(btIncarcaPeAle, "clicked", G_CALLBACK(btIncarcaPeAle_click), (gpointer)deRet);
   g_signal_connect(btSalveazaLucrul, "clicked", G_CALLBACK(btSalveazaLucrul_click), (gpointer)deRet);
   g_signal_connect(btReiaLucrul, "clicked", G_CALLBACK(btReiaLucrul_click), (gpointer)deRet);
+  g_signal_connect(btEEPROM, "clicked", G_CALLBACK(btEEPROM_click), (gpointer)deRet);
   g_signal_connect(btParasesteFrm, "clicked", G_CALLBACK(btParasesteFrm_click), (gpointer)deRet);
   g_signal_connect(txtSrcBuf, "changed", G_CALLBACK(laModificareCod), (gpointer)deRet);
   g_signal_connect(txtSrc, "key-release-event", G_CALLBACK(laDezapasareTasteInCod), (gpointer)deRet);

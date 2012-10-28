@@ -21,6 +21,6 @@
   "Pentru orice nedumeriri/sugestii/reclamații ne găsiți în comunitatea proiectului."
 
 extern GtkWidget *
-initializeaza_formular_info();
+finfo_initializeaza(GtkWindow *parinte);
 
 #endif

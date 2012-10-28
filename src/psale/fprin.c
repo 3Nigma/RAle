@@ -117,8 +117,8 @@ btCartulie_click(GtkWidget *widget, GtkWindow *fereastraParinte) {
 }
 
 static void 
-btInfo_click(GtkWidget *widget, gpointer data) {
-  GtkWidget *dlgInfo = initializeaza_formular_info();
+btInfo_click(GtkWidget *widget, GtkWindow *fereastraParinte) {
+  GtkWidget *dlgInfo = finfo_initializeaza(fereastraParinte);
 
   gtk_widget_show_all(dlgInfo);
 }
@@ -258,7 +258,7 @@ fp_initializeaza_formular_principal() {
   btInfo = gtk_button_new_with_label("Ce avem aici?");
   gtk_button_set_relief(GTK_BUTTON(btInfo), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btInfo), FALSE);
-  g_signal_connect(btInfo, "clicked", G_CALLBACK(btInfo_click), NULL);
+  g_signal_connect(btInfo, "clicked", G_CALLBACK(btInfo_click), frm);
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), btInfo);
 
   /* inițializăm butonul de ieșire */

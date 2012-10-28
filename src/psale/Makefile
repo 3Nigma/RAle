@@ -10,7 +10,7 @@ PROJ_NAME := psale
 CC := gcc
 CFLAGS := -Wall -g `pkg-config --cflags gtk+-2.0 gtksourceview-2.0 goocanvas sqlite3 poppler-glib`
 LDFLAGS := `pkg-config --libs gtk+-2.0 gtksourceview-2.0 goocanvas sqlite3 libcurl poppler-glib`
-OBJS := fprin.o db.o finfo.o fcod.o bic.o dl.o al.o vc.o
+OBJS := fprin.o db.o finfo.o feeprom.o fcod.o bic.o dl.o al.o vc.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $< -o $@
