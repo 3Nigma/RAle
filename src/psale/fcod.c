@@ -223,7 +223,6 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
 
   gchar textComandaGcc[256];
   gchar textComandaObjcopy[256];
-  gchar textComandaAvrdude[256];
   BaraInfoCod *bInfoFormularCurent;
   char denObiectRezultat[L_tmpnam];
   char denHexRezultat[L_tmpnam];
@@ -235,7 +234,6 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
 #ifdef G_OS_WIN32
   g_sprintf(textComandaGcc, "-Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
   g_sprintf(textComandaObjcopy, "-j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
-  g_sprintf(textComandaAvrdude, "-c usbtiny -p t25 -U flash:w:%s", denHexRezultat);
  
   ShellExecute(NULL, "open", "winavr/bin/avr-gcc.exe", textComandaGcc, NULL, SW_SHOWNORMAL);
   ShellExecute(NULL, "open", "winavr/bin/avr-objcopy.exe", textComandaObjcopy, NULL, SW_SHOWNORMAL);
@@ -245,7 +243,6 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
    * să lucreze decât cu stdout!*/
   g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 %s -o %s 2>&1", denFisSursa, denObiectRezultat);
   g_sprintf(textComandaObjcopy, "avr-objcopy -j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
-  g_sprintf(textComandaAvrdude, "sudo avrdude -c usbtiny -p t25 -U flash:w:%s 2> /dev/null", denHexRezultat);
   
   /* încearcă să compilezi sursa curentă */
   FILE *fGCCOut = NULL;
@@ -273,11 +270,7 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
 #endif
 
   if(al_este_placuta_conectata()) {
-    #ifdef G_OS_WIN32
-    ShellExecute(NULL, "open", "avrdude.exe", textComandaAvrdude, NULL, SW_SHOWNORMAL);
-    #elif defined G_OS_UNIX
-	system(textComandaAvrdude);
-	#endif
+    al_scrie_aplicatie(denHexRezultat);
   } else {
     if(fc->laDepistare_neprezentaPlacuta_recurenta != NULL) fc->laDepistare_neprezentaPlacuta_recurenta();
   }

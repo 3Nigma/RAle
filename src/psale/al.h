@@ -16,6 +16,9 @@
 extern gboolean 
 al_este_placuta_conectata();
 
+extern gboolean 
+al_scrie_aplicatie(const gchar *caleFisHex);
+
 extern void
 al_citeste_eeprom(GtkListStore *lm);
 
