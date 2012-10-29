@@ -19,4 +19,7 @@ al_este_placuta_conectata();
 extern void
 al_citeste_eeprom(GtkListStore *lm);
 
+extern void 
+al_scrie_eeprom(GtkListStore *lm);
+
 #endif

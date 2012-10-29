@@ -14,8 +14,6 @@
 
 #include "al.h"
 
-static gint al_obtine_index_mcu();
-
 struct mcu{
   const gchar *avrdudePart;
   const gchar *devSignature; 
@@ -26,6 +24,9 @@ struct mcu{
   {"t85", "0x1e930B", 512},
   {NULL ,      NULL,   0}
 };
+
+static gint al_obtine_index_mcu();
+static gchar *pune_eeprom_in_fis_temporar(GtkListStore *lm);
 
 gboolean 
 al_este_placuta_conectata() {
@@ -88,6 +89,7 @@ al_citeste_eeprom(GtkListStore *lm) {
        * O citim, procesăm și indexăm. */
        fMem = fopen(hexRezultat, "r");
 	   nrRanduriInViz = mcus[indexMCUPrezent].eepromMemSize / 16;
+	   gtk_list_store_clear(lm);
 	   for(cnt = 0; cnt < nrRanduriInViz; ++cnt) {
 	     /* adaugă un rând nou */
 	     gtk_list_store_append(lm, &itrRand);
@@ -103,9 +105,10 @@ al_citeste_eeprom(GtkListStore *lm) {
 		   valCelula[0] = fgetc(fMem);                 /* valoarea superioară a octetului */
 		   valCelula[1] = fgetc(fMem);                 /* valoarea inferioară a octetului */
 		   valCelula[2] = '\0';
-		   if((cnt != nrRanduriInViz - 1 || idCol != 15) && valCelula[1] != ',') {
+		   if((cnt != nrRanduriInViz - 1 || idCol != 15) && 
+		      g_ascii_isxdigit(valCelula[1])) {
 		     fgetc(fMem);                                /* , */
-		   } else if(valCelula[1] == ',') {
+		   } else if(g_ascii_isxdigit(valCelula[1]) == FALSE) {
 		     valCelula[1] = valCelula[0];
 		     valCelula[0] = '0';
 		   }
@@ -113,12 +116,83 @@ al_citeste_eeprom(GtkListStore *lm) {
 		 }
 	   }
 	   fclose(fMem);
+	   remove(hexRezultat);
     } else {
       /* TODO: buba s-a întâmplat! */
     }
 #endif
     g_free(cDir);
   }
+}
+
+void 
+al_scrie_eeprom(GtkListStore *lm) {
+  gchar *fisTempHex = NULL;
+  gchar *cDir = g_get_current_dir();
+  gchar com[255];
+  gint indexMCUPrezent = -1;
+  
+  if(NULL != cDir) {
+    indexMCUPrezent = al_obtine_index_mcu();
+    if(-1 == indexMCUPrezent) {
+	   /* TODO: nu este bun microcontrollerul. Stop! */
+	   return;
+	}
+	
+    fisTempHex = pune_eeprom_in_fis_temporar(lm);
+  
+    /* trimitem memoria rezultată spre plăcuță */
+#ifdef G_OS_WIN32
+    g_sprintf(com, "%s\\avrdude.exe -c usbtiny -p %s -U eeprom:w:%s:r", cDir, mcus[indexMCUPrezent].avrdudePart, fisTempHex);
+#elif defined G_OS_UNIX
+    g_sprintf(com, "sudo %s/avrdude -c usbtiny -p %s -U eeprom:w:%s:r 2>/dev/null", cDir, mcus[indexMCUPrezent].avrdudePart, fisTempHex);
+#endif
+    system(com);
+  }
+  
+  remove(fisTempHex);
+  g_free(fisTempHex);
+}
+
+static gchar *
+pune_eeprom_in_fis_temporar(GtkListStore *lm) {
+  gchar *fisTemporar = NULL;
+  gchar *memFormatata = NULL;
+  GtkTreeModel *tm = NULL;
+  GtkTreeIter trIter;
+  gchar *infoCelula;
+  gint indexCol = 0;
+  FILE *fHexTemp = NULL;
+  char continutMem[2048];
+  int indexContinutMem = 0;
+  
+  /* creem fișierul temporal și deschidem canalul de salvare */
+  fisTemporar = g_new(gchar, 512);
+  tmpnam(fisTemporar);
+  fHexTemp = fopen(fisTemporar, "wb");
+  
+  /* formatează memoria curentă în formatul dorit de avrdude */
+  memFormatata = g_new(gchar, 4096);
+  tm = GTK_TREE_MODEL(lm);
+  gtk_tree_model_get_iter_first(tm, &trIter); 
+  do {
+    for(indexCol = 1; indexCol < 17; ++indexCol) {
+	  gtk_tree_model_get(tm, &trIter, indexCol, &infoCelula, -1);
+	  
+	  /* avem informația din celula curentă.
+	   * O adăugăm în tamponul nostru */
+	  continutMem[indexContinutMem++] = (int)strtol(infoCelula, NULL, 16);
+	  g_free(infoCelula);
+	}
+  } while(gtk_tree_model_iter_next(tm, &trIter));
+  
+  /* scriem tamponul în fișier */
+  fwrite(continutMem, sizeof(char), indexContinutMem, fHexTemp);
+  
+  fclose(fHexTemp);
+  g_free(memFormatata);
+  
+  return fisTemporar;
 }
 
 static gint 

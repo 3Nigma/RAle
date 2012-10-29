@@ -11,10 +11,29 @@
 #include "feeprom.h"
 
 #include <glib/gprintf.h>
+#include <string.h>
+
+#define CULOARE_COLOANA_ADRESE_MUL_HEX "#F0F0F0"
 
 static gboolean frmEEPROM_delev(GtkWidget *widget, GdkEvent *event, FormularEEPROM *fe);
 static GtkWidget *construieste_vizualizator_memorie();
+static gboolean laArataTooltip(GtkWidget  *widget,
+                                gint        x,
+                                gint        y,
+                                gboolean    keyboard_mode,
+                                GtkTooltip *indicatiiCelula,
+                                FormularEEPROM *fe);
+static gboolean tree_view_get_cell_from_pos(GtkTreeView *view, guint x, guint y, 
+                                             guint *cellx, guint *celly);
+static void laEditareCelula(GtkCellRendererText *renderer,
+                             gchar *path, gchar *new_text,
+                             GtkTreeView *tv);
+static void btCitesteEEPROM_click(GtkWidget *widget, FormularEEPROM *fe);
+static void btSalveazaEEPROM_click(GtkWidget *widget, FormularEEPROM *fe);
+static void btParasesteFrm_click(GtkWidget *widget, FormularEEPROM *fe);
 
+static gboolean esteHexValid(gchar *str);
+                                                        
 FormularEEPROM *
 fme_initializeaza(GtkWindow *parinte) {
   FormularEEPROM *fe = NULL;
@@ -28,7 +47,7 @@ fme_initializeaza(GtkWindow *parinte) {
   
   /* creează formularul principal */
   fe->frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(fe->frm), "Acțiuni memorie specială");
+  gtk_window_set_title(GTK_WINDOW(fe->frm), "Acțiuni ale memoriei speciale");
   gtk_window_set_transient_for(GTK_WINDOW(fe->frm), parinte);
   gtk_window_set_position(GTK_WINDOW(fe->frm), GTK_WIN_POS_CENTER_ON_PARENT);
   zonaGenerala = gtk_vbox_new(FALSE, 3);
@@ -59,7 +78,11 @@ fme_initializeaza(GtkWindow *parinte) {
   
   /* legăm evenimentele necesare */
   g_signal_connect(fe->frm, "delete-event", G_CALLBACK(frmEEPROM_delev), (gpointer)fe);
-
+  g_signal_connect(fe->tvEEPROM, "query-tooltip", G_CALLBACK(laArataTooltip), (gpointer)fe);
+  g_signal_connect(btCitesteMem, "clicked", G_CALLBACK(btCitesteEEPROM_click), (gpointer)fe);
+  g_signal_connect(btScrieMem, "clicked", G_CALLBACK(btSalveazaEEPROM_click), (gpointer)fe);
+  g_signal_connect(btParasesteFrm, "clicked", G_CALLBACK(btParasesteFrm_click), (gpointer)fe);
+  
   return fe;
 }
 
@@ -78,21 +101,28 @@ construieste_vizualizator_memorie() {
   gchar capColoana[5];
   
   vizMem = gtk_tree_view_new();
+  gtk_tree_view_set_grid_lines(GTK_TREE_VIEW(vizMem), TRUE);
   gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(vizMem), TRUE);
+  gtk_widget_set_has_tooltip(vizMem, TRUE);
   
   for(cnt = 0; cnt < 17; ++ cnt) {
     clmTreeView = gtk_tree_view_column_new();
     txtCellRenderer = gtk_cell_renderer_text_new();
+    g_object_set_data(G_OBJECT(txtCellRenderer), "x-coord", GINT_TO_POINTER(cnt));
     if(cnt != 0) {
       g_sprintf(capColoana, "%02X", cnt - 1);
       g_object_set(txtCellRenderer, "editable", TRUE, NULL);
     } else {
 	  g_sprintf(capColoana, "    ");
+	  g_object_set(txtCellRenderer, "background", CULOARE_COLOANA_ADRESE_MUL_HEX, NULL);
 	}
 	gtk_tree_view_column_set_title(clmTreeView, capColoana);
     gtk_tree_view_column_pack_start(clmTreeView, txtCellRenderer, FALSE);
     gtk_tree_view_column_add_attribute(clmTreeView, txtCellRenderer, "text", cnt);
     gtk_tree_view_append_column(GTK_TREE_VIEW(vizMem), clmTreeView);
+    
+    /* leagă evenimentele necesare */
+    g_signal_connect(txtCellRenderer, "edited", G_CALLBACK(laEditareCelula), vizMem);
   }
   
   lstModel = gtk_list_store_new(17, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
@@ -109,4 +139,158 @@ static gboolean
 frmEEPROM_delev(GtkWidget *widget, GdkEvent *event, FormularEEPROM *fe) {
   g_free(fe);
   return FALSE;
+}
+
+static gboolean 
+laArataTooltip(GtkWidget  *widget,
+               gint        x,
+               gint        y,
+               gboolean    keyboard_mode,
+               GtkTooltip *indicatiiCelula,
+               FormularEEPROM *fe) {
+  gint relBinX;
+  gint relBinY;
+  guint cellX;
+  guint cellY;
+  GtkTreePath *caleCelula;
+  gchar ttText[512];
+  
+  /* obține coordonate relative hover */
+  gtk_tree_view_convert_widget_to_bin_window_coords(GTK_TREE_VIEW(fe->tvEEPROM), x, y, &relBinX, &relBinY);
+  gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(fe->tvEEPROM), relBinX, relBinY, &caleCelula, NULL,
+                                NULL, NULL); /* cell_x, cell_y */
+ 
+  if(tree_view_get_cell_from_pos(GTK_TREE_VIEW(fe->tvEEPROM), relBinX, relBinY, &cellX, &cellY) == TRUE) {
+	if(cellX > 0 ) {
+      g_sprintf(ttText, "<b>%s</b>0x%03x\n<b>%s</b>%s\n<b>%s</b>%s", 
+                        "Adresă: ", cellY * 16 + cellX - 1, 
+                        "Val. zecimală: ", "DE COMPLETAT", 
+                        "Val. binară: ", "DE COMPLETAT");
+      gtk_tooltip_set_markup(indicatiiCelula, ttText);
+      gtk_tree_view_set_tooltip_cell(GTK_TREE_VIEW(fe->tvEEPROM), indicatiiCelula, caleCelula, NULL, NULL);
+    
+      return TRUE;
+    }
+  }
+  
+  return FALSE;
+}
+
+static gboolean
+tree_view_get_cell_from_pos(GtkTreeView *view, guint x, guint y, 
+                            guint *cellx, guint *celly) {
+  GtkTreeViewColumn *col = NULL;
+  GList *node, *columns, *cells;
+  guint colx = 0;
+  guint coly = 0;
+  guint internalCellX = 0;
+  guint internalCellY = 0;
+  gint width = 0;
+  gint height = 0;
+  gint n_linii = 0;
+  gint cnt = 0;
+  
+  g_return_val_if_fail(view != NULL, FALSE);
+  g_return_val_if_fail(cellx != NULL, FALSE);
+  g_return_val_if_fail(celly != NULL, FALSE);
+
+  /* găsește coloana potrivită */
+  columns = gtk_tree_view_get_columns(view);
+  for(node = columns;  node != NULL && col == NULL;  node = node->next) {
+    GtkTreeViewColumn *checkcol = (GtkTreeViewColumn*) node->data;
+
+    if(x >= colx  &&  x < (colx + checkcol->width)) {
+      col = checkcol;
+      (*cellx) = internalCellX;
+    } else {
+      colx += checkcol->width;
+      internalCellX++;
+    }
+  }
+  g_list_free(columns);
+
+  if(col == NULL) {
+    return FALSE; /* nu am găsit nici un candidat */
+  }
+	
+  /* găsește celula potrivită din coloana respectivă */
+  n_linii = gtk_tree_model_iter_n_children(gtk_tree_view_get_model(view), NULL);
+  cells = gtk_tree_view_column_get_cell_renderers(col);
+  GtkCellRenderer *checkcell = (GtkCellRenderer*)cells->data;
+  gtk_cell_renderer_get_size(checkcell, GTK_WIDGET(view), NULL, NULL, NULL, &width, &height);
+  height += 3; /* TODO: <- ai grijă la valoarea asta. Nu știu de unde vine! */
+  for (cnt = 0;  cnt < n_linii;  ++cnt) {
+    if (y >= coly && y < (coly + height)) {
+	  (*celly) = internalCellY;
+      g_list_free(cells);
+      return TRUE;
+    }
+
+    coly += height;
+    internalCellY++;
+  }
+
+  g_list_free(cells);
+  return FALSE; /* not found */
+}
+
+static void 
+laEditareCelula(GtkCellRendererText *renderer, gchar *path, gchar *new_text, GtkTreeView *tv) {
+  GtkTreeModel *trModel = NULL;
+  GtkTreeIter trIter;
+  gint colx = 0;
+  gchar hexIntermediar[3];
+  
+  /* o scurtă validare a conținutului */
+  if(strlen(new_text) == 0 || strlen(new_text) > 2 ||
+     esteHexValid(new_text) == FALSE) {
+    /* TODO: transformă acest eveniment într-un mesaj pentru utilizator */
+    return;
+  }
+  
+  /* aplicăm o mică corecție */
+  g_sprintf(hexIntermediar, "%s%s", (strlen(new_text) == 1 ? "0" : ""), new_text);
+  
+  trModel = gtk_tree_view_get_model(tv);
+  colx = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(renderer), "x-coord"));
+  if(gtk_tree_model_get_iter_from_string(trModel, &trIter, path)) {
+	gtk_list_store_set(GTK_LIST_STORE(trModel), &trIter, colx, hexIntermediar, -1);
+  }
+}
+
+static gboolean 
+esteHexValid(gchar *str) {
+  gchar *p = NULL;
+  
+  p = str;
+  while(*p != '\0') {
+	if(g_ascii_isxdigit(*p) == FALSE) {
+	  return FALSE;
+	}
+	*p = g_ascii_tolower(*p);
+    p += sizeof(gchar);
+  }
+  
+  return TRUE;
+}
+
+static void 
+btCitesteEEPROM_click(GtkWidget *widget, FormularEEPROM *fe) {
+  GtkTreeModel *tm = NULL;
+  
+  tm = gtk_tree_view_get_model(GTK_TREE_VIEW(fe->tvEEPROM));
+  al_citeste_eeprom(GTK_LIST_STORE(tm));
+}
+
+static void 
+btSalveazaEEPROM_click(GtkWidget *widget, FormularEEPROM *fe) {
+  GtkTreeModel *tm = NULL;
+  
+  tm = gtk_tree_view_get_model(GTK_TREE_VIEW(fe->tvEEPROM));
+  al_scrie_eeprom(GTK_LIST_STORE(tm));
+}
+
+static void 
+btParasesteFrm_click(GtkWidget *widget, FormularEEPROM *fe) {
+  gtk_widget_destroy(fe->frm);
 }
