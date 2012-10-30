@@ -29,8 +29,10 @@
 #include "feeprom.h"
 #include "fcod.h"
 
-#define PSALE_PREFIX_MODIFICARE_COD_TEXT "*"
-#define PSALE_PREFIX_MODIFICARE_COD_FORMATAT "<b>"PSALE_PREFIX_MODIFICARE_COD_TEXT"</b>"
+#define PSALE_PREFIX_LBLSTARENUME_SURSA_PROPRIE "SM"
+#define PSALE_PREFIX_LBLSTARENUME_SURSA_EXEMPLU "Ex"
+#define PSALE_PREFIX_MODIFICARE_COD_TEXT        "*"
+#define PSALE_PREFIX_MODIFICARE_COD_FORMATAT    "<b>"PSALE_PREFIX_MODIFICARE_COD_TEXT"</b>"
 
 #define PSALE_CODS_IMPLICIT ".section text\n" \
   ".global main\n\n" \
@@ -46,14 +48,17 @@
 
 static FormularCod *fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, gboolean esteExemplu);
 static void laModificareCod(GtkTextBuffer *textbuffer, FormularCod *fc);
-static gboolean laDezapasareTasteInCod(GtkWidget *widget, GdkEventKey *ke, FormularCod *fc);
+static gboolean laDezapasareTaste(GtkWidget *widget, GdkEventKey *ke, FormularCod *fc);
 
+static void btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc);
 static void btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc);
 static void btReiaLucrul_click(GtkWidget *bt, FormularCod *fc);
 static void btSalveazaLucrul_click(GtkWidget *bt, FormularCod *fc);
 static void btEEPROM_click(GtkWidget *bt, FormularCod *fc);
 static void btParasesteFrm_click(GtkWidget *bt, FormularCod *fc);
 
+static void actualizeaza_stare_nume_sursa(GtkWidget *lbl, const gchar *numeSursa, gboolean esteExemplu, gboolean esteModificat);
+static void actualizeaza_stare_nume_indicatii(GtkWidget *lbl, gboolean esteExemplu, gboolean esteModificata);
 static gboolean este_sursa_modificata(FormularCod *fc);
 
 static GtkSourceLanguageManager *txtSrcLimbAsignor = NULL;
@@ -208,8 +213,7 @@ static void
 btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   /* Acțiunile ce trebuie realizate pentru trimiterea de cod spre plăcuță sunt următoarele :
      avr-gcc -Os -Wall -mmcu=attiny25 main.s -o main.o
-     avr-objcopy -j .text -O ihex main.o main.hex
-     sudo avrdude -c usbtiny -p t25 -U flash:w:main.hex */
+     avr-objcopy -j .text -O ihex main.o main.hex */
   char denFisSursa[L_tmpnam + 5];
   FILE *fs = NULL;
   gchar *codPrezent = NULL;
@@ -281,15 +285,19 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
 }
 
 static void 
-actualizeaza_stare_nume_sursa(FormularCod *fc, gboolean esteModificat) {
+actualizeaza_stare_nume_sursa(GtkWidget *lbl, const gchar *numeSursa, gboolean esteExemplu, gboolean esteModificat) {
   gchar formatNumeEticheta[256];
   
+  /* actualizează stare nume */
   g_sprintf(formatNumeEticheta, "%s%s%s", 
             esteModificat ? PSALE_PREFIX_MODIFICARE_COD_FORMATAT : "",
-            fc->esteExempluIncarcat ? "<i>Ex</i> : " : "<i>SM</i> : ",
-            fc->numeSimpluAfisat);
+            esteExemplu ? "<i>"PSALE_PREFIX_LBLSTARENUME_SURSA_EXEMPLU"</i> : " : "<i>"PSALE_PREFIX_LBLSTARENUME_SURSA_PROPRIE"</i> : ",
+            numeSursa);
             
-  gtk_label_set_markup(GTK_LABEL(fc->lblStareNSursa), formatNumeEticheta);
+  gtk_label_set_markup(GTK_LABEL(lbl), formatNumeEticheta);
+  
+  /* actualizează indicațiile sale */
+  actualizeaza_stare_nume_indicatii(lbl, esteExemplu, esteModificat);
 }
 
 static gboolean 
@@ -305,24 +313,91 @@ este_sursa_modificata(FormularCod *fc) {
 }
 
 static void 
+actualizeaza_stare_nume_indicatii(GtkWidget *lbl, gboolean esteExemplu, gboolean esteModificata) {
+  gchar textIndicatie[512];
+  
+  g_sprintf(textIndicatie, "Arată numele sursei curente.\n%s%s", 
+                           (esteExemplu ? 
+                             "Prefixul '"PSALE_PREFIX_LBLSTARENUME_SURSA_EXEMPLU"' indică faptul că sursa curentă face parte din exemple." :
+                             "Prefixul '"PSALE_PREFIX_LBLSTARENUME_SURSA_PROPRIE"' sugerează faptul că sursa este personală."),
+                           (esteModificata ? 
+                             "\n'"PSALE_PREFIX_MODIFICARE_COD_FORMATAT"' spune faptul că sursa a suferit modificări între timp." :
+                             ""
+                             )
+                           
+                           );
+  
+  gtk_widget_set_tooltip_markup(lbl, textIndicatie);
+}
+
+static void 
 laModificareCod(GtkTextBuffer *textbuffer, FormularCod *fc) {
   if(este_sursa_modificata(fc) == FALSE) {
-    actualizeaza_stare_nume_sursa(fc, TRUE);
+    actualizeaza_stare_nume_sursa(fc->lblStareNSursa, fc->numeSimpluAfisat, fc->esteExempluIncarcat, TRUE);
   }
 }
 
 static gboolean 
-laDezapasareTasteInCod(GtkWidget *widget, GdkEventKey *ke, FormularCod *fc) {
+laDezapasareTaste(GtkWidget *widget, GdkEventKey *ke, FormularCod *fc) {
   gboolean keyHandled = FALSE;
   
-  if((ke->state & GDK_CONTROL_MASK) != 0 && 
-     (ke->keyval == GDK_KEY_S || ke->keyval == GDK_KEY_s)) {
-    /* realizează o salvarea rapidă o salvare rapidă */
-    if(strlen(fc->caleCurentaSursa) != 0) {
-	  salveaza_continut_in_fisier(obtine_codul_sursa_curent(GTK_TEXT_VIEW(fc->txtVizCod)) , fc->caleCurentaSursa);
-	  actualizeaza_stare_nume_sursa(fc, FALSE);
-	}
-    keyHandled = TRUE;
+  if((ke->state & GDK_CONTROL_MASK) != 0) {
+    /* tasta 'Ctrl' a fost apăsată */
+    switch(ke->keyval) {
+    case GDK_KEY_S:
+    case GDK_KEY_s:
+     /* ... și tasta 's' a fost apăsată.
+      * Realizează o salvarea rapidă o salvare rapidă */
+      if(strlen(fc->caleCurentaSursa) != 0) {
+	    /* sursa curentă nu este un exemplu și are o cale de slavare deja asociată. Continuă cu salvarea */
+	    salveaza_continut_in_fisier(obtine_codul_sursa_curent(GTK_TEXT_VIEW(fc->txtVizCod)) , fc->caleCurentaSursa);
+	    actualizeaza_stare_nume_sursa(fc->lblStareNSursa, fc->numeSimpluAfisat, fc->esteExempluIncarcat, FALSE);
+      }
+      keyHandled = TRUE;
+      break;
+    case GDK_KEY_T:
+    case GDK_KEY_t:
+     /* ... și tasta 't' a fost apăsată
+	  * Simulează o trimitere spre plăcuță. */
+	  btIncarcaPeAle_click(NULL, fc);
+	  keyHandled = TRUE;
+      break;
+    case GDK_KEY_D:
+    case GDK_KEY_d:
+     /* ... și tasta 'd' a fost apăsată
+	  * Simulează o depozitare în memoria internă. */
+	  btSalveazaLucrul_click(NULL, fc);
+	  keyHandled = TRUE;
+      break;
+    case GDK_KEY_R:
+    case GDK_KEY_r:
+     /* ... și tasta 'r' a fost apăsată
+	  * Simulează o reluare de cod propriu. */
+	  btReiaLucrul_click(NULL, fc);
+	  keyHandled = TRUE;
+      break;
+    case GDK_KEY_E:
+    case GDK_KEY_e:
+     /* ... și tasta 'e' a fost apăsată
+	  * Declanșează formularul memoriei speciale. */
+	  btEEPROM_click(NULL, fc);
+	  keyHandled = TRUE;
+      break;
+    case GDK_KEY_P:
+    case GDK_KEY_p:
+     /* ... și tasta 'p' a fost apăsată
+	  * Dorim părăsirea formularului. O realizăm! */
+	  btParasesteFrm_click(NULL, fc);
+	  keyHandled = TRUE;
+      break;
+    case GDK_KEY_B:
+    case GDK_KEY_b:
+     /* ... și tasta 'b' a fost apăsată
+	  * Declanșează o tranziție a regiunii butoanelor */
+	  btExpandatorActiuni_click(NULL, fc);
+	  keyHandled = TRUE;
+      break;
+    }
   }
   
   return keyHandled;
@@ -342,9 +417,8 @@ btSalveazaLucrul_click(GtkWidget *bt, FormularCod *fc) {
     numeSimpluSursa = obtine_doar_nume_fisier(caleSursa);
     
     fc->esteExempluIncarcat = FALSE;
-    actualizeaza_stare_nume_sursa(fc, FALSE);
     g_sprintf(fc->numeSimpluAfisat, "%s", numeSimpluSursa);
-    actualizeaza_stare_nume_sursa(fc, FALSE);
+    actualizeaza_stare_nume_sursa(fc->lblStareNSursa, fc->numeSimpluAfisat, fc->esteExempluIncarcat, FALSE);
     g_sprintf(fc->caleCurentaSursa, "%s", caleSursa);
     
     g_free(caleSursa);
@@ -378,7 +452,7 @@ btReiaLucrul_click(GtkWidget *bt, FormularCod *fc) {
     
     fc->esteExempluIncarcat = FALSE;
     g_sprintf(fc->numeSimpluAfisat, "%s", numeSimpluSursa);
-    actualizeaza_stare_nume_sursa(fc, FALSE);
+    actualizeaza_stare_nume_sursa(fc->lblStareNSursa, fc->numeSimpluAfisat, fc->esteExempluIncarcat, FALSE);
     g_sprintf(fc->caleCurentaSursa, "%s", caleSursa);
     
     g_free(caleSursa);
@@ -402,11 +476,13 @@ btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
 
   switch(fc->vActiuni) {
   case ASCUNSE:
+    gtk_widget_set_tooltip_markup(fc->btExpandator, "Ascunde activitățile formularului.");
     gtk_widget_show(fc->cadruActiuni);
     imgExpandatorPixBuf = db_obtine_imagine_media_scalata(DB_IMG_COLAPSEAZA, 20, 20);
     fc->vActiuni = VIZIBILE;
     break;
   case VIZIBILE:
+    gtk_widget_set_tooltip_markup(fc->btExpandator, "Arată activitățile disponibile.");
     gtk_widget_hide(fc->cadruActiuni);
     imgExpandatorPixBuf = db_obtine_imagine_media_scalata(DB_IMG_EXPANDEAZA, 20, 20);
     fc->vActiuni = ASCUNSE;
@@ -423,14 +499,13 @@ fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
   if(vizibil)  gtk_widget_show_all(fc->frm);
   else gtk_widget_hide_all(fc->frm);
 
-  switch(fc->vActiuni) {
-  case ASCUNSE:
-    gtk_widget_hide(fc->cadruActiuni);
-    break;
-  case VIZIBILE:
-    gtk_widget_show(fc->cadruActiuni);
-    break;
+  /* gestionează vizibilitatea activitătilor */
+  if(fc->vActiuni == ASCUNSE) {
+    fc->vActiuni = VIZIBILE;
+  } else {
+	fc->vActiuni = ASCUNSE;
   }
+  btExpandatorActiuni_click(NULL, fc);
   
   bic_ascunde(&fc->bInfo);
   }
@@ -530,6 +605,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   /* inițializează acțiunile speciale ale formularului de cod */  
   btIncarcaPeAle = gtk_button_new_with_label("Încarcă pe Ale");
   gtk_button_set_focus_on_click(GTK_BUTTON(btIncarcaPeAle), FALSE);
+  gtk_widget_set_tooltip_markup(btIncarcaPeAle, "Construiește aplicația și împingeo pe plăcuță.\nTaste scurte: <i>Ctrl + T</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btIncarcaPeAle), -1, 60);
   GdkPixbuf *imgIncarcaPeAlePixBuf = db_obtine_imagine_media_scalata(DB_IMG_TRIMITE_LA_ALE, 16, 16);
   GtkWidget *imgIncarcaPeAle = gtk_image_new_from_pixbuf(imgIncarcaPeAlePixBuf);
@@ -539,6 +615,9 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   btSalveazaLucrul = gtk_button_new_with_label("Salvează lucrul");
   gtk_button_set_relief(GTK_BUTTON(btSalveazaLucrul), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btSalveazaLucrul), FALSE);
+  gtk_widget_set_tooltip_markup(btSalveazaLucrul, "Depozitează codul într-un fișier intern.\n"
+                                                  "Taste scurte: <i>Ctrl + D</i>\n"
+                                                  "Comandă rapidă: <i>Ctrl + S</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btSalveazaLucrul), -1, 50);
   GdkPixbuf *imgSalveazaLucrulPixBuf = db_obtine_imagine_media_scalata(DB_IMG_SALVEAZA_COD, 16, 16);
   GtkWidget *imgSalveazaLucrul = gtk_image_new_from_pixbuf(imgSalveazaLucrulPixBuf);
@@ -548,6 +627,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   btReiaLucrul = gtk_button_new_with_label("Reia cod");
   gtk_button_set_relief(GTK_BUTTON(btReiaLucrul), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btReiaLucrul), FALSE);
+  gtk_widget_set_tooltip_markup(btReiaLucrul, "Încarcă sursă din fișier extern.\nTaste scurte: <i>Ctrl + R</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btReiaLucrul), -1, 40);
   GdkPixbuf *imgReiaLucrulPixBuf = db_obtine_imagine_media_scalata(DB_IMG_REIA_COD, 16, 16);
   GtkWidget *imgReiaLucrul = gtk_image_new_from_pixbuf(imgReiaLucrulPixBuf);
@@ -557,6 +637,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   btEEPROM = gtk_button_new_with_label("Acțiuni EEPROM");
   gtk_button_set_relief(GTK_BUTTON(btEEPROM), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btEEPROM), FALSE);
+  gtk_widget_set_tooltip_markup(btEEPROM, "Deschide formularul destinat memoriei speciale.\nTaste scurte: <i>Ctrl + E</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btEEPROM), -1, 35);
   GdkPixbuf *imgEEPROMPixBuf = db_obtine_imagine_media_scalata(DB_IMG_EEPROM, 16, 16);
   GtkWidget *imgEEPROM = gtk_image_new_from_pixbuf(imgEEPROMPixBuf);
@@ -566,6 +647,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
   gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
   gtk_button_set_focus_on_click(GTK_BUTTON(btParasesteFrm), FALSE);
+  gtk_widget_set_tooltip_markup(btParasesteFrm, "Părăsește codul curent.\nTaste scurte: <i>Ctrl + P</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btParasesteFrm), -1, 30);
   GdkPixbuf *imgParasesteFrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PARASESTE, 16, 16);
   GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(imgParasesteFrmPixBuf);
@@ -586,9 +668,11 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
 
   /* inițializăm bara de stare inferioară a formularului */
   lblStareLegatura = gtk_label_new("[Conexiune]");
+  gtk_widget_set_tooltip_markup(lblStareLegatura, "Prezintă starea conexiunii cu plăcuța.");
   lblStareCod = gtk_label_new(NULL);
   lblStareNumeSursa = gtk_label_new(NULL);
-
+  actualizeaza_stare_nume_sursa(lblStareNumeSursa, denumireSursa, esteExemplu, FALSE);
+  
   cadruBaraStare = gtk_hbox_new(TRUE, 5);
   gtk_container_set_border_width(GTK_CONTAINER(cadruBaraStare), 3);
   gtk_box_pack_start(GTK_BOX(cadruBaraStare), lblStareLegatura, FALSE, FALSE, 0);
@@ -613,9 +697,6 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   else deRet->vActiuni = ASCUNSE;
   deRet->laDepistare_neprezentaPlacuta_recurenta = NULL;
   
-  /* actualizăm numele sursei afișate */
-  actualizeaza_stare_nume_sursa(deRet, FALSE);
-  
   /* inițializăm bara de stare superioară */
   bic_initializeaza(&deRet->bInfo);
   deRet->bInfo.parentBuff = txtSrcBuf;
@@ -632,7 +713,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   g_signal_connect(btEEPROM, "clicked", G_CALLBACK(btEEPROM_click), (gpointer)deRet);
   g_signal_connect(btParasesteFrm, "clicked", G_CALLBACK(btParasesteFrm_click), (gpointer)deRet);
   g_signal_connect(txtSrcBuf, "changed", G_CALLBACK(laModificareCod), (gpointer)deRet);
-  g_signal_connect(txtSrc, "key-release-event", G_CALLBACK(laDezapasareTasteInCod), (gpointer)deRet);
+  g_signal_connect(frm, "key-release-event", G_CALLBACK(laDezapasareTaste), (gpointer)deRet);
   
   return deRet;
 }

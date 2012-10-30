@@ -8,6 +8,7 @@
  * Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  */
 
+#include <gdk/gdkkeysyms.h>
 #include <stdlib.h>
 
 #include "db.h"
@@ -22,6 +23,8 @@
 
 static void incarca_info_general(GtkWidget *cadruFrm);
 static gboolean frmInfo_delev(GtkWidget *widget, GdkEvent *event, gpointer data);
+static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, GtkWindow *fereastraParinte);
+static void btIesire_clicked(GtkWidget *widget, GtkWindow *fereastraParinte);
 
 GtkWidget *
 finfo_initializeaza(GtkWindow *parinte) {
@@ -38,6 +41,7 @@ finfo_initializeaza(GtkWindow *parinte) {
   gtk_container_set_border_width(GTK_CONTAINER(frm), 5);
   gtk_window_set_modal(GTK_WINDOW(frm), FALSE);
   gtk_window_set_resizable(GTK_WINDOW(frm), FALSE);
+  g_signal_connect(frm, "key-release-event", G_CALLBACK(frmInfo_la_dezapasare_taste), frm);
   g_signal_connect(frm, "delete-event", G_CALLBACK(frmInfo_delev), NULL);
 
   /* inițializăm cadrul formularului */
@@ -56,9 +60,17 @@ finfo_initializeaza(GtkWindow *parinte) {
   btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
   gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
   gtk_button_set_focus_on_click(GTK_BUTTON(btParasesteFrm), FALSE);
+  gtk_widget_set_tooltip_markup(btParasesteFrm, "Închide formularul de informații.\nTastă scurtă: <i>Esc</i>");
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), btParasesteFrm, 3, 4, 3, 4);
-  g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(frmInfo_delev), frm);
+  g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(btIesire_clicked), frm);
 
+  /* atașează pictogramă la acțiunea de părăsire a formularului */
+  GdkPixbuf *imgParasesteFrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PARASESTE_INFO, 16, 16);
+  GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(imgParasesteFrmPixBuf);
+  g_object_unref(imgParasesteFrmPixBuf);
+  gtk_button_set_image_position(GTK_BUTTON(btParasesteFrm), GTK_POS_RIGHT);
+  gtk_button_set_image(GTK_BUTTON(btParasesteFrm), imgParasesteFrm);
+  
   return frm;
 }
 
@@ -75,8 +87,27 @@ imgLicenta_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
 
 static gboolean 
 frmInfo_delev(GtkWidget *widget, GdkEvent *event, gpointer data) {
-  gtk_widget_hide(widget);
-  return TRUE;
+  return FALSE;
+}
+
+static gboolean 
+frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, GtkWindow *fereastraParinte) {
+  gboolean evGestionat = FALSE;
+  
+  if(ke->keyval == GDK_KEY_Escape) {
+	/* tasta 'Esc' a fost apăsată. Părăsește formularul. */
+    btIesire_clicked(widget, fereastraParinte);
+    evGestionat = TRUE;
+  }
+  
+  return evGestionat;
+}
+
+static void 
+btIesire_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
+  if(NULL != fereastraParinte) {
+    gtk_widget_destroy(GTK_WIDGET(fereastraParinte));
+  }
 }
 
 static void 
@@ -111,6 +142,7 @@ incarca_info_general(GtkWidget *cadruFrm) {
   gtk_misc_set_alignment(GTK_MISC(lblValAutor), 1.0f, 0.1f);
   gtk_misc_set_alignment(GTK_MISC(lblValVersiune), 1.0f, 0.1f);
   gtk_misc_set_alignment(GTK_MISC(imgLicenta), 1.0f, 0.1f);
+  gtk_widget_set_tooltip_markup(cadruImgLicenta, "Prezintă informații sumare despre licența aplicației.\n<i>(click pentru a o deschide online)</i>");
   g_signal_connect(cadruImgLicenta, "button-press-event", G_CALLBACK(imgLicenta_click), NULL);
   gtk_container_add(GTK_CONTAINER(cadruImgLicenta), imgLicenta);
 
@@ -128,7 +160,6 @@ incarca_info_general(GtkWidget *cadruFrm) {
   GtkTextBuffer *txtBuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(txtView));
 
   gtk_text_buffer_set_text(txtBuffer, PSALE_TEXT_DESPRE, -1);
-  //gtk_widget_set_size_request(txtView, 300, -1);
   gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(txtView), FALSE);
   gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(txtView), GTK_WRAP_WORD);
   gtk_text_view_set_editable(GTK_TEXT_VIEW(txtView), FALSE);

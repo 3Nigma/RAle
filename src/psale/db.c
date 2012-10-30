@@ -156,6 +156,9 @@ db_obtine_imagine_media_scalata(db_media_type tp, gint w, gint h) {
   case DB_IMG_PARASESTE:
     vMem = db_obtine_blob(TB_NUME_TABEL_MEDIA, "fc_img_bt_icoana_paraseste_frm_cod", &dimMem);
     break;
+  case DB_IMG_PARASESTE_INFO:
+    vMem = db_obtine_blob(TB_NUME_TABEL_MEDIA, "fc_img_bt_icoana_paraseste_frm_info", &dimMem);
+    break;
   case DB_IMG_PARASESTE_EEPROM:
     vMem = db_obtine_blob(TB_NUME_TABEL_MEDIA, "fc_img_bt_icoana_paraseste_frm_eeprom", &dimMem);
     break;

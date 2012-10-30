@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include <glib.h>
+#include <gdk/gdkkeysyms.h>
 #include <glib/gprintf.h>
 #include <gtk/gtk.h>
 
@@ -29,6 +30,9 @@
   /* îl introducem aici pentru compilarea sub windows. Se pare că GTK-ul de windows nu-l definiește */
   #define G_VALUE_INIT { 0, { { 0 } } }
 #endif
+
+static gboolean frmPrincipal_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, GtkWindow *fereastraParinte);
+static void btIesire_clicked(GtkWidget *widget, GtkWindow *fereastraParinte);
 
 static gboolean estePlacutaConectata;
 static gboolean dlgCodForteazaActualizConex;
@@ -145,23 +149,24 @@ creeaza_cmbxExemple() {
 
   g_value_init(&val, G_TYPE_STRING);
 
+  /* inițializăm modelul și adăugăm capul de coloană */
   magazie = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
   gtk_list_store_append(magazie, &iter);
   gtk_list_store_set(magazie, &iter, 0, "", 1, "Cod din cărțulie ...", -1);
   db_incarca_exemple_carte(magazie);
 
   deRet = gtk_combo_box_new_with_model(GTK_TREE_MODEL(magazie));
-  //gtk_widget_set_size_request(GTK_WIDGET(deRet), 80, -1);
   gtk_combo_box_set_active(GTK_COMBO_BOX(deRet), 0);
   g_object_unref(G_OBJECT(magazie));
 
   afisorCel0 = gtk_cell_renderer_text_new();
-  g_value_set_static_string (&val, "Sans Italic 8");
+  g_value_set_static_string(&val, "Sans Italic 8");
   g_object_set_property(G_OBJECT(afisorCel0), "font", &val);
-  afisorCel1 = gtk_cell_renderer_text_new();
   gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(deRet), afisorCel0, TRUE);
-  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(deRet), afisorCel1, TRUE);
   gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(deRet), afisorCel0, "text", 0, NULL);
+  
+  afisorCel1 = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(deRet), afisorCel1, TRUE);
   gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(deRet), afisorCel1, "text", 1, NULL);
 
   return deRet;
@@ -193,6 +198,42 @@ la_interval_tick(gpointer user_data) {
   return TRUE;
 }
 
+static gboolean 
+frmPrincipal_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, GtkWindow *fereastraParinte) {
+  gboolean evGestionat = FALSE;
+  
+  if((ke->state & GDK_CONTROL_MASK) != 0) {
+    /* tasta 'Ctrl' a fost apăsată */
+    switch(ke->keyval) {
+    case GDK_KEY_P:
+    case GDK_KEY_p:
+      /* ... și tasta 'p'. Ieși din aplicație. */
+      btIesire_clicked(widget, fereastraParinte);
+      evGestionat = TRUE;
+      break;
+    case GDK_KEY_V:
+    case GDK_KEY_v:
+      /* ... și tasta 'v'. Deschide vizualizatorul cărțuliei. */
+      btCartulie_click(widget, fereastraParinte);
+      evGestionat = TRUE;
+      break;
+    }
+  } else if(ke->keyval == GDK_KEY_F1) {
+	/* tasta 'F1' a fost apăsată. Afișează formularul de informații. */
+    btInfo_click(widget, fereastraParinte);
+    evGestionat = TRUE;
+  }
+  
+  return evGestionat;
+}
+
+static void 
+btIesire_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
+  if(NULL != fereastraParinte) {
+    gtk_widget_destroy(GTK_WIDGET(fereastraParinte));
+  }
+}
+
 GtkWidget *
 fp_initializeaza_formular_principal() {
   GtkWidget *cadruFormPrincipal = NULL;
@@ -216,6 +257,7 @@ fp_initializeaza_formular_principal() {
   gtk_window_set_resizable(GTK_WINDOW(frm), FALSE);
   gtk_window_set_title(GTK_WINDOW(frm), "psAle");
   gtk_window_set_position(GTK_WINDOW(frm), GTK_WIN_POS_CENTER);
+  g_signal_connect(frm, "key-release-event", G_CALLBACK(frmPrincipal_la_dezapasare_taste), frm);
   g_signal_connect(frm, "delete-event", G_CALLBACK(frmPrincipal_delev), NULL);
   g_signal_connect(frm, "destroy", G_CALLBACK(frmPrincipal_destroy), NULL);
 
@@ -228,6 +270,7 @@ fp_initializeaza_formular_principal() {
 
   /* inițializăm cadrul pentru logoul aplicației */
   cadruImgLogo = gtk_event_box_new();
+  gtk_widget_set_tooltip_markup(cadruImgLogo, "Imaginea proiectului ...\n<i>(Click pe ea pentru a deschide pagina <b>tuScale</b>)</i>");
   gtk_widget_set_events(cadruImgLogo, GDK_KEY_PRESS_MASK);
   gtk_container_add(GTK_CONTAINER(cadruImgLogo), imgLogo);
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), cadruImgLogo);
@@ -235,20 +278,23 @@ fp_initializeaza_formular_principal() {
 
   /* inițializăm meniul de selecție pentru programare brută */
   cmbxCodNou = gtk_combo_box_text_new();
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(cmbxCodNou), "Hai la programare ...");
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(cmbxCodNou), "... în ASM");
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(cmbxCodNou), "... în C");
+  gtk_widget_set_tooltip_markup(cmbxCodNou, "Deschide un formular de cod nou utilizând limbajul dorit.");
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(cmbxCodNou), "\t\t\tHai la programare ...");
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(cmbxCodNou), "\t\t\t\t\t\t... în ASM");
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(cmbxCodNou), "\t\t\t\t\t\t... în C");
   gtk_combo_box_set_active(GTK_COMBO_BOX(cmbxCodNou), 0);
   g_signal_connect(cmbxCodNou, "changed", G_CALLBACK(cmbxCodNou_selectat), NULL);
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), cmbxCodNou);
 
   /* inițializăm meniul de selecție pentru exemplele de cod din carte */
   cmbxCodCarte = creeaza_cmbxExemple();
+  gtk_widget_set_tooltip_markup(cmbxCodCarte, "Navighează și deschide exemplele din cărțulie.");
   g_signal_connect(cmbxCodCarte, "changed", G_CALLBACK(cmbxCodCarte_selectat), NULL);
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), cmbxCodCarte);
 
   /* inițializăm butonul de citire a cărțuliei */
   btCartulie = gtk_button_new_with_label("Vizitează cărțulia");
+  gtk_widget_set_tooltip_markup(btCartulie, "Deschide cărțulia în format electronic.\nTaste scurte: <i>Ctrl + V</i>");
   gtk_button_set_relief(GTK_BUTTON(btCartulie), GTK_RELIEF_HALF);
   gtk_button_set_focus_on_click(GTK_BUTTON(btCartulie), FALSE);
   g_signal_connect(btCartulie, "clicked", G_CALLBACK(btCartulie_click), (gpointer)frm);
@@ -256,6 +302,7 @@ fp_initializeaza_formular_principal() {
 
   /* inițializăm butonul de informații */
   btInfo = gtk_button_new_with_label("Ce avem aici?");
+  gtk_widget_set_tooltip_markup(btInfo, "Afișează informații generale despre '<i>psAle</i>'.\nTastă scurtă: <i>F1</i>");
   gtk_button_set_relief(GTK_BUTTON(btInfo), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btInfo), FALSE);
   g_signal_connect(btInfo, "clicked", G_CALLBACK(btInfo_click), frm);
@@ -263,9 +310,10 @@ fp_initializeaza_formular_principal() {
 
   /* inițializăm butonul de ieșire */
   btIesire = gtk_button_new_with_label("Gata, am ieșit!");
+  gtk_widget_set_tooltip_markup(btIesire, "Părăsește definitiv aplicația.\nTaste scurte: <i>Ctrl + P</i>");
   gtk_button_set_relief(GTK_BUTTON(btIesire), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btIesire), FALSE);
-  g_signal_connect_swapped(btIesire, "clicked", G_CALLBACK(gtk_widget_destroy), frm);
+  g_signal_connect(btIesire, "clicked", G_CALLBACK(btIesire_clicked), frm);
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), btIesire);
 
   /* permite butoanelor să afișeze atât imaginea cât și textul dorit */
