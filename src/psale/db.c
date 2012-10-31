@@ -32,7 +32,7 @@ bd_obtine_rezultat_unic(const char *fisBD, const char *com, int colId) {
     sqlite3_close(db);
     return NULL;
   }
-
+  
   rez = sqlite3_column_value(af, colId);
 
   sqlite3_close(db);
@@ -137,6 +137,7 @@ db_obtine_img_info_aleatoare(const char *numeTbl, int *dim) {
 GdkPixbuf *
 db_obtine_imagine_media_scalata(db_media_type tp, gint w, gint h) {
   GInputStream *memImg = NULL;
+  GdkPixbuf *bufImg = NULL;
   const void *vMem = NULL;
   int dimMem = 0;
   
@@ -197,6 +198,10 @@ db_obtine_imagine_media_scalata(db_media_type tp, gint w, gint h) {
     break;
   }
   memImg = g_memory_input_stream_new_from_data(vMem, dimMem, NULL);
+  bufImg = gdk_pixbuf_new_from_stream_at_scale(memImg, w, h, FALSE, NULL, NULL); 
   
-  return gdk_pixbuf_new_from_stream_at_scale(memImg, w, h, FALSE, NULL, NULL);
+  g_input_stream_close(memImg,NULL,NULL);
+  g_object_unref(G_OBJECT(memImg));
+  
+  return bufImg;
 }

@@ -13,10 +13,15 @@
 #include <math.h>
 
 #include <cairo.h>
+#include <gdk/gdkkeysyms.h>
 #include <gtk/gtkadjustment.h>
 
 #include "db.h"
 #include "vc.h"
+
+static void btUrmPag_clicked(GtkToolItem *tooleditcopy, VizualizatorCartulie *vc);
+static void btPrecPag_clicked(GtkToolItem *tooleditcut, VizualizatorCartulie *vc);
+static gboolean pdfviz_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, VizualizatorCartulie *vc);
 
 static void
 reseteazaIndicatorSoricel(VizualizatorCartulie *vc) {
@@ -59,6 +64,7 @@ pdfviz_mouse_click_event(GtkWidget *widget, GdkEventButton *e, VizualizatorCartu
 static gboolean 
 pdfviz_mouse_misc_event(GtkWidget *widget, GdkEventMotion *e, VizualizatorCartulie *vc) {
   GList *l = NULL;
+  GdkCursor *cursorCurent = NULL;
   gboolean actiuneGasita = FALSE;
   PopplerLinkMapping *lmapping = NULL;
   PopplerAction *action = NULL;
@@ -82,7 +88,9 @@ pdfviz_mouse_misc_event(GtkWidget *widget, GdkEventMotion *e, VizualizatorCartul
           e->x <= x2Rendat && e->y >= y2Rendat &&
           vc->actiune_salt_proxim != action) {
           vc->actiune_salt_proxim = action;
-          gdk_window_set_cursor(gtk_widget_get_window(GTK_WIDGET(vc->frm)), gdk_cursor_new(GDK_HAND2));
+          cursorCurent = gdk_cursor_new(GDK_HAND2);
+          gdk_window_set_cursor(gtk_widget_get_window(GTK_WIDGET(vc->frm)), cursorCurent);
+          gdk_cursor_unref(cursorCurent);
           actiuneGasita = TRUE;
         }
         break;
@@ -175,9 +183,46 @@ pdfviz_expose_event(GtkWidget *widget, GdkEventExpose *event, VizualizatorCartul
   if(vc->x_start_rendare < 0) vc->x_start_rendare = 0;
   if(vc->y_start_rendare < 0) vc->y_start_rendare = 0;
   
+  /* începem cu un fundal alb */
+  cairo_rectangle(cr, vc->x_start_rendare, vc->y_start_rendare, 
+                      cairo_image_surface_get_width(vc->suprafataPag), cairo_image_surface_get_height(vc->suprafataPag));
+  cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+  cairo_fill(cr);
+  
+  /* adăugăm pagina curentă */
   cairo_set_source_surface(cr, vc->suprafataPag, vc->x_start_rendare, vc->y_start_rendare);
   cairo_paint(cr);
   cairo_destroy(cr);
+}
+
+static gboolean 
+pdfviz_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, VizualizatorCartulie *vc) {
+  gboolean evGestionat = FALSE;
+  
+  switch(ke->keyval) {
+  case GDK_KEY_C:
+  case GDK_KEY_c:
+    /* tasta 'C' a fost apăsată */
+    if((ke->state & GDK_CONTROL_MASK) != 0) {
+	  /* și 'Ctrl', de asemenea. Sari la cuprins */
+	  vc_sari_la_pagina(vc, PAGINA_CUPRINS - 1);
+	}
+    break;
+  case GDK_KEY_Escape:
+    /* s-a apăsat tasta 'Esc' */
+    vc_destroy_frm(widget, NULL);
+    break;
+  case GDK_KEY_Left:
+    /* tasta 'săgeata la stânga' a fost apăsată. Sari la pagina precedentă. */
+    btPrecPag_clicked(NULL, vc);
+    break;
+  case GDK_KEY_Right:
+    /* tasta 'săgeata la dreapta' a fost apăsată. Mergi la pagina următoare. */
+    btUrmPag_clicked(NULL, vc);
+    break;
+  }
+  
+  return evGestionat;
 }
 
 static void 
@@ -204,8 +249,8 @@ adauga_cuprins_la_pagina_curenta(VizualizatorCartulie *vc, cairo_t *cr, cairo_su
   
   /* adaugăm elementul activ de salt la proaspăta imagine */
   activLaClicCuprins = poppler_link_mapping_new();
-  activLaClicCuprins->action = g_slice_new0(PopplerAction);
-  activLaClicCuprins->action->goto_dest.dest = g_new(PopplerDest, 1);
+  activLaClicCuprins->action = g_new0(PopplerAction, 1);
+  activLaClicCuprins->action->goto_dest.dest = g_slice_alloc0(sizeof(PopplerDest));
   activLaClicCuprins->area.x1 = x1 * X_IMG_SCAL_CUPRINS/vc->x_pag_scale;
   activLaClicCuprins->area.x2 = x2 * X_IMG_SCAL_CUPRINS/vc->x_pag_scale;
   activLaClicCuprins->area.y1 = vc->pag_height - y1 * Y_IMG_SCAL_CUPRINS/vc->y_pag_scale ;
@@ -225,7 +270,7 @@ adauga_salturi_cuprins(VizualizatorCartulie *vc, cairo_t *cr) {
   gint wimg, himg;
   gint wpanza, hpanza;
   
-  imgCuprinsPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PAG_SALT_CUPRINS, 28, 28);
+  imgCuprinsPixBuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, 24, 24);//db_obtine_imagine_media_scalata(DB_IMG_PAG_SALT_CUPRINS, 28, 28);
   wimg = gdk_pixbuf_get_width(imgCuprinsPixBuf);
   himg = gdk_pixbuf_get_height(imgCuprinsPixBuf);
   supImgCuprins = cairo_image_surface_create_for_data(gdk_pixbuf_get_pixels(imgCuprinsPixBuf),
@@ -234,7 +279,7 @@ adauga_salturi_cuprins(VizualizatorCartulie *vc, cairo_t *cr) {
                                                       gdk_pixbuf_get_rowstride(imgCuprinsPixBuf));
   wpanza = (int)ceil(vc->pag_width) * vc->x_pag_scale;
   hpanza = (int)ceil(vc->pag_height) * vc->y_pag_scale;
-
+  
   /* imprimă "butonul" de cuprins în toate cele 4 coțuri ale paginii curente */
   cairo_scale(cr, X_IMG_SCAL_CUPRINS/vc->x_pag_scale, Y_IMG_SCAL_CUPRINS/vc->y_pag_scale);
   adauga_cuprins_la_pagina_curenta(vc, cr, supImgCuprins,
@@ -249,6 +294,9 @@ adauga_salturi_cuprins(VizualizatorCartulie *vc, cairo_t *cr) {
   adauga_cuprins_la_pagina_curenta(vc, cr, supImgCuprins,
                                    wpanza - wimg * 3.0/2, hpanza - himg * 3.0/2,
                                    wpanza - wimg * 3.0/2, wpanza - wimg/2, hpanza - himg/2, hpanza - himg * 3.0/2);
+                              
+  g_object_unref(imgCuprinsPixBuf);
+  cairo_surface_destroy(supImgCuprins);
 }
 
 VizualizatorCartulie * 
@@ -281,6 +329,7 @@ vc_initializeaza() {
   /* adaugă butonul de navigare la pagina precedentă */
   btPrecPag = gtk_button_new();
   gtk_widget_set_can_focus(btPrecPag, FALSE);
+  gtk_widget_set_tooltip_markup(btPrecPag, "Mergi la pagina precedentă.\nTastă scurtă: <i>Săgeată stânga</i>");
   gtk_button_set_relief(GTK_BUTTON(btPrecPag), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btPrecPag), FALSE);
   GdkPixbuf *imgPagPrecPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PAG_PREC, 28, 28);
@@ -290,6 +339,7 @@ vc_initializeaza() {
   /* adaugă butonul de navigare la pagina următoare */
   btUrmPag = gtk_button_new();
   gtk_widget_set_can_focus(btUrmPag, FALSE);
+  gtk_widget_set_tooltip_markup(btUrmPag, "Mergi la pagina următoare.\nTastă scurtă: <i>Săgeată dreapta</i>");
   gtk_button_set_relief(GTK_BUTTON(btUrmPag), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btUrmPag), FALSE);
   GdkPixbuf *imgPagUrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PAG_URM, 28, 28);
@@ -312,7 +362,8 @@ vc_initializeaza() {
 
   /* atașăm evenimentele */
   g_signal_connect(G_OBJECT(deRet->frm), "destroy", G_CALLBACK(vc_destroy_frm), NULL);
-  g_signal_connect(G_OBJECT(deRet->frm), "delete_event", G_CALLBACK(vc_delete_event_frm), NULL);
+  g_signal_connect(G_OBJECT(deRet->frm), "delete-event", G_CALLBACK(vc_delete_event_frm), NULL);
+  g_signal_connect(G_OBJECT(deRet->frm), "key-release-event", G_CALLBACK(pdfviz_la_dezapasare_taste), (gpointer)deRet);
   g_signal_connect(G_OBJECT(btPrecPag), "clicked", G_CALLBACK(btPrecPag_clicked), (gpointer)deRet);
   g_signal_connect(G_OBJECT(btUrmPag), "clicked", G_CALLBACK(btUrmPag_clicked), (gpointer)deRet);
   g_signal_connect(G_OBJECT(deRet->pdfviz), "scroll-event", G_CALLBACK(pdfviz_vscrol_modif_event), (gpointer)deRet);
@@ -347,22 +398,37 @@ vc_sari_la_pagina(VizualizatorCartulie *vc, int nrPag)  {
   h = (int)ceil(vc->pag_height) * vc->y_pag_scale;
   
   /* obținem lista de salturi(linkuri) de pe pagina curentă */
-  if(NULL != vc->salturi_curente) poppler_page_free_link_mapping(vc->salturi_curente);
+  poppler_page_free_link_mapping(vc->salturi_curente);
   vc->salturi_curente = poppler_page_get_link_mapping(ppage);
   
   /* imprimăm pagina dorită */
-  if(NULL != vc->suprafataPag) cairo_surface_destroy(vc->suprafataPag);
-  vc->suprafataPag = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h);
-  cr = cairo_create(vc->suprafataPag);
+  if(NULL != vc->suprafataPag) {
+    if(w == cairo_image_surface_get_width(vc->suprafataPag) &&
+       h == cairo_image_surface_get_height(vc->suprafataPag)) {
+       cr = cairo_create(vc->suprafataPag);
+       /* șterge imaginea curentă, dar nu o reinițializa pentru că dimensiunile sale sunt cele dorite */
+       cairo_rectangle(cr, 0.0, 0.0, w, h);
+       cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+       cairo_fill(cr);
+    } else {
+	  cairo_surface_destroy(vc->suprafataPag); 
+      vc->suprafataPag = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h);
+      cr = cairo_create(vc->suprafataPag);
+	}
+  } else {
+    vc->suprafataPag = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h);
+    cr = cairo_create(vc->suprafataPag);
+  }
+
   cairo_scale(cr, vc->x_pag_scale, vc->y_pag_scale);
   poppler_page_render(ppage, cr);
   adauga_salturi_cuprins(vc, cr);
   
   /* adaugă chenar (issue #10) la pagina curentă */
-  cairo_set_line_width (cr, 0.1);
-  cairo_set_source_rgb (cr, 0, 0, 0);
-  cairo_rectangle (cr, 0.25, 0.25, (gdouble)w - 0.25, (gdouble)h - 0.25);
-  cairo_stroke (cr);
+  cairo_set_line_width(cr, 0.1);
+  cairo_set_source_rgb(cr, 0, 0, 0);
+  cairo_rectangle(cr, 0.25, 0.25, (gdouble)w - 0.25, (gdouble)h - 0.25);
+  cairo_stroke(cr);
   
   /* actualizăm titlul vizualizatorului pentru a reflecta numărul noii pagini */
   strBuf = g_string_sized_new(30);
@@ -372,6 +438,7 @@ vc_sari_la_pagina(VizualizatorCartulie *vc, int nrPag)  {
   /* operațiuni de curățire și înștiințare a formularului */
   g_string_free(strBuf, TRUE);
   cairo_destroy(cr);
+  g_object_unref(ppage);
   gtk_widget_set_size_request(vc->pdfviz, w, h);
   gtk_widget_queue_draw(vc->pdfviz);
 }
