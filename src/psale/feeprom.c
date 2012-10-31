@@ -12,6 +12,7 @@
 
 #include "db.h"
 
+#include <gdk/gdkkeysyms.h>
 #include <glib/gprintf.h>
 #include <string.h>
 
@@ -25,6 +26,7 @@ static gboolean laArataTooltip(GtkWidget  *widget,
                                 gboolean    keyboard_mode,
                                 GtkTooltip *indicatiiCelula,
                                 FormularEEPROM *fe);
+static gboolean frmEEPROM_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FormularEEPROM *fe);
 static gboolean tree_view_get_cell_from_pos(GtkTreeView *view, guint x, guint y, 
                                              guint *cellx, guint *celly);
 static void laEditareCelula(GtkCellRendererText *renderer,
@@ -67,6 +69,7 @@ fme_initializeaza(GtkWindow *parinte) {
   
   btCitesteMem = gtk_button_new_with_label("Citește EEPROM");
   gtk_button_set_relief(GTK_BUTTON(btCitesteMem), GTK_RELIEF_HALF);
+  gtk_widget_set_tooltip_markup(btCitesteMem, "Citește starea curentă a memoriei speciale.\nTaste scurte: <i>Ctrl + C</i>");
   GdkPixbuf *imgCitesteMemPixBuf = db_obtine_imagine_media_scalata(DB_IMG_CITESTE_EEPROM, 16, 16);
   GtkWidget *imgCitesteMem = gtk_image_new_from_pixbuf(imgCitesteMemPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btCitesteMem), GTK_POS_LEFT);
@@ -75,6 +78,7 @@ fme_initializeaza(GtkWindow *parinte) {
   
   btScrieMem = gtk_button_new_with_label("Scrie EEPROM");
   gtk_button_set_relief(GTK_BUTTON(btScrieMem), GTK_RELIEF_HALF);
+  gtk_widget_set_tooltip_markup(btScrieMem, "Scrie memoria specială cu valorile dorite.\nTaste scurte: <i>Ctrl + S</i>");
   GdkPixbuf *imgbtScrieMemPixBuf = db_obtine_imagine_media_scalata(DB_IMG_SCRIE_EEPROM, 16, 16);
   GtkWidget *imgbtScrieMem = gtk_image_new_from_pixbuf(imgbtScrieMemPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btScrieMem), GTK_POS_LEFT);
@@ -83,6 +87,7 @@ fme_initializeaza(GtkWindow *parinte) {
   
   btParasesteFrm = gtk_button_new_with_label("Închide formular");
   gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
+  gtk_widget_set_tooltip_markup(btParasesteFrm, "Închide formularul curent.\nTastă scurtă: <i>Esc</i>");
   GdkPixbuf *imgParasesteFrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PARASESTE_EEPROM, 16, 16);
   GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(imgParasesteFrmPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btParasesteFrm), GTK_POS_RIGHT);
@@ -95,6 +100,7 @@ fme_initializeaza(GtkWindow *parinte) {
   
   /* legăm evenimentele necesare */
   g_signal_connect(fe->frm, "delete-event", G_CALLBACK(frmEEPROM_delev), (gpointer)fe);
+  g_signal_connect(fe->frm, "key-release-event", G_CALLBACK(frmEEPROM_la_dezapasare_taste), (gpointer)fe);
   g_signal_connect(fe->tvEEPROM, "query-tooltip", G_CALLBACK(laArataTooltip), (gpointer)fe);
   g_signal_connect(btCitesteMem, "clicked", G_CALLBACK(btCitesteEEPROM_click), (gpointer)fe);
   g_signal_connect(btScrieMem, "clicked", G_CALLBACK(btSalveazaEEPROM_click), (gpointer)fe);
@@ -191,6 +197,31 @@ laArataTooltip(GtkWidget  *widget,
   }
   
   return FALSE;
+}
+
+static gboolean 
+frmEEPROM_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FormularEEPROM *fe) {
+  gboolean evGestionat = FALSE;
+  
+  if((ke->state & GDK_CONTROL_MASK) != 0) {
+    /* tasta 'Ctrl' a fost apăsată */
+    switch(ke->keyval) {
+    case GDK_KEY_S:
+    case GDK_KEY_s:
+      /* și tasta 's' a fost apăsată. Scrie memoria EEPROM */
+      btSalveazaEEPROM_click(widget, fe);
+      break;
+    case GDK_KEY_C:
+    case GDK_KEY_c:
+      /* și tasta 'c' a fost apăsată. Citește starea memoriei EEPROM */
+      btCitesteEEPROM_click(widget, fe);
+      break;
+    }
+  } else if(ke->keyval == GDK_KEY_Escape) {
+    btParasesteFrm_click(widget, fe);
+  }
+  
+  return evGestionat;
 }
 
 static gboolean
