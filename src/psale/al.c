@@ -227,6 +227,7 @@ al_obtine_index_mcu() {
   gchar *cDir = g_get_current_dir();
   gchar com[255];
   gint indexMcu = -1;
+  gchar semnCompCitita[10];
   
 #ifdef G_OS_WIN32
   g_sprintf(com, "%s\\avrdude.exe -c usbtiny -p t25 -V 2>&1", cDir);
@@ -239,7 +240,6 @@ al_obtine_index_mcu() {
   char lineBuff[4096];
   GRegex *tipar = NULL;
   GMatchInfo *containerPotriviri = NULL;
-  gchar semnCompCitita[10];
   
   if((fConsoleOut = popen(com, "r")) == NULL) {
 	  /* TODO: s-a întâmplat ceva cu execuția aplicației */

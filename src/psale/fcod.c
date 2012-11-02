@@ -29,6 +29,7 @@
 #include "feeprom.h"
 #include "fcod.h"
 
+#define PSALE_SURSELE_MELE_DIR                  "sursele mele"
 #define PSALE_PREFIX_LBLSTARENUME_SURSA_PROPRIE "SM"
 #define PSALE_PREFIX_LBLSTARENUME_SURSA_EXEMPLU "Ex"
 #define PSALE_PREFIX_MODIFICARE_COD_TEXT        "*"
@@ -104,7 +105,7 @@ initializeaza_dialog_reluare_salvare(FormularCod *fc, TipDialogFisier df) {
   gtk_window_set_title(GTK_WINDOW(dlgDeschideSursa), titluDialog);
   gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(dlgDeschideSursa), FALSE);
   gtk_file_chooser_set_filter(GTK_FILE_CHOOSER(dlgDeschideSursa), filtruFisSursa);
-  gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlgDeschideSursa), "sursele mele");
+  gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlgDeschideSursa), PSALE_SURSELE_MELE_DIR);
   
   return dlgDeschideSursa;
 }
