@@ -76,15 +76,19 @@ db_incarca_exemplu_recurent(void *userArg, int nrOfCols, char **colTxts, char **
 }
 
 int 
-db_incarca_exemple_carte(GtkListStore *st) {
-  return bd_executa_comanda(PSALE_BD_NUME_FIS, "select IndiceCarte, TipSursa, Titlu from exemple order by OrdineAfis asc", db_incarca_exemplu_recurent, (void *)st);
+db_incarca_exemple_carte(GtkListStore *st, const gchar *limbajDorit) {
+  gchar propSQL[256];
+
+  g_sprintf(propSQL, "select IndiceCarte, TipSursa, Titlu from exemple where TipSursa='%s' order by OrdineAfis asc", limbajDorit);
+
+  return bd_executa_comanda(PSALE_BD_NUME_FIS, propSQL, db_incarca_exemplu_recurent, (void *)st);
 }
 
 const char *
-db_obtine_cod_complet(const gchar *titluLung) {
+db_obtine_cod_complet(const gchar *titluLung, const gchar *limbajDorit) {
   char sintaxaInterogare[124];
 
-  sprintf(sintaxaInterogare, "select TextCod from exemple where Titlu = '%s'", titluLung);
+  sprintf(sintaxaInterogare, "select TextCod from exemple where Titlu = '%s' and TipSursa ='%s'", titluLung, limbajDorit);
   sqlite3_value *rez = bd_obtine_rezultat_unic(PSALE_BD_NUME_FIS, sintaxaInterogare, 0);
 
   return (const char *)sqlite3_value_text(rez);

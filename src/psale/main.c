@@ -14,15 +14,15 @@
 #include "fprin.h"
 
 int main(int argc, char *argv[]) {
-  GtkWidget *formPrincipal = NULL;
+  FormularPrincipal *fprin = NULL;
 
   gtk_init (&argc, &argv);
   
-  formPrincipal = fp_initializeaza_formular_principal();
-  gtk_widget_show_all(formPrincipal);
+  fprin = fp_initializeaza_formular_principal();
+  fp_arata(fprin);
   
   gtk_main();
-  fp_curata();
+  fp_curata(fprin);
   dl_curata();
 
   return 0;

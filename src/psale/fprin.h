@@ -13,10 +13,19 @@
 
 #include <gtk/gtk.h>
 
-extern GtkWidget *
+typedef struct {
+  GtkWidget *frm;
+  GtkWidget *cmbxExemple;
+  GSList *listaDlgCod;
+} FormularPrincipal;
+
+extern FormularPrincipal *
 fp_initializeaza_formular_principal();
 
 extern void 
-fp_curata();
+fp_arata(FormularPrincipal *fp);
+
+extern void 
+fp_curata(FormularPrincipal *fp);
 
 #endif
