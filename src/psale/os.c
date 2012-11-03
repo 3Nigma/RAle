@@ -1,3 +1,13 @@
+/*
+ * psAle - If Ale's board ever needed an app, then this would be IT!
+ * Copyright (c) 2012 by Victor ADÄ‚SCÄ‚LIÈšEI at admin@tuscale.ro
+ * 
+ * This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License. 
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ , read it from the 
+ * COPYING file that resides in the same directory as this file does or send a letter to 
+ * Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+ */
+
 #include "os.h"
 
 #include <glib/gprintf.h>
@@ -71,7 +81,7 @@ os_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta) {
   DWORD nrOctetiCititi; 
   SECURITY_ATTRIBUTES securityAttributes;
   
-  /* construim structura de siguran?ã a pipe-ului */
+  /* construim structura de siguranÈ›Äƒ a pipe-ului */
   securityAttributes.nLength = sizeof(SECURITY_ATTRIBUTES); 
   securityAttributes.bInheritHandle = TRUE; 
   securityAttributes.lpSecurityDescriptor = NULL;
@@ -102,14 +112,14 @@ os_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta) {
 #elif defined G_OS_UNIX
   FILE *fGCCOut = NULL;
   
-  /* încearcã sã compilezi sursa curentã */
+  /* Ã®ncearcÄƒ sÄƒ compilezi sursa curentÃ£ */
   if((fGCCOut = popen(comanda, "r")) == NULL) {
-	g_warning("S-a întâmplat ceva cu execu?ia compilatorului!");
+	g_warning("S-a Ã®ntÃ¢mplat ceva cu execuÈ›ia compilatorului!");
   } else {
 	bic_text_initializeaza(baraInfoTinta);
 	while(fgets(lineBuff, 4096, fGCCOut) != NULL) {
-      /* s-a ob?inut un rând din fluxul stãrii returnate. 
-	     Este clar cã a apãrut o eroare în cod altfel nu s-ar fi ajuns aici! */
+      /* s-a obÈ›inut un rÃ¢nd din fluxul stÄƒrii returnate. 
+	     Este clar cÄƒ a apÄƒrut o eroare Ã®n cod altfel nu s-ar fi ajuns aici! */
       gccCompilatCuSucces = FALSE;
       bic_text_adauga_linie(baraInfoTinta, lineBuff);
 	}
@@ -140,7 +150,7 @@ os_obtine_nume_fis_temporar(gchar *buff, gint buffLen) {
 #elif defined G_OS_UNIX
   g_sprintf(buff, "%s", tmpnam(NULL));
 #endif
-  g_debug("Am creeat fi?ierul temporal '%s'", buff);
+  g_debug("Am creeat fiÈ™ierul temporal '%s'", buff);
 }
 
 extern gchar * 
@@ -158,7 +168,7 @@ os_obtine_cod_mcu_prezent(gchar *comanda) {
   DWORD nrOctetiCititi; 
   SECURITY_ATTRIBUTES securityAttributes;
   
-  /* construim structura de siguran?ã a pipe-ului */
+  /* construim structura de siguranÈ›Äƒ a pipe-ului */
   securityAttributes.nLength = sizeof(SECURITY_ATTRIBUTES); 
   securityAttributes.bInheritHandle = TRUE; 
   securityAttributes.lpSecurityDescriptor = NULL;
@@ -174,7 +184,8 @@ os_obtine_cod_mcu_prezent(gchar *comanda) {
 	  if(*linePt == '\r') {
 	    (*linePt) = '\0';
 		
-		/* s-a încãrcat o linie nouã. Aplicã tiparul ?i verificã dacã putem extrage informa?ia doritã (codul MCU-ului curent) */
+		/* s-a Ã®ncÄƒrcat o linie nouÄƒ. 
+		 * AplicÄƒ tiparul È™i verificÄƒ dacÄƒ putem extrage informaÈ›ia doritÄƒ (codul MCU-ului curent) */
 		g_regex_match(tipar, lineBuff, 0, &containerPotriviri);
 	    if(g_match_info_matches(containerPotriviri)) {
 		  g_sprintf(codMCUGasit, "%s", g_match_info_fetch(containerPotriviri, 1));
@@ -188,13 +199,13 @@ os_obtine_cod_mcu_prezent(gchar *comanda) {
     CloseHandle(avrGccOuput[0]);
     CloseHandle(avrGccOuput[1]);
   } else {
-    g_warning("S-a ivit o problemã la invocarea lui 'avrdude' : '%s'! Ac?iunea a fost anulatã ...", comanda);
+    g_warning("S-a ivit o problemÄƒ la invocarea lui 'avrdude' : '%s'! AcÈ›iunea a fost anulatÄƒ ...", comanda);
   }
 #elif defined G_OS_UNIX
   FILE *fConsoleOut = NULL;
 
   if((fConsoleOut = popen(com, "r")) == NULL) {
-	g_warning("S-a ivit o problemã la invocarea lui 'avrdude' : '%s'! Ac?iunea a fost anulatã ...", comanda);
+	g_warning("S-a ivit o problemÄƒ la invocarea lui 'avrdude' : '%s'! AcÈ›iunea a fost anulatÄƒ ...", comanda);
   } else {
 	while(fgets(lineBuff, 4096, fConsoleOut) != NULL) {
       g_regex_match(tipar, lineBuff, 0, &containerPotriviri);

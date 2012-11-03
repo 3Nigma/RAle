@@ -605,7 +605,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   /* inițializează acțiunile speciale ale formularului de cod */  
   btIncarcaPeAle = gtk_button_new_with_label("Încarcă pe Ale");
   gtk_button_set_focus_on_click(GTK_BUTTON(btIncarcaPeAle), FALSE);
-  gtk_widget_set_tooltip_markup(btIncarcaPeAle, "Construiește aplicația și împingeo pe plăcuță.\nTaste scurte: <i>Ctrl + T</i>");
+  gtk_widget_set_tooltip_markup(btIncarcaPeAle, "Construiește aplicația și împinge-o pe plăcuță.\nTaste scurte: <i>Ctrl + T</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btIncarcaPeAle), -1, 60);
   GdkPixbuf *imgIncarcaPeAlePixBuf = db_obtine_imagine_media_scalata(DB_IMG_TRIMITE_LA_ALE, 16, 16);
   GtkWidget *imgIncarcaPeAle = gtk_image_new_from_pixbuf(imgIncarcaPeAlePixBuf);

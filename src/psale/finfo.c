@@ -35,7 +35,7 @@ finfo_initializeaza(GtkWindow *parinte) {
 
   /* inițializăm formularul de informații */
   frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(frm), "Despre aplicație ...");
+  gtk_window_set_title(GTK_WINDOW(frm), "psAle ~ Despre aplicație ...");
   gtk_window_set_transient_for(GTK_WINDOW(frm), parinte);
   gtk_window_set_position(GTK_WINDOW(frm), GTK_WIN_POS_CENTER_ON_PARENT);
   gtk_container_set_border_width(GTK_CONTAINER(frm), 5);

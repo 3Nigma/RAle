@@ -1,6 +1,6 @@
 /*
  * psAle - If Ale's board ever needed an app, then this would be IT!
- * Copyright (c) 2012 by Victor ADĂSCĂLIȚEI at admin@tuscale.ro
+ * Copyright (c) 2012 by Victor ADASCALI?EI at admin@tuscale.ro
  * 
  * This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License. 
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ , read it from the 
@@ -91,7 +91,7 @@ fme_initializeaza(GtkWindow *parinte) {
   
   btParasesteFrm = gtk_button_new_with_label("Închide formular");
   gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
-  gtk_widget_set_tooltip_markup(btParasesteFrm, "Închide formularul curent.\nTastă scurtă: <i>Esc</i>");
+  gtk_widget_set_tooltip_markup(btParasesteFrm, "Închide formularul curent.\nTastă scurta: <i>Esc</i>");
   GdkPixbuf *imgParasesteFrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PARASESTE_EEPROM, 16, 16);
   GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(imgParasesteFrmPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btParasesteFrm), GTK_POS_RIGHT);
@@ -102,7 +102,7 @@ fme_initializeaza(GtkWindow *parinte) {
   gtk_container_set_border_width(GTK_CONTAINER(fe->frm), 4);
   gtk_container_add(GTK_CONTAINER(fe->frm), zonaGenerala);
   
-  /* legăm evenimentele necesare */
+  /* legagă evenimentele necesare */
   g_signal_connect(fe->frm, "delete-event", G_CALLBACK(frmEEPROM_delev), (gpointer)fe);
   g_signal_connect(fe->frm, "key-release-event", G_CALLBACK(frmEEPROM_la_dezapasare_taste), (gpointer)fe);
   g_signal_connect(fe->tvEEPROM, "query-tooltip", G_CALLBACK(laArataTooltip), (gpointer)fe);
@@ -190,9 +190,9 @@ laArataTooltip(GtkWidget  *widget,
   if(tree_view_get_cell_from_pos(GTK_TREE_VIEW(fe->tvEEPROM), relBinX, relBinY, &cellX, &cellY) == TRUE) {
 	if(cellX > 0 ) {
       g_sprintf(ttText, "<b>%s</b>0x%03x"/*\n<b>%s</b>%s\n<b>%s</b>%s"*/, 
-                        "Adresă: ", cellY * 16 + cellX - 1/*, 
-                        "Val. zecimală: ", "DE COMPLETAT", 
-                        "Val. binară: ", "DE COMPLETAT"*/);
+                        "Adresa: ", cellY * 16 + cellX - 1/*, 
+                        "Val. zecimala: ", "DE COMPLETAT", 
+                        "Val. binara: ", "DE COMPLETAT"*/);
       gtk_tooltip_set_markup(indicatiiCelula, ttText);
       gtk_tree_view_set_tooltip_cell(GTK_TREE_VIEW(fe->tvEEPROM), indicatiiCelula, caleCelula, NULL, NULL);
     
@@ -208,7 +208,7 @@ frmEEPROM_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FormularEEPROM
   gboolean evGestionat = FALSE;
   
   if((ke->state & GDK_CONTROL_MASK) != 0) {
-    /* tasta 'Ctrl' a fost apăsată */
+    /* tasta 'Ctrl' a fost apasata */
     switch(ke->keyval) {
     case GDK_KEY_S:
     case GDK_KEY_s:
@@ -265,7 +265,7 @@ tree_view_get_cell_from_pos(GtkTreeView *view, guint x, guint y,
     return FALSE; /* nu am găsit nici un candidat */
   }
 	
-  /* găsește celula potrivită din coloana respectivă */
+  /* găsește celula potrivită în coloana respectivă */
   n_linii = gtk_tree_model_iter_n_children(gtk_tree_view_get_model(view), NULL);
   cells = gtk_tree_view_column_get_cell_renderers(col);
   GtkCellRenderer *checkcell = (GtkCellRenderer*)cells->data;
@@ -289,7 +289,7 @@ tree_view_get_cell_from_pos(GtkTreeView *view, guint x, guint y,
   }
 
   g_list_free(cells);
-  return FALSE; /* not found */
+  return FALSE; /* nu s-a găsit */
 }
 
 static void 
@@ -306,7 +306,7 @@ laEditareCelula(GtkCellRendererText *renderer, gchar *path, gchar *new_text, Gtk
     return;
   }
   
-  /* aplicăm o mică corecție */
+  /* aplică o mică corecție */
   g_sprintf(hexIntermediar, "%s%s", (strlen(new_text) == 1 ? "0" : ""), new_text);
   
   trModel = gtk_tree_view_get_model(tv);
