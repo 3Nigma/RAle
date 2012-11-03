@@ -12,6 +12,11 @@
 
 #include <glib/gprintf.h>
 
+#ifdef G_OS_WIN32
+  #include <windows.h>
+#endif
+
+#include "os.h"
 #include "al.h"
 
 struct mcu{
@@ -30,20 +35,18 @@ static gchar *pune_eeprom_in_fis_temporar(GtkListStore *lm);
 
 gboolean 
 al_este_placuta_conectata() {
-  int avrdudeRet = 0;
   gchar *cDir = g_get_current_dir();
-  gchar com[255];
+  gchar avrDudeCom[1024];
   
   if(NULL != cDir) {
 #ifdef G_OS_WIN32
-  g_sprintf(com, "%s\\avrdude.exe -c usbtiny -p t25 -V", cDir);
-  g_print("%s", com);
-  avrdudeRet = system(com);
-  
-  return avrdudeRet == 0;
+  g_sprintf(avrDudeCom, "\"%s\\avrdude.exe\" -c usbtiny -p t25 -V", cDir);
+
+  return os_win_executa_com_fara_redirectionari(avrDudeCom) == 0;
 #elif defined G_OS_UNIX
-  g_sprintf(com, "sudo %s/avrdude -c usbtiny -p t25 -V 2> /dev/null", cDir);
-  avrdudeRet = system(com);
+  int avrdudeRet = 0;
+  g_sprintf(avrDudeCom, "sudo %s/avrdude -c usbtiny -p t25 -V 2> /dev/null", cDir);
+  avrdudeRet = system(avrDudeCom);
   
   if(WIFEXITED(avrdudeRet))
     return WEXITSTATUS(avrdudeRet) == 0;
@@ -56,28 +59,19 @@ al_este_placuta_conectata() {
 
 gboolean 
 al_scrie_aplicatie(const gchar *caleFisHex) {
-  int avrdudeRet = 0;
   gchar *cDir = g_get_current_dir();
-  gchar com[255];
+  gchar avrDudeCom[1024];
   
   if(NULL != cDir) {
 #ifdef G_OS_WIN32
-  g_sprintf(com, "%s\\avrdude.exe -c usbtiny -p t25 -U flash:w:%s", cDir, caleFisHex);
-  g_print("%s", com);
-  avrdudeRet = system(com);
-  
-  return avrdudeRet == 0;
+    g_sprintf(avrDudeCom, "\"%s\\avrdude.exe\" -c usbtiny -p t25 -U flash:w:\"%s\":i", cDir, caleFisHex);
 #elif defined G_OS_UNIX
-  g_sprintf(com, "sudo %s/avrdude -c usbtiny -p t25 -U flash:w:%s 2> /dev/null", cDir, caleFisHex);
-  avrdudeRet = system(com);
-  
-  if(WIFEXITED(avrdudeRet))
-    return WEXITSTATUS(avrdudeRet) == 0;
+    g_sprintf(avrDudeCom, "sudo \"%s/avrdude\" -c usbtiny -p t25 -U flash:w:\"%s\":i 2> /dev/null", cDir, caleFisHex);
 #endif
     g_free(cDir);
   }
   
-  return FALSE;
+  return os_system(avrDudeCom) == 0;
 }
 
 void

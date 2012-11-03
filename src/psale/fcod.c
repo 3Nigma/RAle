@@ -21,9 +21,10 @@
 #include <gtksourceview/gtksourcestyleschememanager.h>
 
 #ifdef G_OS_WIN32
-#include <windows.h>
+  #include <windows.h>
 #endif
 
+#include "os.h"
 #include "al.h"
 #include "db.h"
 #include "feeprom.h"
@@ -214,75 +215,73 @@ static void
 btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   /* Acțiunile ce trebuie realizate pentru trimiterea de cod spre plăcuță sunt următoarele :
      avr-gcc -Os -Wall -mmcu=attiny25 main.s -o main.o
-     avr-objcopy -j .text -O ihex main.o main.hex */
-  char denFisSursa[L_tmpnam + 5];
+     avr-objcopy -j .text -O ihex main.o main.hex 
+	 + scrierea prin avrdude */
+  /* depozitează sursa curentă într-un fișier temporar pentru a putea fi procesat mai departe */
+  char denFisSursa[1024];
   FILE *fs = NULL;
   gchar *codPrezent = NULL;
-
-  /* depozitează sursa curentă într-un fișier temporar pentru a putea fi procesat mai departe */
-  sprintf(denFisSursa, "%s%s", tmpnam(NULL), fc->lmFolosit == C ? ".c" : ".s");
+  gchar locatieTempFisSursa[1024];
+  
+  os_obtine_nume_fis_temporar(locatieTempFisSursa, sizeof(locatieTempFisSursa)/(sizeof(gchar)));
+  sprintf(denFisSursa, "%s%s", locatieTempFisSursa, fc->lmFolosit == C ? ".c" : ".s");
   fs = fopen(denFisSursa, "w");
   codPrezent = obtine_codul_sursa_curent(GTK_TEXT_VIEW(fc->txtVizCod));
   fwrite(codPrezent, sizeof(gchar), strlen(codPrezent), fs);
   fclose(fs);
 
-  gchar textComandaGcc[256];
-  gchar textComandaObjcopy[256];
+  /* alocăm variabile necesare pentru execuția celorlalte tool-uri */
+  gchar textComandaGcc[1024];
+  gchar textComandaObjcopy[1024];
   BaraInfoCod *bInfoFormularCurent;
-  char denObiectRezultat[L_tmpnam];
-  char denHexRezultat[L_tmpnam];
-
-  tmpnam(denObiectRezultat);
-  tmpnam(denHexRezultat);
+  char denObiectRezultat[1024];
+  char denHexRezultat[1024];
+  
+  /* generăm fișierele temporale necesare */
+  os_obtine_nume_fis_temporar(denObiectRezultat, sizeof(denObiectRezultat)/(sizeof(gchar)));
+  os_obtine_nume_fis_temporar(denHexRezultat, sizeof(denHexRezultat)/(sizeof(gchar)));
   bInfoFormularCurent = &fc->bInfo;
   
 #ifdef G_OS_WIN32
-  g_sprintf(textComandaGcc, "-Os -Wall -mmcu=attiny25 %s -o %s", denFisSursa, denObiectRezultat);
-  g_sprintf(textComandaObjcopy, "-j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
- 
-  ShellExecute(NULL, "open", "winavr/bin/avr-gcc.exe", textComandaGcc, NULL, SW_SHOWNORMAL);
-  ShellExecute(NULL, "open", "winavr/bin/avr-objcopy.exe", textComandaObjcopy, NULL, SW_SHOWNORMAL);
+  gchar *cDir = g_get_current_dir();
+  
+  g_sprintf(textComandaGcc, "%s\\winavr\\bin\\avr-gcc.exe -Os -Wall -mmcu=attiny25 \"%s\" -o \"%s\"", cDir, denFisSursa, denObiectRezultat);
+  g_sprintf(textComandaObjcopy, "%s\\winavr\\bin\\avr-objcopy.exe -j .text -O ihex \"%s\" \"%s\"", cDir, denObiectRezultat, denHexRezultat);
+
+  g_free(cDir);
 #elif defined G_OS_UNIX
   /* Construiește instrucțiunile ce vor fi executate pe cod, prin sistemul de operare.
    * Redirecționarea de tip stderr > stdout ('2>&1') se realizează pentru a ajuta funcția popen care nu știe 
    * să lucreze decât cu stdout!*/
-  g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 %s -o %s 2>&1", denFisSursa, denObiectRezultat);
-  g_sprintf(textComandaObjcopy, "avr-objcopy -j .text -O ihex %s %s", denObiectRezultat, denHexRezultat);
+  g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 \"%s\" -o \"%s\" 2>&1", denFisSursa, denObiectRezultat);
+  g_sprintf(textComandaObjcopy, "avr-objcopy -j .text -O ihex \"%s\" \"%s\"", denObiectRezultat, denHexRezultat);
+#endif
+  /* încearcă să compilezi sursa curentă trecând-o prin 'avr-gcc' și interpretând eventualele erori în bara de stare a formularului curent */
+  if(os_executa_si_completeaza_bic_fc(textComandaGcc, bInfoFormularCurent)) {
+    /* Compilarea a reușit. Încearcă o extragere a secțiunilor necesare pentru programator și construiește HEX-ul */
+    os_system(textComandaObjcopy);
+    bic_ascunde(bInfoFormularCurent);
   
-  /* încearcă să compilezi sursa curentă */
-  FILE *fGCCOut = NULL;
-  char lineBuff[4096];
-  
-  if((fGCCOut = popen(textComandaGcc, "r")) == NULL) {
-	  /* TODO: s-a întâmplat ceva cu execuția compilatorului */
-  } else {
-	bic_text_initializeaza(bInfoFormularCurent);
-	while(fgets(lineBuff, 4096, fGCCOut) != NULL) {
-      bic_text_adauga_linie(bInfoFormularCurent, lineBuff);
-    }
-	pclose(fGCCOut);
-	
-	/* încearcă extragerea secțiunilor necesare pentru programator */
-	if(bic_text_contine_informatii_utile(bInfoFormularCurent) == FALSE) {
-      /* totul este bine, mergi mai departe cu compilarea */
-      system(textComandaObjcopy);
-      bic_ascunde(bInfoFormularCurent);
+    /* verifică conexiunea cu plăcuța și trimite codul rezultat doar dacă aceasta este vizibilă */
+    if(al_este_placuta_conectata()) {
+      if(!al_scrie_aplicatie(denHexRezultat)) {
+	    g_debug("Nu am putut trimite aplicația spre plăcuță!");
+	  }
     } else {
-	  /* au existat mesaje din partea compilatorului. Afișează-le, dar nu mergi mai departe cu compilarea! */
+      /* asigură-te că, întradevăr, formularele de cod deschise știu că plăcuța nu este conectată */
+      if(fc->laDepistare_neprezentaPlacuta_recurenta != NULL) fc->laDepistare_neprezentaPlacuta_recurenta();
+    }
+  
+    /* realizează o curățare generală a fișierelor implicate în proces */
+    remove(denFisSursa);
+    remove(denObiectRezultat);
+    remove(denHexRezultat);
+  } else {
+    /* există erori în codul utilizatorului. Afișează mesajele culese prin bara de stare (dacă acestea există) */
+	if(bic_text_contine_informatii_utile(bInfoFormularCurent)) {
 	  bic_arata(bInfoFormularCurent);
 	}
   }
-#endif
-
-  if(al_este_placuta_conectata()) {
-    al_scrie_aplicatie(denHexRezultat);
-  } else {
-    if(fc->laDepistare_neprezentaPlacuta_recurenta != NULL) fc->laDepistare_neprezentaPlacuta_recurenta();
-  }
-  
-  remove(denFisSursa);
-  remove(denObiectRezultat);
-  remove(denHexRezultat);
 }
 
 static void 
