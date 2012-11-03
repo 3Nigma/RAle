@@ -25,4 +25,7 @@ os_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta);
 extern void 
 os_obtine_nume_fis_temporar(gchar *buff, gint buffLen);
 
+extern gchar * 
+os_obtine_cod_mcu_prezent(gchar *comanda);
+
 #endif

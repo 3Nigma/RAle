@@ -79,7 +79,6 @@ al_citeste_eeprom(GtkListStore *lm) {
   gchar *cDir = g_get_current_dir();
   gchar com[255];
   char hexRezultat[L_tmpnam];
-  int avrdudeRet = 0;
   gint indexMCUPrezent = -1;
   gint nrRanduriInViz = 0;
   gint cnt = 0;
@@ -91,21 +90,18 @@ al_citeste_eeprom(GtkListStore *lm) {
   if(NULL != cDir) {
     indexMCUPrezent = al_obtine_index_mcu();
     if(-1 == indexMCUPrezent) {
-	   /* TODO: nu este bun microcontrollerul. Stop! */
+	   g_warning("Nu recunosc microcontrollerul atașat! Nu pot continua ...");
 	   return;
 	}
 	 
     tmpnam(hexRezultat);
 #ifdef G_OS_WIN32
-    g_sprintf(com, "%s\\avrdude.exe -c usbtiny -p %s -U eeprom:r:%s:h", cDir, mcus[indexMCUPrezent].avrdudePart, hexRezultat);
-    system(com);
-    /* TODO: adaugă și la windows captura de consolă */
+    g_sprintf(com, "\"%s\\avrdude.exe\" -c usbtiny -p %s -U eeprom:r:\"%s\":h", cDir, mcus[indexMCUPrezent].avrdudePart, hexRezultat);
 #elif defined G_OS_UNIX
-    g_sprintf(com, "sudo %s/avrdude -c usbtiny -p %s -U eeprom:r:%s:h 2>/dev/null", cDir, mcus[indexMCUPrezent].avrdudePart, hexRezultat);
-    avrdudeRet = system(com);
-  
-    if(WIFEXITED(avrdudeRet) && WEXITSTATUS(avrdudeRet) == 0) {
-      /* avem memoria în fișierul 'hexRezultat'.
+    g_sprintf(com, "sudo \"%s/avrdude\" -c usbtiny -p %s -U eeprom:r:\"%s\":h 2>/dev/null", cDir, mcus[indexMCUPrezent].avrdudePart, hexRezultat);
+#endif
+    if(os_system(com) == 0) {
+	  /* avem memoria în fișierul 'hexRezultat'.
        * O citim, procesăm și indexăm. */
        fMem = fopen(hexRezultat, "r");
 	   nrRanduriInViz = mcus[indexMCUPrezent].eepromMemSize / 16;
@@ -138,9 +134,8 @@ al_citeste_eeprom(GtkListStore *lm) {
 	   fclose(fMem);
 	   remove(hexRezultat);
     } else {
-      /* TODO: buba s-a întâmplat! */
+      g_warning("Nu am putut obține memoria EEPROM pentru că nu am putut executa aplicația 'avrdude'!");
     }
-#endif
     g_free(cDir);
   }
 }
@@ -155,19 +150,19 @@ al_scrie_eeprom(GtkListStore *lm) {
   if(NULL != cDir) {
     indexMCUPrezent = al_obtine_index_mcu();
     if(-1 == indexMCUPrezent) {
-	   /* TODO: nu este bun microcontrollerul. Stop! */
-	   return;
+	  g_warning("Nu recunosc microcontrollerul atașat! Nu pot continua ...");
+	  return;
 	}
 	
     fisTempHex = pune_eeprom_in_fis_temporar(lm);
   
-    /* trimitem memoria rezultată spre plăcuță */
 #ifdef G_OS_WIN32
-    g_sprintf(com, "%s\\avrdude.exe -c usbtiny -p %s -U eeprom:w:%s:r", cDir, mcus[indexMCUPrezent].avrdudePart, fisTempHex);
+    g_sprintf(com, "\"%s\\avrdude.exe\" -c usbtiny -p %s -U eeprom:w:\"%s\":r", cDir, mcus[indexMCUPrezent].avrdudePart, fisTempHex);
 #elif defined G_OS_UNIX
-    g_sprintf(com, "sudo %s/avrdude -c usbtiny -p %s -U eeprom:w:%s:r 2>/dev/null", cDir, mcus[indexMCUPrezent].avrdudePart, fisTempHex);
+    g_sprintf(com, "sudo \"%s/avrdude\" -c usbtiny -p %s -U eeprom:w:\"%s\":r 2>/dev/null", cDir, mcus[indexMCUPrezent].avrdudePart, fisTempHex);
 #endif
-    system(com);
+    /* trimitem memoria rezultată spre plăcuță */
+    os_system(com);
   }
   
   remove(fisTempHex);
@@ -219,39 +214,16 @@ static gint
 al_obtine_index_mcu() {
   gint cnt = 0;
   gchar *cDir = g_get_current_dir();
-  gchar com[255];
+  gchar comAvrDude[255];
   gint indexMcu = -1;
-  gchar semnCompCitita[10];
+  gchar *semnCompCitita = NULL;
   
 #ifdef G_OS_WIN32
-  g_sprintf(com, "%s\\avrdude.exe -c usbtiny -p t25 -V 2>&1", cDir);
-  system(com);
-  /* TODO: adaugă și la windows captura de consolă */
+  g_sprintf(comAvrDude, "\"%s\\avrdude.exe\" -c usbtiny -p t25 -V 2>&1", cDir);
 #elif defined G_OS_UNIX
-  g_sprintf(com, "sudo %s/avrdude -c usbtiny -p t25 -V 2>&1", cDir);
-  
-  FILE *fConsoleOut = NULL;
-  char lineBuff[4096];
-  GRegex *tipar = NULL;
-  GMatchInfo *containerPotriviri = NULL;
-  
-  if((fConsoleOut = popen(com, "r")) == NULL) {
-	  /* TODO: s-a întâmplat ceva cu execuția aplicației */
-  } else {
-	tipar = g_regex_new("Device signature = ([\\w]+)", 0, 0, NULL);
-	while(fgets(lineBuff, 4096, fConsoleOut) != NULL) {
-      g_regex_match(tipar, lineBuff, 0, &containerPotriviri);
-      if(g_match_info_matches(containerPotriviri)) {
-		g_sprintf(semnCompCitita, "%s", g_match_info_fetch(containerPotriviri, 1));
-        break;
-      }
-    }
-    g_regex_unref(tipar);
-	g_match_info_free(containerPotriviri);
-	pclose(fConsoleOut);
-  }
+  g_sprintf(comAvrDude, "sudo \"%s/avrdude\" -c usbtiny -p t25 -V 2>&1", cDir);
 #endif
-
+  semnCompCitita = os_obtine_cod_mcu_prezent(comAvrDude);
   for(cnt = 0; cnt < sizeof(mcus)/sizeof(struct mcu); ++cnt) {
     if(g_strcmp0(mcus[cnt].devSignature, semnCompCitita) == 0) {
 	    indexMcu = cnt;
@@ -260,6 +232,7 @@ al_obtine_index_mcu() {
   }
   
   g_free(cDir);
+  g_free(semnCompCitita);
   
   return indexMcu;
 }

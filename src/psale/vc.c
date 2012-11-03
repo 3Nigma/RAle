@@ -100,7 +100,7 @@ pdfviz_mouse_misc_event(GtkWidget *widget, GdkEventMotion *e, VizualizatorCartul
     }
     
     if(actiuneGasita == FALSE && NULL != vc->actiune_salt_proxim) {
-      /* regiunea prosimă a fost părăsită, resetăm cursorul șoricelului */
+      /* regiunea proximă a fost părăsită, resetăm cursorul șoricelului */
       vc->actiune_salt_proxim = NULL;
       reseteazaIndicatorSoricel(vc);
     }

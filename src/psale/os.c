@@ -71,10 +71,12 @@ os_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta) {
   DWORD nrOctetiCititi; 
   SECURITY_ATTRIBUTES securityAttributes;
   
+  /* construim structura de siguran?ã a pipe-ului */
   securityAttributes.nLength = sizeof(SECURITY_ATTRIBUTES); 
   securityAttributes.bInheritHandle = TRUE; 
   securityAttributes.lpSecurityDescriptor = NULL;
    
+  /* construim efectiv pipe-ul */
   CreatePipe(&avrGccOuput[0], &avrGccOuput[1], &securityAttributes, 0); 
   
   if(os_win_executa_com(avrGccOuput[1], NULL, avrGccOuput[1], comanda) != 0) {
@@ -138,5 +140,75 @@ os_obtine_nume_fis_temporar(gchar *buff, gint buffLen) {
 #elif defined G_OS_UNIX
   g_sprintf(buff, "%s", tmpnam(NULL));
 #endif
-  g_debug("Temp. file created : '%s'\n", buff);
+  g_debug("Am creeat fi?ierul temporal '%s'", buff);
+}
+
+extern gchar * 
+os_obtine_cod_mcu_prezent(gchar *comanda) {
+  gchar *codMCUGasit = NULL;
+  char lineBuff[4096];
+  GRegex *tipar = NULL;
+  GMatchInfo *containerPotriviri = NULL;
+  
+  tipar = g_regex_new("Device signature = ([\\w]+)", 0, 0, NULL);
+  codMCUGasit = g_new0(gchar, 10); 
+#ifdef G_OS_WIN32
+  gchar *linePt = lineBuff;
+  HANDLE avrGccOuput[2];  /* [0] = Read, [1] = Write */
+  DWORD nrOctetiCititi; 
+  SECURITY_ATTRIBUTES securityAttributes;
+  
+  /* construim structura de siguran?ã a pipe-ului */
+  securityAttributes.nLength = sizeof(SECURITY_ATTRIBUTES); 
+  securityAttributes.bInheritHandle = TRUE; 
+  securityAttributes.lpSecurityDescriptor = NULL;
+   
+  /* construim efectiv pipe-ul */
+  CreatePipe(&avrGccOuput[0], &avrGccOuput[1], &securityAttributes, 0); 
+  
+  if(os_win_executa_com(avrGccOuput[1], NULL, avrGccOuput[1], comanda) == 0) {
+    while(ReadFile(avrGccOuput[0], linePt, 1, &nrOctetiCititi, NULL)) {
+      if(nrOctetiCititi == 0) {
+	    break;
+	  }
+	  if(*linePt == '\r') {
+	    (*linePt) = '\0';
+		
+		/* s-a încãrcat o linie nouã. Aplicã tiparul ?i verificã dacã putem extrage informa?ia doritã (codul MCU-ului curent) */
+		g_regex_match(tipar, lineBuff, 0, &containerPotriviri);
+	    if(g_match_info_matches(containerPotriviri)) {
+		  g_sprintf(codMCUGasit, "%s", g_match_info_fetch(containerPotriviri, 1));
+          break;
+        }
+	    linePt = lineBuff;
+      } else {
+	    linePt ++;
+      }
+    }
+    CloseHandle(avrGccOuput[0]);
+    CloseHandle(avrGccOuput[1]);
+  } else {
+    g_warning("S-a ivit o problemã la invocarea lui 'avrdude' : '%s'! Ac?iunea a fost anulatã ...", comanda);
+  }
+#elif defined G_OS_UNIX
+  FILE *fConsoleOut = NULL;
+
+  if((fConsoleOut = popen(com, "r")) == NULL) {
+	g_warning("S-a ivit o problemã la invocarea lui 'avrdude' : '%s'! Ac?iunea a fost anulatã ...", comanda);
+  } else {
+	while(fgets(lineBuff, 4096, fConsoleOut) != NULL) {
+      g_regex_match(tipar, lineBuff, 0, &containerPotriviri);
+      if(g_match_info_matches(containerPotriviri)) {
+		g_sprintf(codMCUGasit, "%s", g_match_info_fetch(containerPotriviri, 1));
+        break;
+      }
+    }
+	pclose(fConsoleOut);
+  }
+#endif
+
+  g_regex_unref(tipar);
+  g_match_info_free(containerPotriviri);
+  
+  return codMCUGasit;
 }

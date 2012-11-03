@@ -51,14 +51,18 @@ fme_initializeaza(GtkWindow *parinte) {
   
   /* creează formularul principal */
   fe->frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(fe->frm), "Acțiuni ale memoriei speciale");
+  gtk_window_set_title(GTK_WINDOW(fe->frm), "psAle ~ Acțiuni ale memoriei speciale");
   gtk_window_set_transient_for(GTK_WINDOW(fe->frm), parinte);
   gtk_window_set_position(GTK_WINDOW(fe->frm), GTK_WIN_POS_CENTER_ON_PARENT);
   zonaGenerala = gtk_vbox_new(FALSE, 3);
   
   /* creează tabelul de valori a memoriei speciale */
   fe->tvEEPROM = construieste_vizualizator_memorie();
+#ifdef G_OS_WIN32
+  gtk_widget_set_size_request(fe->tvEEPROM, 418, 250);
+#elif defined G_OS_UNIX
   gtk_widget_set_size_request(fe->tvEEPROM, 455, 250);
+#endif
   gtk_box_pack_start(GTK_BOX(zonaGenerala), fe->tvEEPROM, TRUE, TRUE, 0);
   gtk_box_pack_start(GTK_BOX(zonaGenerala), gtk_hseparator_new(), FALSE, FALSE, 0);
   
@@ -185,10 +189,10 @@ laArataTooltip(GtkWidget  *widget,
  
   if(tree_view_get_cell_from_pos(GTK_TREE_VIEW(fe->tvEEPROM), relBinX, relBinY, &cellX, &cellY) == TRUE) {
 	if(cellX > 0 ) {
-      g_sprintf(ttText, "<b>%s</b>0x%03x\n<b>%s</b>%s\n<b>%s</b>%s", 
-                        "Adresă: ", cellY * 16 + cellX - 1, 
+      g_sprintf(ttText, "<b>%s</b>0x%03x"/*\n<b>%s</b>%s\n<b>%s</b>%s"*/, 
+                        "Adresă: ", cellY * 16 + cellX - 1/*, 
                         "Val. zecimală: ", "DE COMPLETAT", 
-                        "Val. binară: ", "DE COMPLETAT");
+                        "Val. binară: ", "DE COMPLETAT"*/);
       gtk_tooltip_set_markup(indicatiiCelula, ttText);
       gtk_tree_view_set_tooltip_cell(GTK_TREE_VIEW(fe->tvEEPROM), indicatiiCelula, caleCelula, NULL, NULL);
     
@@ -266,7 +270,13 @@ tree_view_get_cell_from_pos(GtkTreeView *view, guint x, guint y,
   cells = gtk_tree_view_column_get_cell_renderers(col);
   GtkCellRenderer *checkcell = (GtkCellRenderer*)cells->data;
   gtk_cell_renderer_get_size(checkcell, GTK_WIDGET(view), NULL, NULL, NULL, &width, &height);
-  height += 3; /* TODO: <- ai grijă la valoarea asta. Nu știu de unde vine! */
+  /* Ai grijă la valoarea următoare. Nu știu de unde vine, dar este dependentă de sistemul de operare !!! */
+#ifdef G_OS_WIN32
+  height += 5;
+#elif defined G_OS_UNIX
+  height += 3;
+#endif
+  
   for (cnt = 0;  cnt < n_linii;  ++cnt) {
     if (y >= coly && y < (coly + height)) {
 	  (*celly) = internalCellY;
