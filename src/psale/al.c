@@ -41,20 +41,13 @@ al_este_placuta_conectata() {
   if(NULL != cDir) {
 #ifdef G_OS_WIN32
   g_sprintf(avrDudeCom, "\"%s\\avrdude.exe\" -c usbtiny -p t25 -V", cDir);
-
-  return os_win_executa_com_fara_redirectionari(avrDudeCom) == 0;
 #elif defined G_OS_UNIX
-  int avrdudeRet = 0;
-  g_sprintf(avrDudeCom, "sudo %s/avrdude -c usbtiny -p t25 -V 2> /dev/null", cDir);
-  avrdudeRet = system(avrDudeCom);
-  
-  if(WIFEXITED(avrdudeRet))
-    return WEXITSTATUS(avrdudeRet) == 0;
+  g_sprintf(avrDudeCom, "sudo \"%s/avrdude\" -c usbtiny -p t25 -V 2> /dev/null", cDir);
 #endif
     g_free(cDir);
   }
   
-  return FALSE;
+  return os_system(avrDudeCom) == 0;
 }
 
 gboolean 

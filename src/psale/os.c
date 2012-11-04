@@ -11,7 +11,9 @@
 #include "os.h"
 
 #include <glib/gprintf.h>
+#include <stdlib.h>
 
+#ifdef G_OS_WIN32
 DWORD 
 os_win_executa_com(HANDLE *hConsoleOutput, HANDLE *hConsoleInput, HANDLE *hConsoleError, gchar *command) {
   STARTUPINFO startupInfo;
@@ -51,6 +53,7 @@ DWORD
 os_win_executa_com_fara_redirectionari(gchar *command) {
   return os_win_executa_com(NULL, NULL, NULL, command);
 }
+#endif
 
 unsigned long 
 os_system(gchar *command) {
@@ -204,7 +207,7 @@ os_obtine_cod_mcu_prezent(gchar *comanda) {
 #elif defined G_OS_UNIX
   FILE *fConsoleOut = NULL;
 
-  if((fConsoleOut = popen(com, "r")) == NULL) {
+  if((fConsoleOut = popen(comanda, "r")) == NULL) {
 	g_warning("S-a ivit o problemă la invocarea lui 'avrdude' : '%s'! Acțiunea a fost anulată ...", comanda);
   } else {
 	while(fgets(lineBuff, 4096, fConsoleOut) != NULL) {
