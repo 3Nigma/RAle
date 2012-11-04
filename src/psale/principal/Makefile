@@ -6,23 +6,21 @@
 # COPYING file that resides in the same directory as this file does or send a letter to 
 # Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 
-PROJ_NAME := psale
-DIR_CONSTRUIT := .
-CC := gcc
+include ../Makefile.defs
+
 CFLAGS := -g -Wall `pkg-config --cflags gtk+-2.0 gtksourceview-2.0 sqlite3 poppler-glib`
 LDFLAGS := `pkg-config --libs gtk+-2.0 gtksourceview-2.0 sqlite3 libcurl poppler-glib`
 OBJS := fprin.o os.o db.o finfo.o feeprom.o fcod.o bic.o dl.o al.o vc.o
+TIPCONSTRUCTIE :=
 
 .c.o :
 	$(CC) $(CFLAGS) -c $< -o $@
 
 all : $(OBJS)
-	mkdir -p $(DIR_CONSTRUIT)
-	$(CC) $(CFLAGS) $(OBJS) main.c -o $(DIR_CONSTRUIT)/$(PROJ_NAME) $(LDFLAGS)
+	$(CC) $(TIPCONSTRUCTIE) $(CFLAGS) $(OBJS) main.c -o $(PRIN_BIN_NAME) $(LDFLAGS)
 
-win : $(OBJS)
-	mkdir -p $(DIR_CONSTRUIT)
-	$(CC) -mwindows $(CFLAGS) $(OBJS) main.c -o $(DIR_CONSTRUIT)/$(PROJ_NAME) $(LDFLAGS)
+win : TIPCONSTRUCTIE := -mwindows 
+win : all
 
 clean :
-	rm -f $(DIR_CONSTRUIT)/$(PROJ_NAME) $(OBJS) *~
+	rm -f $(PRIN_BIN_NAME) $(OBJS) *~
