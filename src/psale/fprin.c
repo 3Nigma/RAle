@@ -177,13 +177,14 @@ populeaza_cmbxExemple(GtkComboBox *cmbx, Limbaj lmb) {
   magazie = GTK_LIST_STORE(gtk_combo_box_get_model(cmbx));
   gtk_list_store_clear(magazie);
   gtk_list_store_append(magazie, &iter);
-  gtk_list_store_set(magazie, &iter, 0, "", 1, "Cod din cărțulie ...", -1);
   switch(lmb) {
   case C:
     db_incarca_exemple_carte(magazie, "c");
+    gtk_list_store_set(magazie, &iter, 0, "", 1, "Cod din cărțulie ....", -1);
     break;
   case ASM:
     db_incarca_exemple_carte(magazie, "s");
+    gtk_list_store_set(magazie, &iter, 0, "", 1, "Cod din cărțulie ...", -1);
     break;
   }
   gtk_combo_box_set_active(cmbx, 0);
@@ -313,7 +314,7 @@ fp_initializeaza_formular_principal() {
   /* inițializăm meniul de selecție pentru exemplele de cod din carte */
   cmbxCodCarte = creeaza_cmbxExemple();
   populeaza_cmbxExemple(GTK_COMBO_BOX(cmbxCodCarte), lmbCodExemple);
-  gtk_widget_set_tooltip_markup(cmbxCodCarte, "Navighează și deschide exemplele din cărțulie.");
+  gtk_widget_set_tooltip_markup(cmbxCodCarte, "Navighează și deschide exemplele din cărțulie.\nTaste scurte pentru a trece în celălalt limbaj [C/S]: <i>Ctrl + S</i>");
   gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), cmbxCodCarte);
 
   /* inițializăm butonul de citire a cărțuliei */
