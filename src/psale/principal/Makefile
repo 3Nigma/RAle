@@ -7,7 +7,7 @@
 # Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 
 PROJ_NAME := psale
-DIR_CONSTRUIT := ./construit
+DIR_CONSTRUIT := .
 CC := gcc
 CFLAGS := -g -Wall `pkg-config --cflags gtk+-2.0 gtksourceview-2.0 sqlite3 poppler-glib`
 LDFLAGS := `pkg-config --libs gtk+-2.0 gtksourceview-2.0 sqlite3 libcurl poppler-glib`
