@@ -216,6 +216,9 @@ dl_descarca_fisier(const char *adresa, FILE *fisTinta) {
     curl_easy_setopt(legatura, CURLOPT_URL, adresa);
     curl_easy_setopt(legatura, CURLOPT_ERRORBUFFER, errBuff);
     
+    curl_easy_setopt(legatura, CURLOPT_SSL_VERIFYPEER, TRUE); 
+    curl_easy_setopt(legatura, CURLOPT_CAINFO, "cacert.pem");
+    
     curl_easy_setopt(legatura, CURLOPT_WRITEFUNCTION, citeste_date_actualizare_recurent);
     curl_easy_setopt(legatura, CURLOPT_WRITEDATA, fisTinta);
     
