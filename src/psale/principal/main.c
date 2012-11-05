@@ -10,7 +10,6 @@
 
 #include <gtk/gtk.h>
 
-#include "dl.h"
 #include "fprin.h"
 
 int main(int argc, char *argv[]) {
@@ -23,7 +22,6 @@ int main(int argc, char *argv[]) {
   
   gtk_main();
   fp_curata(fprin);
-  dl_curata();
 
   return 0;
 }

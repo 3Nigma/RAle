@@ -94,17 +94,3 @@ db_obtine_cod_complet(const gchar *titluLung, const gchar *limbajDorit) {
   return (const char *)sqlite3_value_text(rez);
 }
 
-const char *
-db_obtine_adresa_actualizare() {
-  sqlite3_value *rez = bd_obtine_rezultat_unic(PSALE_BD_NUME_FIS, "select LinkReinoire FROM meta", 0);
-
-  return (const char *)sqlite3_value_text(rez);
-}
-
-int 
-db_obtine_versiune_curenta() {
-  sqlite3_value *rez = bd_obtine_rezultat_unic(PSALE_BD_NUME_FIS, "select VersBDActuala FROM meta", 0);
-
-  return sqlite3_value_int(rez);
-}
-

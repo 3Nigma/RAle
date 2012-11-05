@@ -21,10 +21,4 @@ db_incarca_exemple_carte(GtkListStore *st, const gchar *limbajDorit);
 extern const char *
 db_obtine_cod_complet(const gchar *titluLung, const gchar *limbajDorit);
 
-extern const char *
-db_obtine_adresa_actualizare();
-
-extern int 
-db_obtine_versiune_curenta();
-
 #endif
