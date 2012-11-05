@@ -64,10 +64,11 @@ int main(int argc, char *argv[]) {
 	  frmPrimaIntrebare = gtk_message_dialog_new_with_markup(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, 
                                                   GTK_BUTTONS_NONE, "Având în vedere că aceasta este prima dată când deschideți aplicația,\n\n"
                                                 "<b>cum doriți să se realizeze actualizările ?</b>\n\n"
-                                                "<i> > <b>În mod automat</b>: de fiecare dată când deschideți programul,\n"
+                                                "<i> > <b>În mod automat</b>: la fiecare pornire a aplicației,\n"
                                                 " > <b>Manual</b>: prin butonul de pe formularul de informații, sau\n"
                                                 " > <b>Răspund mai târziu</b>: mă mai gândesc.</i>");
 	  gtk_window_set_title(GTK_WINDOW(frmPrimaIntrebare), "Întrebare");
+	  gtk_window_set_position(GTK_WINDOW(frmPrimaIntrebare), GTK_WIN_POS_CENTER);
 	  gtk_dialog_add_buttons(GTK_DIALOG(frmPrimaIntrebare), "Răspund mai târziu", RPS_PRIMA_INTREB_RASPUNS_MAI_TARZIU,
 													  "Actualizează manual", RPS_PRIMA_INTREB_RASPUNS_MANUAL,
 													  "Actualizează automat", RPS_PRIMA_INTREB_RASPUNS_AUTOMAT,
@@ -103,7 +104,17 @@ int main(int argc, char *argv[]) {
 static void 
 lanseazaPSAle() {
 #ifdef G_OS_WIN32
-  /* TODO: de completat și pentru sistemul acesta de operare */
+  STARTUPINFO startupInfo;
+  PROCESS_INFORMATION processInformation;
+
+  ZeroMemory(&startupInfo, sizeof(startupInfo));
+  ZeroMemory(&processInformation, sizeof(processInformation));
+
+  startupInfo.cb = sizeof(startupInfo);	
+
+  if(!CreateProcess(NULL, RPS_CALE_PSALE, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation)) {
+    g_error("Nu am putut porni aplicația 'psAle'!");
+  }
 #elif defined G_OS_UNIX
   pid_t IdProcCopil;
   
