@@ -14,6 +14,9 @@
 
 #include "db.h"
 
+static gboolean db_executa_comanda(const char *comanda);
+static sqlite3_stmt *db_aplica_afirmatie(const char *com);
+
 static sqlite3 *db = NULL;
 
 gboolean 
@@ -32,22 +35,6 @@ db_curata() {
   g_assert(NULL != db);
   
   sqlite3_close(db);
-}
-
-static sqlite3_stmt *
-db_aplica_afirmatie(const char *com) {
-  g_assert(NULL != db);
-
-  sqlite3_stmt *af = NULL;
-  
-  if(sqlite3_prepare_v2(db, com, -1, &af, NULL) != SQLITE_OK ||
-     sqlite3_step(af) != SQLITE_ROW) {
-    g_warning("Nu pot pregăti baza de date : %s\n", sqlite3_errmsg(db));
-    sqlite3_close(db);
-    return NULL;
-  }
-  
-  return af;
 }
 
 const char *
@@ -94,4 +81,64 @@ db_obtine_este_prima_rulare() {
   }
   
   return rezInterogare;
+}
+
+gboolean 
+db_consuma_prima_rulare() {
+  return db_executa_comanda("update " TB_NUME_TABEL_META " set EstePrimaRulare=0");
+}
+
+gboolean 
+db_obtine_este_actualizare_automata() {
+  double rezInterogare = TRUE;
+  
+  sqlite3_stmt *af = NULL;
+  sqlite3_value *rez = NULL;
+
+  if((af = db_aplica_afirmatie("select ActualizariAutomate FROM " TB_NUME_TABEL_META)) != NULL) {
+    rez = sqlite3_column_value(af, 0);
+    rezInterogare = (sqlite3_value_int(rez) == 1);
+    sqlite3_finalize(af);
+  }
+  
+  return rezInterogare;
+}
+
+gboolean
+db_seteaza_actualizare_automata() {
+  return db_executa_comanda("update " TB_NUME_TABEL_META " set ActualizariAutomate=1");
+}
+
+gboolean
+db_seteaza_actualizare_manuala() {
+  return db_executa_comanda("update " TB_NUME_TABEL_META " set ActualizariAutomate=0");
+}
+
+static gboolean 
+db_executa_comanda(const char *comanda) {
+  char *zErrMsg = NULL;
+
+  if(sqlite3_exec(db, comanda, NULL, NULL, &zErrMsg) != SQLITE_OK) {
+    g_warning("Eroare la executarea comenzii pe BD : %s\n", zErrMsg);
+    sqlite3_free(zErrMsg);
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static sqlite3_stmt *
+db_aplica_afirmatie(const char *com) {
+  g_assert(NULL != db);
+
+  sqlite3_stmt *af = NULL;
+  
+  if(sqlite3_prepare_v2(db, com, -1, &af, NULL) != SQLITE_OK ||
+     sqlite3_step(af) != SQLITE_ROW) {
+    g_warning("Nu pot pregăti baza de date : %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return NULL;
+  }
+  
+  return af;
 }

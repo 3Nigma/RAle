@@ -32,4 +32,16 @@ db_obtine_versiune_curenta();
 extern gboolean 
 db_obtine_este_prima_rulare();
 
+extern gboolean
+db_consuma_prima_rulare();
+
+extern gboolean 
+db_obtine_este_actualizare_automata();
+
+extern gboolean
+db_seteaza_actualizare_automata();
+
+extern gboolean
+db_seteaza_actualizare_manuala();
+
 #endif
