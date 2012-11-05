@@ -10,7 +10,7 @@
 
 #include "feeprom.h"
 
-#include "db.h"
+#include "fl.h"
 
 #include <gdk/gdkkeysyms.h>
 #include <glib/gprintf.h>
@@ -74,8 +74,9 @@ fme_initializeaza(GtkWindow *parinte) {
   btCitesteMem = gtk_button_new_with_label("Citește EEPROM");
   gtk_button_set_relief(GTK_BUTTON(btCitesteMem), GTK_RELIEF_HALF);
   gtk_widget_set_tooltip_markup(btCitesteMem, "Citește starea curentă a memoriei speciale.\nTaste scurte: <i>Ctrl + C</i>");
-  GdkPixbuf *imgCitesteMemPixBuf = db_obtine_imagine_media_scalata(DB_IMG_CITESTE_EEPROM, 16, 16);
+  GdkPixbuf *imgCitesteMemPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FEEPROM_CITESTE, 16, 16);
   GtkWidget *imgCitesteMem = gtk_image_new_from_pixbuf(imgCitesteMemPixBuf);
+  g_object_unref(imgCitesteMemPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btCitesteMem), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btCitesteMem), imgCitesteMem);
   gtk_box_pack_start(GTK_BOX(zonaButoane), btCitesteMem, FALSE, FALSE, 0);
@@ -83,8 +84,9 @@ fme_initializeaza(GtkWindow *parinte) {
   btScrieMem = gtk_button_new_with_label("Scrie EEPROM");
   gtk_button_set_relief(GTK_BUTTON(btScrieMem), GTK_RELIEF_HALF);
   gtk_widget_set_tooltip_markup(btScrieMem, "Scrie memoria specială cu valorile dorite.\nTaste scurte: <i>Ctrl + S</i>");
-  GdkPixbuf *imgbtScrieMemPixBuf = db_obtine_imagine_media_scalata(DB_IMG_SCRIE_EEPROM, 16, 16);
+  GdkPixbuf *imgbtScrieMemPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FEEPROM_SCRIE, 16, 16);
   GtkWidget *imgbtScrieMem = gtk_image_new_from_pixbuf(imgbtScrieMemPixBuf);
+  g_object_unref(imgbtScrieMemPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btScrieMem), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btScrieMem), imgbtScrieMem);
   gtk_box_pack_start(GTK_BOX(zonaButoane), btScrieMem, FALSE, FALSE, 0);
@@ -92,8 +94,9 @@ fme_initializeaza(GtkWindow *parinte) {
   btParasesteFrm = gtk_button_new_with_label("Închide formular");
   gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
   gtk_widget_set_tooltip_markup(btParasesteFrm, "Închide formularul curent.\nTastă scurta: <i>Esc</i>");
-  GdkPixbuf *imgParasesteFrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PARASESTE_EEPROM, 16, 16);
+  GdkPixbuf *imgParasesteFrmPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FEEPROM_PARASESTE, 16, 16);
   GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(imgParasesteFrmPixBuf);
+  g_object_unref(imgParasesteFrmPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btParasesteFrm), GTK_POS_RIGHT);
   gtk_button_set_image(GTK_BUTTON(btParasesteFrm), imgParasesteFrm);
   gtk_box_pack_start(GTK_BOX(zonaButoane), btParasesteFrm, FALSE, FALSE, 0);

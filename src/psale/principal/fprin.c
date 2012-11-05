@@ -19,6 +19,7 @@
   #include <windows.h>
 #endif
 
+#include "fl.h"
 #include "db.h"
 #include "al.h"
 #include "vc.h"
@@ -293,7 +294,7 @@ fp_initializeaza_formular_principal() {
   gtk_container_add(GTK_CONTAINER(frm), cadruFormPrincipal);
 
   /* inițializăm logoul aplicației */
-  imgLogo = gtk_image_new_from_pixbuf(db_obtine_imagine_media_scalata(DB_IMG_TUSCALE_LOGO, -1, -1));
+  imgLogo = gtk_image_new_from_pixbuf(fl_obtine_imagine_media_scalata(FL_IMG_TUSCALE_LOGO, -1, -1));
 
   /* inițializăm cadrul pentru logoul aplicației */
   cadruImgLogo = gtk_event_box_new();

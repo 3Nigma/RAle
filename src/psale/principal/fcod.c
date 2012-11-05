@@ -25,6 +25,7 @@
 #endif
 
 #include "os.h"
+#include "fl.h"
 #include "al.h"
 #include "db.h"
 #include "feeprom.h"
@@ -478,13 +479,13 @@ btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
   case ASCUNSE:
     gtk_widget_set_tooltip_markup(fc->btExpandator, "Ascunde activitățile formularului.");
     gtk_widget_show(fc->cadruActiuni);
-    imgExpandatorPixBuf = db_obtine_imagine_media_scalata(DB_IMG_COLAPSEAZA, 20, 20);
+    imgExpandatorPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FCOD_COLAPSEAZA, 20, 20);
     fc->vActiuni = VIZIBILE;
     break;
   case VIZIBILE:
     gtk_widget_set_tooltip_markup(fc->btExpandator, "Arată activitățile disponibile.");
     gtk_widget_hide(fc->cadruActiuni);
-    imgExpandatorPixBuf = db_obtine_imagine_media_scalata(DB_IMG_EXPANDEAZA, 20, 20);
+    imgExpandatorPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FCOD_EXPANDEAZA, 20, 20);
     fc->vActiuni = ASCUNSE;
     break;
   }
@@ -597,8 +598,9 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   btGestioneazaActiuni = gtk_button_new();
   gtk_button_set_relief(GTK_BUTTON(btGestioneazaActiuni), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btGestioneazaActiuni), FALSE);
-  GdkPixbuf *imgExpandatorPixBuf = db_obtine_imagine_media_scalata(esteExemplu ? DB_IMG_COLAPSEAZA : DB_IMG_EXPANDEAZA, 20, 20);
+  GdkPixbuf *imgExpandatorPixBuf = fl_obtine_imagine_media_scalata(esteExemplu ? FL_IMG_FCOD_COLAPSEAZA : FL_IMG_FCOD_EXPANDEAZA, 20, 20);
   GtkWidget *imgExpandatorActiuni = gtk_image_new_from_pixbuf(imgExpandatorPixBuf);
+  g_object_unref(imgExpandatorPixBuf);
   gtk_button_set_image(GTK_BUTTON(btGestioneazaActiuni), imgExpandatorActiuni);
   gtk_table_attach(GTK_TABLE(cadruFrm), btGestioneazaActiuni, 1, 2, 0, 3, GTK_SHRINK, GTK_FILL, 0, 0);
 
@@ -607,8 +609,9 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_button_set_focus_on_click(GTK_BUTTON(btIncarcaPeAle), FALSE);
   gtk_widget_set_tooltip_markup(btIncarcaPeAle, "Construiește aplicația și împinge-o pe plăcuță.\nTaste scurte: <i>Ctrl + T</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btIncarcaPeAle), -1, 60);
-  GdkPixbuf *imgIncarcaPeAlePixBuf = db_obtine_imagine_media_scalata(DB_IMG_TRIMITE_LA_ALE, 16, 16);
+  GdkPixbuf *imgIncarcaPeAlePixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FCOD_TRIMITE_LA_ALE, 16, 16);
   GtkWidget *imgIncarcaPeAle = gtk_image_new_from_pixbuf(imgIncarcaPeAlePixBuf);
+  g_object_unref(imgIncarcaPeAlePixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btIncarcaPeAle), GTK_POS_RIGHT);
   gtk_button_set_image(GTK_BUTTON(btIncarcaPeAle), imgIncarcaPeAle);
 
@@ -619,9 +622,10 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
                                                   "Taste scurte: <i>Ctrl + D</i>\n"
                                                   "Comandă rapidă: <i>Ctrl + S</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btSalveazaLucrul), -1, 50);
-  GdkPixbuf *imgSalveazaLucrulPixBuf = db_obtine_imagine_media_scalata(DB_IMG_SALVEAZA_COD, 16, 16);
+  GdkPixbuf *imgSalveazaLucrulPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FCOD_SALVEAZA, 16, 16);
   GtkWidget *imgSalveazaLucrul = gtk_image_new_from_pixbuf(imgSalveazaLucrulPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btSalveazaLucrul), GTK_POS_LEFT);
+  g_object_unref(imgSalveazaLucrulPixBuf);
   gtk_button_set_image(GTK_BUTTON(btSalveazaLucrul), imgSalveazaLucrul);
 
   btReiaLucrul = gtk_button_new_with_label("Reia cod");
@@ -629,8 +633,9 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_button_set_focus_on_click(GTK_BUTTON(btReiaLucrul), FALSE);
   gtk_widget_set_tooltip_markup(btReiaLucrul, "Încarcă sursă din fișier extern.\nTaste scurte: <i>Ctrl + R</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btReiaLucrul), -1, 40);
-  GdkPixbuf *imgReiaLucrulPixBuf = db_obtine_imagine_media_scalata(DB_IMG_REIA_COD, 16, 16);
+  GdkPixbuf *imgReiaLucrulPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FCOD_REIA, 16, 16);
   GtkWidget *imgReiaLucrul = gtk_image_new_from_pixbuf(imgReiaLucrulPixBuf);
+  g_object_unref(imgReiaLucrulPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btReiaLucrul), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btReiaLucrul), imgReiaLucrul);
 
@@ -639,8 +644,9 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_button_set_focus_on_click(GTK_BUTTON(btEEPROM), FALSE);
   gtk_widget_set_tooltip_markup(btEEPROM, "Deschide formularul destinat memoriei speciale.\nTaste scurte: <i>Ctrl + E</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btEEPROM), -1, 35);
-  GdkPixbuf *imgEEPROMPixBuf = db_obtine_imagine_media_scalata(DB_IMG_EEPROM, 16, 16);
+  GdkPixbuf *imgEEPROMPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FCOD_EEPROM, 16, 16);
   GtkWidget *imgEEPROM = gtk_image_new_from_pixbuf(imgEEPROMPixBuf);
+  g_object_unref(imgEEPROMPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btEEPROM), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btEEPROM), imgEEPROM);
 
@@ -649,8 +655,9 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   gtk_button_set_focus_on_click(GTK_BUTTON(btParasesteFrm), FALSE);
   gtk_widget_set_tooltip_markup(btParasesteFrm, "Părăsește codul curent.\nTaste scurte: <i>Ctrl + P</i>");
   gtk_widget_set_size_request(GTK_WIDGET(btParasesteFrm), -1, 30);
-  GdkPixbuf *imgParasesteFrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PARASESTE, 16, 16);
+  GdkPixbuf *imgParasesteFrmPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FCOD_PARASESTE, 16, 16);
   GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(imgParasesteFrmPixBuf);
+  g_object_unref(imgParasesteFrmPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btParasesteFrm), GTK_POS_LEFT);
   gtk_button_set_image(GTK_BUTTON(btParasesteFrm), imgParasesteFrm);
 

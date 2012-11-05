@@ -11,6 +11,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <stdlib.h>
 
+#include "fl.h"
 #include "db.h"
 #include "dl.h"
 
@@ -18,7 +19,7 @@
 
 /* ATENȚIE: a nu se muta această incluziune în altă parte pentru că G_OS_WIN32 se definește în gtk/gtk.h care este inclus în 'finfo.h' */
 #if defined(G_OS_WIN32) && !defined(_WINDOWS_H)
-#include <windows.h>
+  #include <windows.h>
 #endif
 
 static void incarca_info_general(GtkWidget *cadruFrm);
@@ -32,7 +33,7 @@ finfo_initializeaza(GtkWindow *parinte) {
   GtkWidget *cadruFrm = NULL;
   GtkWidget *imgInfo = NULL;
   GtkWidget *btParasesteFrm = NULL;
-
+  
   /* inițializăm formularul de informații */
   frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(frm), "psAle ~ Despre aplicație ...");
@@ -53,7 +54,9 @@ finfo_initializeaza(GtkWindow *parinte) {
   incarca_info_general(cadruFrm);
 
   /* inițializăm imaginea de informație */
-  imgInfo = gtk_image_new_from_pixbuf(db_obtine_imagine_media_scalata(DB_IMG_INFO, -1, -1));
+  GdkPixbuf *pixInfoPictograma = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_INFO, -1, -1);
+  imgInfo = gtk_image_new_from_pixbuf(pixInfoPictograma);
+  g_object_unref(pixInfoPictograma);
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo, 0, 1, 0, 1);
 
   /* inițializăm butonul de părăsire a formularului */
@@ -62,10 +65,10 @@ finfo_initializeaza(GtkWindow *parinte) {
   gtk_button_set_focus_on_click(GTK_BUTTON(btParasesteFrm), FALSE);
   gtk_widget_set_tooltip_markup(btParasesteFrm, "Închide formularul de informații.\nTastă scurtă: <i>Esc</i>");
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), btParasesteFrm, 3, 4, 3, 4);
-  g_signal_connect_swapped(btParasesteFrm, "clicked", G_CALLBACK(btIesire_clicked), frm);
+  g_signal_connect(btParasesteFrm, "clicked", G_CALLBACK(btIesire_clicked), frm);
 
   /* atașează pictogramă la acțiunea de părăsire a formularului */
-  GdkPixbuf *imgParasesteFrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PARASESTE_INFO, 16, 16);
+  GdkPixbuf *imgParasesteFrmPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_PARASESTE, 16, 16);
   GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(imgParasesteFrmPixBuf);
   g_object_unref(imgParasesteFrmPixBuf);
   gtk_button_set_image_position(GTK_BUTTON(btParasesteFrm), GTK_POS_RIGHT);
@@ -136,7 +139,9 @@ incarca_info_general(GtkWidget *cadruFrm) {
 
   GtkWidget *lblValAutor = gtk_label_new(PSALE_NUME_AUTOR);
   GtkWidget *lblValVersiune = gtk_label_new(PSALE_VERSIUNE);
-  GtkWidget *imgLicenta = gtk_image_new_from_file("media/licenta.png");
+  GdkPixbuf *pixImgLicenta = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_LICENTA, -1, -1);
+  GtkWidget *imgLicenta = gtk_image_new_from_pixbuf(pixImgLicenta);
+  g_object_unref(pixImgLicenta);
   GtkWidget *cadruImgLicenta = gtk_event_box_new();
 
   gtk_misc_set_alignment(GTK_MISC(lblValAutor), 1.0f, 0.1f);

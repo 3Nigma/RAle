@@ -16,7 +16,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtkadjustment.h>
 
-#include "db.h"
+#include "fl.h"
 #include "vc.h"
 
 static void btUrmPag_clicked(GtkToolItem *tooleditcopy, VizualizatorCartulie *vc);
@@ -270,7 +270,7 @@ adauga_salturi_cuprins(VizualizatorCartulie *vc, cairo_t *cr) {
   gint wimg, himg;
   gint wpanza, hpanza;
   
-  imgCuprinsPixBuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, 24, 24);//db_obtine_imagine_media_scalata(DB_IMG_PAG_SALT_CUPRINS, 28, 28);
+  imgCuprinsPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FVIZC_PAG_SALT_CUPRINS, 28, 28);
   wimg = gdk_pixbuf_get_width(imgCuprinsPixBuf);
   himg = gdk_pixbuf_get_height(imgCuprinsPixBuf);
   supImgCuprins = cairo_image_surface_create_for_data(gdk_pixbuf_get_pixels(imgCuprinsPixBuf),
@@ -332,8 +332,9 @@ vc_initializeaza() {
   gtk_widget_set_tooltip_markup(btPrecPag, "Mergi la pagina precedentă.\nTastă scurtă: <i>Săgeată stânga</i>");
   gtk_button_set_relief(GTK_BUTTON(btPrecPag), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btPrecPag), FALSE);
-  GdkPixbuf *imgPagPrecPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PAG_PREC, 28, 28);
+  GdkPixbuf *imgPagPrecPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FVIZC_PAG_PREC, 28, 28);
   GtkWidget *imgPagPrec = gtk_image_new_from_pixbuf(imgPagPrecPixBuf);
+  g_object_unref(imgPagPrecPixBuf);
   gtk_button_set_image(GTK_BUTTON(btPrecPag), imgPagPrec);
   
   /* adaugă butonul de navigare la pagina următoare */
@@ -342,8 +343,9 @@ vc_initializeaza() {
   gtk_widget_set_tooltip_markup(btUrmPag, "Mergi la pagina următoare.\nTastă scurtă: <i>Săgeată dreapta</i>");
   gtk_button_set_relief(GTK_BUTTON(btUrmPag), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btUrmPag), FALSE);
-  GdkPixbuf *imgPagUrmPixBuf = db_obtine_imagine_media_scalata(DB_IMG_PAG_URM, 28, 28);
+  GdkPixbuf *imgPagUrmPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FVIZC_PAG_URM, 28, 28);
   GtkWidget *imgPagUrm = gtk_image_new_from_pixbuf(imgPagUrmPixBuf);
+  g_object_unref(imgPagUrmPixBuf);
   gtk_button_set_image(GTK_BUTTON(btUrmPag), imgPagUrm);
 
   /* adaugă regiunea centrală a formularului cu pânza de imprimare a cărțuliei */
