@@ -88,7 +88,9 @@ int main(int argc, char *argv[]) {
 	      /* s-a analizat și s-a găsit o versiune de aplicație mai bună. 
 	       * Începe procedeul de actualizare */
 	      dl_actualizeaza_aplicatia();
-	    }
+	    } else {
+		  g_debug("Nu s-a găsit o versiune mai bună a aplicației.");
+		}
         dl_curata();
       }
     }

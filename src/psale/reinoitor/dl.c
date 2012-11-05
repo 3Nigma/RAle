@@ -62,10 +62,12 @@ dl_exista_versiune_mai_buna_decat(double versCurentaLocal) {
   gboolean existaActualizare = FALSE;
   
   dl_descarca_fisier(adrListaActualizare, pFisVersActuala);
+  g_debug("Am descărcat fișierul-listă de actualizări de la adresa '%s'.", adrListaActualizare);
   rewind(pFisVersActuala);
   tipar = g_regex_new("([0-9\\.]+):\"([http|www]\\S+)\":\"(.+)\"\\\\0", 0, 0, NULL);
   while(fgets(buffLinie, sizeof(buffLinie), pFisVersActuala) != NULL) {
 	/* extragem informația utilă pentru verificarea versiunii */
+	g_debug("Linia curentă interpretată : %s", buffLinie);
 	g_regex_match(tipar, buffLinie, 0, &containerPotriviri);
 	if(g_match_info_matches(containerPotriviri)) {
 	  /* [1] = versiune, [2] = adresă de descărcare, [3] = mesaj modificări */
@@ -200,7 +202,7 @@ citeste_date_actualizare_recurent(void *ptr, size_t size, size_t nmemb, void *us
 
 static int 
 instiintare_progres_retea(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
-
+  g_debug("Progresul actual: %f/%f", dlnow, dltotal);
   return 0;
 }
 
@@ -208,9 +210,11 @@ static gboolean
 dl_descarca_fisier(const char *adresa, FILE *fisTinta) {
   CURL *legatura = curl_easy_init();
   gboolean opIncheiataCuSucces = FALSE;
-
+  char errBuff[CURL_ERROR_SIZE];
+  
   if(NULL != legatura) {
     curl_easy_setopt(legatura, CURLOPT_URL, adresa);
+    curl_easy_setopt(legatura, CURLOPT_ERRORBUFFER, errBuff);
     
     curl_easy_setopt(legatura, CURLOPT_WRITEFUNCTION, citeste_date_actualizare_recurent);
     curl_easy_setopt(legatura, CURLOPT_WRITEDATA, fisTinta);
@@ -221,8 +225,12 @@ dl_descarca_fisier(const char *adresa, FILE *fisTinta) {
     
     if(curl_easy_perform(legatura) == CURLE_OK) {
       opIncheiataCuSucces = TRUE;
-    }
+    } else {
+	  g_warning("S-a ivit o eroare la descărcarea fișierului : %s!", errBuff);
+	}
     curl_easy_cleanup(legatura);
+  } else {
+    g_warning("Nu am putut inițializa librăria de descărcări!");
   }
 
   return opIncheiataCuSucces;
