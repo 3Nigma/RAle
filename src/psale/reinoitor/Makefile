@@ -8,15 +8,15 @@
 
 include ../Makefile.defs
 
-CFLAGS := -g -Wall `pkg-config --cflags gtk+-2.0 sqlite3`
-LDFLAGS := `pkg-config --libs gtk+-2.0 sqlite3 libcurl`
-OBJS :=
+CFLAGS := -g -Wall `pkg-config --cflags gtk+-2.0 sqlite3 libzip`
+LDFLAGS := `pkg-config --libs gtk+-2.0 sqlite3 libcurl libzip`
+OBJS := dl.o db.o
 TIPCONSTRUCTIE :=
 
 .c.o :
 	$(CC) $(CFLAGS) -c $< -o $@
 
-all:
+all: $(OBJS)
 	$(CC) $(TIPCONSTRUCTIE) $(CFLAGS) $(OBJS) main.c -o $(REIN_BIN_NAME) $(LDFLAGS)
 
 win : TIPCONSTRUCTIE := -mwindows 

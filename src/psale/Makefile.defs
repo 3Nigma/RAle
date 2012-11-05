@@ -6,6 +6,7 @@
 # COPYING file that resides in the same directory as this file does or send a letter to 
 # Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 
+SQLITEDB_NAME := date.sqlite
 PRIN_BIN_NAME := psale
 REIN_BIN_NAME := rpsale
 

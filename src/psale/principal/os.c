@@ -210,7 +210,7 @@ os_obtine_cod_mcu_prezent(gchar *comanda) {
   if((fConsoleOut = popen(comanda, "r")) == NULL) {
 	g_warning("S-a ivit o problemă la invocarea lui 'avrdude' : '%s'! Acțiunea a fost anulată ...", comanda);
   } else {
-	while(fgets(lineBuff, 4096, fConsoleOut) != NULL) {
+	while(fgets(lineBuff, sizeof(lineBuff), fConsoleOut) != NULL) {
       g_regex_match(tipar, lineBuff, 0, &containerPotriviri);
       if(g_match_info_matches(containerPotriviri)) {
 		g_sprintf(codMCUGasit, "%s", g_match_info_fetch(containerPotriviri, 1));

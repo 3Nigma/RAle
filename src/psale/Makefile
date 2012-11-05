@@ -17,9 +17,10 @@ TIPCONSTRUCTIE :=
 all :
 	cd $(PRINCIPAL_DIR); make $(TIPCONSTRUCTIE)
 	cd $(REINOITOR_DIR); make $(TIPCONSTRUCTIE)
-	# copiem binarele în directorul rezultat
+# copiem binarele în directorul rezultat
 	mkdir -p $(DIR_CONSTRUIT)
 	cp $(PRINCIPAL_DIR)/$(PRIN_BIN_NAME) $(DIR_CONSTRUIT)/$(PRIN_BIN_NAME)
+	cp $(PRINCIPAL_DIR)/$(SQLITEDB_NAME) $(DIR_CONSTRUIT)/$(SQLITEDB_NAME)
 	cp $(REINOITOR_DIR)/$(REIN_BIN_NAME) $(DIR_CONSTRUIT)/$(REIN_BIN_NAME)
 	
 win : TIPCONSTRUCTIE := win
