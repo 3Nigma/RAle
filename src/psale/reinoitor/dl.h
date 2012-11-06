@@ -13,7 +13,8 @@
 
 #include <gtk/gtk.h>
 
-#define DL_TEMP_ARHIVA "temp.zip"
+#define DL_TEMP_ARHIVA     "temp.zip"
+#define DL_CURL_TIMEOUT    5
 
 extern gboolean 
 dl_initializeaza(const char *adresa);
