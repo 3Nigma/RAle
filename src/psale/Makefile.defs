@@ -7,6 +7,8 @@
 # Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 
 SQLITEDB_NAME := date.sqlite
+CART_ODT_NAME := CartulieALEv09Usoara_nonpwdp.odt
+CART_PDF_NAME := ale_creierase_pentru_toti.pdf
 PRIN_BIN_NAME := psale
 REIN_BIN_NAME := rpsale
 

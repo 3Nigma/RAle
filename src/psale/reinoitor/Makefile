@@ -14,13 +14,16 @@ OBJS := dl.o db.o
 TIPCONSTRUCTIE :=
 
 .c.o :
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Construiesc obiectul '$@' ..."
 
 all: $(OBJS)
-	$(CC) $(TIPCONSTRUCTIE) $(CFLAGS) $(OBJS) main.c -o $(REIN_BIN_NAME) $(LDFLAGS)
-
+	@$(CC) $(TIPCONSTRUCTIE) $(CFLAGS) $(OBJS) main.c -o $(REIN_BIN_NAME) $(LDFLAGS)
+	@echo "Asamblez aplicația reînoitor ..."
+	
 win : TIPCONSTRUCTIE := -mwindows 
 win: all
 
 clean :
-	rm -f $(REIN_BIN_NAME) $(OBJS) *~
+	@rm -f $(REIN_BIN_NAME) $(OBJS) *~
+	@echo "Curăț directorul curent ..."

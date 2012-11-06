@@ -14,12 +14,13 @@
 #include <gtk/gtk.h>
 #include <poppler.h>
 
-#define TEXT_FACTOR_TITLU ".electro:cărțulia"
-#define SCROLURI_PER_PAG 20
-#define INCREMENT_MARIRE 0.05
-#define PAGINA_CUPRINS 5
-#define MAX_INCR_ZOOM 1.9
-#define MIN_INCR_ZOOM 0.5
+#define VC_CALE_CARTULIE   "./ale_creierase_pentru_toti.pdf"
+#define TEXT_FACTOR_TITLU  ".electro:cărțulia"
+#define SCROLURI_PER_PAG   20
+#define INCREMENT_MARIRE   0.05
+#define PAGINA_CUPRINS     5
+#define MAX_INCR_ZOOM      1.9
+#define MIN_INCR_ZOOM      0.5
 #define X_IMG_SCAL_CUPRINS 1.0
 #define Y_IMG_SCAL_CUPRINS 1.0
 

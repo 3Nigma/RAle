@@ -14,13 +14,16 @@ OBJS := fprin.o os.o fl.o db.o finfo.o feeprom.o fcod.o bic.o al.o vc.o
 TIPCONSTRUCTIE :=
 
 .c.o :
-	$(CC) $(CFLAGS) -c $< -o $@
-
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Construiesc obiectul '$@' ..."
+	
 all : $(OBJS)
-	$(CC) $(TIPCONSTRUCTIE) $(CFLAGS) $(OBJS) main.c -o $(PRIN_BIN_NAME) $(LDFLAGS)
+	@$(CC) $(TIPCONSTRUCTIE) $(CFLAGS) $(OBJS) main.c -o $(PRIN_BIN_NAME) $(LDFLAGS)
+	@echo "Asamblez aplicația principală ..."
 
 win : TIPCONSTRUCTIE := -mwindows 
 win : all
 
 clean :
-	rm -f $(PRIN_BIN_NAME) $(OBJS) *~
+	@rm -f $(PRIN_BIN_NAME) $(OBJS) *~
+	@echo "Curăț directorul curent ..."

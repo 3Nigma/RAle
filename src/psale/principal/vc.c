@@ -310,7 +310,7 @@ vc_initializeaza() {
   
   /* inițializăm structura principală a vizualizatorului */
   deRet = g_new(VizualizatorCartulie, 1);
-  deRet->doc = poppler_document_new_from_file(g_file_get_uri(g_file_new_for_commandline_arg("./cartulie_fis_test.pdf")), NULL, NULL);
+  deRet->doc = poppler_document_new_from_file(g_file_get_uri(g_file_new_for_commandline_arg(VC_CALE_CARTULIE)), NULL, NULL);
   if(NULL == deRet->doc) {
     g_free(deRet);
     return NULL;
