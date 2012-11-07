@@ -23,6 +23,10 @@
   #include <windows.h>
 #endif
 
+#define FINFO_ACTCONF_DLG_DA       0
+#define FINFO_ACTCONF_DLG_NU       1
+#define FINFO_ACTCONF_DLG_INREGULA 2
+
 static void incarca_info_general(GtkWidget *cadruFrm);
 static gboolean frmInfo_delev(GtkWidget *widget, GdkEvent *event, gpointer data);
 static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, GtkWindow *fereastraParinte);
@@ -137,14 +141,19 @@ btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
                                                                    GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
                                                                    "Am găsit o actualizare.\n"
                                                                    "Se pare că ultima versiune este <b>" PSALE_FORMAT_VERSIUNE "</b> !\n\n"
-                                                                   "Doriți să treceți la această nouă versiune ?",
+                                                                   "Doriți să treceți la această nouă versiune ?\n\n"
+                                                                   "<b>Atenție!</b> Dacă răspundeți <b><i>Da</i></b> atunci aplicația curentă <u>se va închide</u>! "
+                                                                   "Asigurați-vă că nu pierdeți nimic din lucrul curent.",
                                                                     dl_obtine_vers_curenta_server());
                                                                  
       gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Întrebare");
-      gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Da", 0,
-                                                                  "Nu", 1,
+      gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Da", FINFO_ACTCONF_DLG_DA,
+                                                                  "Nu", FINFO_ACTCONF_DLG_NU,
                                                                   NULL);
-      gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), 0);
+      gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_DA);
+      if(gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare)) == FINFO_ACTCONF_DLG_DA) {
+	    /* avem actualizare și acordul utilizatorului de a o aplica. Îi dăm drumul lui 'rpsAle' să treacă la treabă! */
+	  }
     } else {
 	  g_debug("Nu am găsit nici o actualizare sau s-a întâmplat ceva cu procesul de actualizare ... ");
       
@@ -155,13 +164,10 @@ btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
                                                                     db_obtine_versiune_curenta());
                                                                  
       gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Rezultat");
-      gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Am înțeles", 2,
+      gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Am înțeles", FINFO_ACTCONF_DLG_INREGULA,
                                                                   NULL);
-      gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), 2);
-	}
-    
-    if(gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare)) == 0) {
-	  
+      gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_INREGULA);
+      gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare));
 	}
 	
     gtk_widget_destroy(dlgIntrebareActualizare);

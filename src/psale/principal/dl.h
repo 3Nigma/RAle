@@ -16,6 +16,12 @@
 #define DL_TEMP_ARHIVA     "temp.zip"
 #define DL_CURL_TIMEOUT    5
 
+typedef struct {
+  char *adrPachetNou;
+  double vers;
+  char *mesajModificari;
+} IntrareActualizare;
+
 extern gboolean 
 dl_initializeaza(const char *adresa);
 

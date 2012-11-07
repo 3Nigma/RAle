@@ -32,17 +32,21 @@ static size_t citeste_date_actualizare_recurent(void *ptr, size_t size, size_t n
 static gboolean dl_descarca_fisier(const char *adresa, FILE *fisTinta);
 
 static FILE *pFisVersActuala;
+static IntrareActualizare *intrareaCeaMaiRecenta = NULL;
 static char adrListaActualizare[256];
-static char adrPachetCurentActualizare[512];
-static double versActualaServer = 0.0;
-static char mesajVersiuneNoua[4096];
 
 gboolean 
 dl_initializeaza(const char *adresa) {
   strcpy(adrListaActualizare, adresa);
-  strcpy(adrPachetCurentActualizare, "\0");
-  strcpy(mesajVersiuneNoua, "\0");
   pFisVersActuala = tmpfile();
+
+  intrareaCeaMaiRecenta = (IntrareActualizare *)malloc(sizeof(IntrareActualizare));
+  intrareaCeaMaiRecenta->adrPachetNou = (char *)malloc(1024 * sizeof(char));
+  intrareaCeaMaiRecenta->vers = 0.0;
+  intrareaCeaMaiRecenta->mesajModificari = (char *)malloc(4096 * sizeof(char));
+  
+  strcpy(intrareaCeaMaiRecenta->adrPachetNou, "\0");
+  strcpy(intrareaCeaMaiRecenta->mesajModificari, "\0");
 
   return pFisVersActuala != NULL;
 }
@@ -52,13 +56,20 @@ dl_curata() {
   if(NULL != pFisVersActuala)  {
     fclose(pFisVersActuala);
     remove(DL_TEMP_ARHIVA);
+  
+    if(NULL != intrareaCeaMaiRecenta) {
+	  free(intrareaCeaMaiRecenta->adrPachetNou);
+	  free(intrareaCeaMaiRecenta->mesajModificari);
+	  free(intrareaCeaMaiRecenta);
+	}
   }
 }
 
 gboolean 
 dl_exista_versiune_mai_buna_decat(double versCurentaLocal) {
   g_assert(NULL != pFisVersActuala);
-
+  g_assert(NULL != intrareaCeaMaiRecenta);
+  
   gchar buffLinie[4096];
   GRegex *tipar = NULL;
   GMatchInfo *containerPotriviri = NULL;
@@ -74,11 +85,11 @@ dl_exista_versiune_mai_buna_decat(double versCurentaLocal) {
 	g_regex_match(tipar, buffLinie, 0, &containerPotriviri);
 	if(g_match_info_matches(containerPotriviri)) {
 	  /* [1] = versiune, [2] = adresă de descărcare, [3] = mesaj modificări */
-      versActualaServer = g_ascii_strtod(g_match_info_fetch(containerPotriviri, 1), NULL);
-      if(versActualaServer > versCurentaLocal) {
+      intrareaCeaMaiRecenta->vers = g_ascii_strtod(g_match_info_fetch(containerPotriviri, 1), NULL);
+      if(intrareaCeaMaiRecenta->vers > versCurentaLocal) {
         /* păstrăm entitățile necesare */
-        g_sprintf(adrPachetCurentActualizare, "%s", g_match_info_fetch(containerPotriviri, 2));
-        g_sprintf(mesajVersiuneNoua, "%s", g_match_info_fetch(containerPotriviri, 3));
+        g_sprintf(intrareaCeaMaiRecenta->adrPachetNou, "%s", g_match_info_fetch(containerPotriviri, 2));
+        g_sprintf(intrareaCeaMaiRecenta->mesajModificari, "%s", g_match_info_fetch(containerPotriviri, 3));
         
         existaActualizare = TRUE;
         break;
@@ -94,14 +105,14 @@ dl_exista_versiune_mai_buna_decat(double versCurentaLocal) {
 
 extern double
 dl_obtine_vers_curenta_server() {
-  return versActualaServer;
+  return intrareaCeaMaiRecenta->vers;
 }
 
 gboolean 
 dl_actualizeaza_aplicatia() {
   g_assert(NULL != pFisVersActuala);
-  g_assert(strlen(adrPachetCurentActualizare) != 0);
-  g_assert(strlen(mesajVersiuneNoua) != 0);
+  g_assert(strlen(intrareaCeaMaiRecenta->adrPachetNou) != 0);
+  g_assert(strlen(intrareaCeaMaiRecenta->mesajModificari) != 0);
  
   /* ajungând aici avem certitudinea că există o versiunea de aplicație mai bună decât cea locală,
    * iar datele necesare sunt încărcate în variabilele de modul. */
@@ -110,7 +121,7 @@ dl_actualizeaza_aplicatia() {
   gboolean rezultatOp = FALSE;
 
   if((tempFisArhiva = fopen(DL_TEMP_ARHIVA, "wb")) != NULL) {
-    if(dl_descarca_fisier(adrPachetCurentActualizare, tempFisArhiva)) {
+    if(dl_descarca_fisier(intrareaCeaMaiRecenta->adrPachetNou, tempFisArhiva)) {
 	  fclose(tempFisArhiva);
       /* am obținut arhiva dorită. mergi mai departe și despacheteaz-o */
       if(dl_despacheteaza_pachet_in_situ(DL_TEMP_ARHIVA)) {
