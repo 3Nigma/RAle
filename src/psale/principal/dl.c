@@ -41,12 +41,9 @@ dl_initializeaza(const char *adresa) {
   pFisVersActuala = tmpfile();
 
   intrareaCeaMaiRecenta = (IntrareActualizare *)malloc(sizeof(IntrareActualizare));
-  intrareaCeaMaiRecenta->adrPachetNou = (char *)malloc(1024 * sizeof(char));
+  intrareaCeaMaiRecenta->adrPachetNou = (char *)calloc(1024, sizeof(char));
   intrareaCeaMaiRecenta->vers = 0.0;
-  intrareaCeaMaiRecenta->mesajModificari = (char *)malloc(4096 * sizeof(char));
-  
-  strcpy(intrareaCeaMaiRecenta->adrPachetNou, "\0");
-  strcpy(intrareaCeaMaiRecenta->mesajModificari, "\0");
+  intrareaCeaMaiRecenta->mesajModificari = (char *)calloc(4096, sizeof(char));
 
   return pFisVersActuala != NULL;
 }
@@ -103,7 +100,17 @@ dl_exista_versiune_mai_buna_decat(double versCurentaLocal) {
   return existaActualizare;
 }
 
-extern double
+const IntrareActualizare *
+dl_obtine_ultima_intrare_actualizare() {
+  return intrareaCeaMaiRecenta;
+}
+
+void
+dl_seteaza_ultima_intrare_actualizare(IntrareActualizare *iac) {
+  intrareaCeaMaiRecenta = iac;
+}
+
+double
 dl_obtine_vers_curenta_server() {
   return intrareaCeaMaiRecenta->vers;
 }
@@ -112,7 +119,6 @@ gboolean
 dl_actualizeaza_aplicatia() {
   g_assert(NULL != pFisVersActuala);
   g_assert(strlen(intrareaCeaMaiRecenta->adrPachetNou) != 0);
-  g_assert(strlen(intrareaCeaMaiRecenta->mesajModificari) != 0);
  
   /* ajungând aici avem certitudinea că există o versiunea de aplicație mai bună decât cea locală,
    * iar datele necesare sunt încărcate în variabilele de modul. */

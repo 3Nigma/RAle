@@ -9,6 +9,8 @@
  */
 
 #include <gtk/gtk.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "db.h"
 #include "dl.h"
@@ -16,7 +18,6 @@
 #ifdef G_OS_WIN32
   #include <windows.h>
 #elif defined G_OS_UNIX
-  #include <string.h>
   #include <unistd.h>
   #include <errno.h>
 #endif
@@ -51,17 +52,60 @@ frmPrimaIntrebare_click_raspuns(GtkDialog *dialog, gint idRaspuns, gpointer user
   gtk_main_quit();
 }
 
+IntrareActualizare *
+reconstituieCerereDeActualizare(int argc, char *argv[]) {
+  IntrareActualizare *iac = NULL;
+  int cnt = 0;
+  
+  iac = (IntrareActualizare *)malloc(sizeof(IntrareActualizare));
+  iac->adrPachetNou = (char *)calloc(1024, sizeof(char));
+  iac->vers = 0.0;
+  iac->mesajModificari = (char *)calloc(4096, sizeof(char));
+  
+  for(cnt = 1; cnt <= argc && argv[cnt] != NULL; cnt += 2) {
+    if(strcmp(argv[cnt], "-a") == 0) {
+      /* ar trebui să urmeze adresa pachetului în argv[cnt + 1] */
+	  strcpy(iac->adrPachetNou, argv[cnt + 1]);
+	} else if(strcmp(argv[cnt], "-m")) {
+      /* ar trebui să urmeze mesajul de modificări asociat acestei versiuni în argv[cnt + 1] */
+	  strcpy(iac->mesajModificari, argv[cnt + 1]);
+	} else if(strcmp(argv[cnt], "-v")) {
+      /* în argv[cnt + 1] ar trebui să găsim versiunea */
+	  iac->vers = atof(argv[cnt + 1]);
+	}
+  }
+  
+  if(strlen(iac->adrPachetNou) == 0) {
+    /* nu există nici măcar adresa pachetului printre argumentele de invocare.
+     * Se poate considera că invocare este validă prin interpretarea de argumente. */
+     free(iac->adrPachetNou);
+     free(iac->mesajModificari);
+     free(iac);
+     iac = NULL;
+  }
+  
+  return iac;
+}
+
 int main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);
   
+  IntrareActualizare *infoActualizareExtern = NULL;
+  
   if(db_initializeaza()) {
 	
-	if(db_obtine_este_prima_rulare()) {
+	/* încărcăm eventualele informații venite din exterior (în parametrii dați prin linia de comandă) */
+	if(argc != 1) {
+	  infoActualizareExtern = reconstituieCerereDeActualizare(argc, argv);
+	}
+	
+	if(db_obtine_este_prima_rulare() &&
+	    infoActualizareExtern == NULL) {
 	  g_debug("Afișez formularul de 'primă rulare' ...");
 	  
 	  GtkWidget *frmPrimaIntrebare = NULL;
 	  
-	  /* parese că este prima execuție a aplicației (de la instalare ?).
+	  /* pare-se că este prima execuție a aplicației (de la instalare ?).
 	   * Interoghează-l pe utilizator privind modul de actualizare dorit */
 	  frmPrimaIntrebare = gtk_message_dialog_new_with_markup(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, 
                                                   GTK_BUTTONS_NONE, "Având în vedere că aceasta este prima dată când deschideți aplicația,\n\n"
@@ -84,21 +128,52 @@ int main(int argc, char *argv[]) {
 	  g_debug("Aceasta nu este prima execuție a aplicației ...");
 	}
 	
-	if(db_obtine_este_actualizare_automata()) {
-	  g_debug("Utilizatorul dorește actualizare automată ori de câte ori pornește aplicația.");
+	if(db_obtine_este_actualizare_automata() ||
+	   infoActualizareExtern != NULL) {
+	  g_debug("Utilizatorul fie dorește actualizare automată ori de câte ori pornește aplicația fie actualizatorul a fost invocat de către programul principal.");
 	  if(dl_initializeaza(db_obtine_adresa_actualizare())) {
-		g_debug("Modulul de descărcări (downloads : 'dl') a fost inițializat.");
-        if(dl_exista_versiune_mai_buna_decat(db_obtine_versiune_curenta())) {
-		  g_debug("S-a analizat și s-a găsit o versiune de aplicație mai nouă. Începe procedeul de actualizare ...");
-	      dl_actualizeaza_aplicatia();
+		g_debug("Modulul de descărcări (downloads : 'dl') a fost inițializat cu succes.");
+        if(infoActualizareExtern != NULL ||
+           dl_exista_versiune_mai_buna_decat(db_obtine_versiune_curenta())) {
+	      g_debug("S-a analizat și s-a găsit o versiune de aplicație mai nouă. Începe procedeul de actualizare ...");
+	        
+	      if(infoActualizareExtern != NULL) {
+		    /* procesul curent a fost scurtcircuitat de parametrii valizi dați în linia de comandă */
+		    dl_seteaza_ultima_intrare_actualizare(infoActualizareExtern);
+          } else {
+            /* execuția curentă a fost comandată direct de către utilizator */
+            //infoActualizareExtern = dl_obtine_ultima_intrare_actualizare();
+          }
+	      
+	      GtkWidget *dlgRezultatActualizare = NULL;
+	      if(dl_actualizeaza_aplicatia()) {
+            dlgRezultatActualizare = gtk_message_dialog_new_with_markup(NULL, GTK_DIALOG_MODAL,
+                                                                        GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+                                                                        "Actualizarea s-a realizat cu <u>succes</u>.\n\n"
+                                                                        "Versiunea curentă a programului este <b>%.2lf</b>.",
+                                                                        db_obtine_versiune_curenta());
+		    gtk_window_set_title(GTK_WINDOW(dlgRezultatActualizare), "Succes!");
+		  } else {
+            dlgRezultatActualizare = gtk_message_dialog_new_with_markup(NULL, GTK_DIALOG_MODAL,
+                                                                        GTK_MESSAGE_WARNING, GTK_BUTTONS_OK,
+                                                                        "A existat <u>o problemă</u> la actualizare!\n\n"
+                                                                        "Vă rugăm încercați mai târziu, iar dacă problema persistă, atunci "
+                                                                        "contactați unul din programatori.\n\n"
+                                                                        "<b>Vă mulțumim pentru înțelegere și <u>ne pare rău</u> pentru cele întâmplate!</b>");
+		    gtk_window_set_title(GTK_WINDOW(dlgRezultatActualizare), "Problemă!");
+		  }
+		  gtk_dialog_run(GTK_DIALOG(dlgRezultatActualizare));
+		  gtk_widget_destroy(dlgRezultatActualizare);
 	    } else {
-		  g_debug("Nu s-a găsit o versiune mai bună a aplicației.");
-		}
-        dl_curata();
-      }
+          g_debug("Nu s-a găsit o versiune mai bună a aplicației.");
+        }
+	  }
+	    
+      dl_curata();
     }
-    
     db_curata();
+  } else {
+    g_warning("Nu am putut inițializa modulul bazei de date. Procesul de actualizare nu a putut avea loc!");
   }
   
   lanseazaPSAle();

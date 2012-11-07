@@ -14,6 +14,7 @@
 
 #include "fl.h"
 #include "db.h"
+#include "os.h"
 #include "dl.h"
 
 #include "finfo.h"
@@ -132,6 +133,7 @@ btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
   if(dl_initializeaza(db_obtine_adresa_actualizare())) {
     g_debug("Modulul de descărcări (downloads : 'dl') a fost inițializat.");
     
+    gboolean actualizareConfirmata = FALSE;
     GtkWidget *dlgIntrebareActualizare = NULL;
     
     if(dl_exista_versiune_mai_buna_decat(db_obtine_versiune_curenta())) {
@@ -141,7 +143,7 @@ btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
                                                                    GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
                                                                    "Am găsit o actualizare.\n"
                                                                    "Se pare că ultima versiune este <b>" PSALE_FORMAT_VERSIUNE "</b> !\n\n"
-                                                                   "Doriți să treceți la această nouă versiune ?\n\n"
+                                                                   "Doriți să treceți <i>acum</i> la această nouă versiune ?\n\n"
                                                                    "<b>Atenție!</b> Dacă răspundeți <b><i>Da</i></b> atunci aplicația curentă <u>se va închide</u>! "
                                                                    "Asigurați-vă că nu pierdeți nimic din lucrul curent.",
                                                                     dl_obtine_vers_curenta_server());
@@ -152,7 +154,7 @@ btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
                                                                   NULL);
       gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_DA);
       if(gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare)) == FINFO_ACTCONF_DLG_DA) {
-	    /* avem actualizare și acordul utilizatorului de a o aplica. Îi dăm drumul lui 'rpsAle' să treacă la treabă! */
+	    actualizareConfirmata = TRUE;
 	  }
     } else {
 	  g_debug("Nu am găsit nici o actualizare sau s-a întâmplat ceva cu procesul de actualizare ... ");
@@ -171,7 +173,20 @@ btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
 	}
 	
     gtk_widget_destroy(dlgIntrebareActualizare);
+    
+    if(TRUE == actualizareConfirmata) {
+	  /* avem actualizare și acordul utilizatorului de a o aplica. Îi dăm drumul lui 'rpsAle' să treacă la treabă! */
+	  os_executa_actualizator(dl_obtine_ultima_intrare_actualizare());
+	}
+    
+    /* curățăm modulul */
     dl_curata();
+    
+    if(TRUE == actualizareConfirmata) {
+	  /* totul este pregătit pentru actualizare. 'rpsAle' e pornit, iar nouă nu ne mai rămâne decât să închidem 'psAle'
+	   * și să lăsăm actualizatorul să-și facă treaba */
+	  gtk_main_quit();
+	}
   }
 }
 

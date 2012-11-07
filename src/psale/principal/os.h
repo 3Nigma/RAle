@@ -14,20 +14,26 @@
 #include <gtk/gtk.h>
 
 #include "bic.h"
+#include "dl.h"
+
+#define OS_NUME_RPSALE "rpsale"
+#define OS_CALE_RPSALE "./"OS_NUME_RPSALE
 
 #ifdef G_OS_WIN32
-#include <windows.h>
+  #include <windows.h>
 
-extern DWORD 
-os_win_executa_com(HANDLE *hConsoleOutput, HANDLE *hConsoleInput, HANDLE *hConsoleError, gchar *command);
+  extern DWORD 
+  os_win_executa_com(HANDLE *hConsoleOutput, HANDLE *hConsoleInput, HANDLE *hConsoleError, gchar *command);
 
-extern DWORD 
-os_win_executa_com_fara_redirectionari(gchar *command);
-
+  extern DWORD 
+  os_win_executa_com_fara_redirectionari(gchar *command);
 #endif
 
 extern unsigned long 
 os_system(gchar *command);
+
+extern gboolean 
+os_executa_actualizator(const IntrareActualizare *ia);
 
 extern gboolean
 os_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta);

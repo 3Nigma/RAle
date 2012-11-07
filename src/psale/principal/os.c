@@ -14,6 +14,13 @@
 #include <stdlib.h>
 
 #ifdef G_OS_WIN32
+#elif defined G_OS_UNIX
+  #include <string.h>
+  #include <unistd.h>
+  #include <errno.h>
+#endif
+
+#ifdef G_OS_WIN32
 DWORD 
 os_win_executa_com(HANDLE *hConsoleOutput, HANDLE *hConsoleInput, HANDLE *hConsoleError, gchar *command) {
   STARTUPINFO startupInfo;
@@ -68,6 +75,42 @@ os_system(gchar *command) {
     return -1;
   }
 #endif
+}
+
+gboolean 
+os_executa_actualizator(const IntrareActualizare *ia) {
+  gboolean stareExecutieActualizator = TRUE;
+  
+#ifdef G_OS_WIN32
+  STARTUPINFO startupInfo;
+  PROCESS_INFORMATION processInformation;
+  gchar listaArgumente[5120];
+  
+  ZeroMemory(&startupInfo, sizeof(startupInfo));
+  ZeroMemory(&processInformation, sizeof(processInformation));
+
+  startupInfo.cb = sizeof(startupInfo);	
+
+  g_sprintf(listaArgumente, "-v \"%lf\" -a \"%s\" -m \"%s\"", ia->vers, ia->adrPachetNou, ia->mesajModificari);
+  if(!CreateProcess(OS_CALE_RPSALE, listaArgumente, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation)) {
+    g_warning("Nu am putut porni actualizatorul 'rpsAle'!");
+    stareExecutieActualizator = FALSE;
+  }
+#elif defined G_OS_UNIX
+  pid_t IdProcCopil;
+  char sirVers[10];
+  
+  sprintf(sirVers, "%lf", ia->vers);
+  if((IdProcCopil = fork()) != 0) {
+    /* suntem în firul copil */
+    if(execlp(OS_CALE_RPSALE, OS_NUME_RPSALE, "-v", sirVers, "-a", ia->adrPachetNou, "-m", ia->mesajModificari, NULL) == -1) {
+	  g_warning("Nu am putut porni actualizatorul 'rpsAle'! : %s", strerror(errno));
+	  stareExecutieActualizator = FALSE;
+	}
+  }
+#endif
+
+  return stareExecutieActualizator;
 }
 
 gboolean

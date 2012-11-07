@@ -31,6 +31,12 @@ dl_exista_versiune_mai_buna_decat(double versCurentaLocal);
 extern void
 dl_curata();
 
+extern const IntrareActualizare *
+dl_obtine_ultima_intrare_actualizare();
+
+extern void
+dl_seteaza_ultima_intrare_actualizare(IntrareActualizare *iac);
+
 extern double
 dl_obtine_vers_curenta_server();
 
