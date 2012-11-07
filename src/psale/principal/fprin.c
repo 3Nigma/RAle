@@ -277,10 +277,8 @@ fp_initializeaza_formular_principal() {
   GtkWidget *btInfo = NULL;
   GtkWidget *btIesire = NULL;
 
-  /* Dezactivate momentan pentru a nu folosi inutil resursele rețelei
-     dl_initializeaza(db_obtine_adresa_actualizare());
-
-     dl_actualizeaza_bd();*/
+  /* inițializăm alte module */
+  db_initializeaza();
 
   /* inițializăm formularul principal */
   frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -376,6 +374,10 @@ fp_arata(FormularPrincipal *fp) {
 
 void 
 fp_curata(FormularPrincipal *fp) {
+  /* curățăm valori locale */
   g_slist_free(fp->listaDlgCod);
   g_free(fp);
+  
+  /* eliberăm alte module utilizate */
+  db_curata();
 }

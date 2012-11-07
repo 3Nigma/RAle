@@ -13,12 +13,42 @@
 
 #include <gtk/gtk.h>
 
-#define PSALE_BD_NUME_FIS "date.sqlite"
+#define PSALE_BD_NUME_FIS     "date.sqlite"
+#define DB_NUME_TABEL_EXEMPLE "exemple"
+#define DB_NUME_TABEL_MEDIA   "media"
+#define DB_NUME_TABEL_META    "meta"
+
+extern gboolean 
+db_initializeaza();
+
+extern void 
+db_curata();
+
+extern const char *
+db_obtine_adresa_actualizare();
+
+extern double 
+db_obtine_versiune_curenta();
+
+extern gboolean 
+db_obtine_este_prima_rulare();
+
+extern gboolean
+db_consuma_prima_rulare();
+
+extern gboolean 
+db_obtine_este_actualizare_automata();
+
+extern gboolean
+db_seteaza_actualizare_automata();
+
+extern gboolean
+db_seteaza_actualizare_manuala();
 
 extern int 
 db_incarca_exemple_carte(GtkListStore *st, const gchar *limbajDorit);
 
-extern const char *
+extern char *
 db_obtine_cod_complet(const gchar *titluLung, const gchar *limbajDorit);
 
 #endif

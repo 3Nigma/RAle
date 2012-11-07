@@ -737,12 +737,19 @@ fc_initializeaza_fara_cod(Limbaj lmDorit) {
 FormularCod *
 fc_initializeaza_cu_exemplu(const gchar *titluScurt, const gchar *titluLung) {
   gchar numeExempluAfisat[256];
+  char *codCompletExemplu = NULL;
   FormularCod *dlgCodRezultat = NULL;
   
   g_sprintf(numeExempluAfisat, "%s", titluLung);
-  if(g_str_has_suffix(titluScurt, "s")) dlgCodRezultat = fc_initializeaza(ASM, db_obtine_cod_complet(titluLung, "s"), numeExempluAfisat, TRUE);
-  else dlgCodRezultat = fc_initializeaza(C, db_obtine_cod_complet(titluLung, "c"), numeExempluAfisat, TRUE);
+  if(g_str_has_suffix(titluScurt, "s")) {
+	codCompletExemplu = db_obtine_cod_complet(titluLung, "s");
+    dlgCodRezultat = fc_initializeaza(ASM, codCompletExemplu, numeExempluAfisat, TRUE);
+  } else {
+	codCompletExemplu = db_obtine_cod_complet(titluLung, "c");
+    dlgCodRezultat = fc_initializeaza(C, codCompletExemplu, numeExempluAfisat, TRUE);
+  }
   
+  if(NULL != codCompletExemplu) free(codCompletExemplu);
   return dlgCodRezultat;
 }
 

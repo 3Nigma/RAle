@@ -8,21 +8,30 @@
 
 include ../Makefile.defs
 
-CFLAGS := -g -Wall `pkg-config --cflags gtk+-2.0 sqlite3 libzip`
+OBIECTE_PSALE := psale_db.o psale_dl.o
+PSALE_CALE_SURSE := ../principal
+
+CFLAGS := -g -Wall -I$(PSALE_CALE_SURSE) `pkg-config --cflags gtk+-2.0 sqlite3 libzip`
 LDFLAGS := `pkg-config --libs gtk+-2.0 sqlite3 libcurl libzip`
-OBJS := dl.o db.o
+OBJS = $(OBIECTE_PSALE)
+
 TIPCONSTRUCTIE :=
 
-.c.o :
+.c.o:
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Construiesc obiectul '$@' ..."
 
+.PHONY : all
 all: $(OBJS)
 	@$(CC) $(TIPCONSTRUCTIE) $(CFLAGS) $(OBJS) main.c -o $(REIN_BIN_NAME) $(LDFLAGS)
 	@echo "Asamblez aplicația reînoitor ..."
 	
 win : TIPCONSTRUCTIE := -mwindows 
 win: all
+
+$(OBIECTE_PSALE): psale_%.o: $(PSALE_CALE_SURSE)/%.c
+	@$(CC) $(CFLAGS) -I$(PSALE_CALE_SURSE) -c $< -o $@
+	@echo "Construiesc obiectul '$@' ..."
 
 clean :
 	@rm -f $(REIN_BIN_NAME) $(OBJS) *~

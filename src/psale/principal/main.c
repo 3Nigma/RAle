@@ -22,6 +22,5 @@ int main(int argc, char *argv[]) {
   
   gtk_main();
   fp_curata(fprin);
-
   return 0;
 }
