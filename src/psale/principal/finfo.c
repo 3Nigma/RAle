@@ -25,6 +25,10 @@ static void incarca_info_general(GtkWidget *cadruFrm);
 static gboolean frmInfo_delev(GtkWidget *widget, GdkEvent *event, gpointer data);
 static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, GtkWindow *fereastraParinte);
 static void btIesire_clicked(GtkWidget *widget, GtkWindow *fereastraParinte);
+static void btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte);
+static GtkWidget *finfo_creeaza_buton(GtkWindow *fereastraParinte,
+                                       const gchar *textAfisat, fl_media_type tpImg, 
+                                       const gchar *textIndicatie, void (*fctClicked)(GtkWidget *, GtkWindow *));
 
 GtkWidget *
 finfo_initializeaza(GtkWindow *parinte) {
@@ -32,6 +36,7 @@ finfo_initializeaza(GtkWindow *parinte) {
   GtkWidget *cadruFrm = NULL;
   GtkWidget *imgInfo = NULL;
   GtkWidget *btParasesteFrm = NULL;
+  GtkWidget *btActualizeaza = NULL;
   
   /* inițializăm formularul de informații */
   frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -58,20 +63,16 @@ finfo_initializeaza(GtkWindow *parinte) {
   g_object_unref(pixInfoPictograma);
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo, 0, 1, 0, 1);
 
-  /* inițializăm butonul de părăsire a formularului */
-  btParasesteFrm = gtk_button_new_with_label("Părăsește formular");
-  gtk_button_set_relief(GTK_BUTTON(btParasesteFrm), GTK_RELIEF_HALF);
-  gtk_button_set_focus_on_click(GTK_BUTTON(btParasesteFrm), FALSE);
-  gtk_widget_set_tooltip_markup(btParasesteFrm, "Închide formularul de informații.\nTastă scurtă: <i>Esc</i>");
+  /* inițializăm butoanele formularului */
+  btActualizeaza = finfo_creeaza_buton(GTK_WINDOW(frm), 
+                                       "Actualizează", FL_IMG_FINFO_ACTUALIZEAZA,
+                                       "Verifică și aplică eventualele îmbunătățiri ale aplicației.\nTaste scurte: <i>Ctrl + R</i>", btActualizeaza_clicked);
+  gtk_table_attach_defaults(GTK_TABLE(cadruFrm), btActualizeaza, 2, 3, 3, 4);
+  
+  btParasesteFrm = finfo_creeaza_buton(GTK_WINDOW(frm), 
+                                       "Părăsește formular", FL_IMG_FINFO_PARASESTE,
+                                       "Închide formularul de informații.\nTastă scurtă: <i>Esc</i>", btIesire_clicked);
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), btParasesteFrm, 3, 4, 3, 4);
-  g_signal_connect(btParasesteFrm, "clicked", G_CALLBACK(btIesire_clicked), frm);
-
-  /* atașează pictogramă la acțiunea de părăsire a formularului */
-  GdkPixbuf *imgParasesteFrmPixBuf = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_PARASESTE, 16, 16);
-  GtkWidget *imgParasesteFrm = gtk_image_new_from_pixbuf(imgParasesteFrmPixBuf);
-  g_object_unref(imgParasesteFrmPixBuf);
-  gtk_button_set_image_position(GTK_BUTTON(btParasesteFrm), GTK_POS_RIGHT);
-  gtk_button_set_image(GTK_BUTTON(btParasesteFrm), imgParasesteFrm);
   
   return frm;
 }
@@ -100,6 +101,14 @@ frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, GtkWindow *ferea
 	/* tasta 'Esc' a fost apăsată. Părăsește formularul. */
     btIesire_clicked(widget, fereastraParinte);
     evGestionat = TRUE;
+  } else if((ke->state & GDK_CONTROL_MASK) != 0){
+    switch(ke->keyval) {
+	case GDK_KEY_R:
+	case GDK_KEY_r:
+	  /* Ctrl + R apăsat. Declanșează secvența de actualizare. */
+	  btActualizeaza_clicked(widget, fereastraParinte);
+	  break;
+	}
   }
   
   return evGestionat;
@@ -110,6 +119,11 @@ btIesire_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
   if(NULL != fereastraParinte) {
     gtk_widget_destroy(GTK_WIDGET(fereastraParinte));
   }
+}
+
+static void 
+btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
+
 }
 
 static void 
@@ -168,4 +182,29 @@ incarca_info_general(GtkWidget *cadruFrm) {
   gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(txtView), GTK_WRAP_WORD);
   gtk_text_view_set_editable(GTK_TEXT_VIEW(txtView), FALSE);
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), txtView, 2, 4, 1, 2);
+}
+
+static GtkWidget *
+finfo_creeaza_buton(GtkWindow *fereastraParinte,
+                    const gchar *textAfisat, fl_media_type tpImg, 
+                    const gchar *textIndicatie, void (*fctClicked)(GtkWidget *, GtkWindow *)) {
+  GtkWidget *btRezultat = NULL;						
+
+  /* inițializări generale */
+  btRezultat = gtk_button_new_with_label(textAfisat);
+  gtk_button_set_relief(GTK_BUTTON(btRezultat), GTK_RELIEF_HALF);
+  gtk_button_set_focus_on_click(GTK_BUTTON(btRezultat), FALSE);
+  gtk_widget_set_tooltip_markup(btRezultat, textIndicatie);
+  if(NULL != fctClicked) {
+    g_signal_connect(btRezultat, "clicked", G_CALLBACK(fctClicked), fereastraParinte);
+  }
+  
+  /* atașăm pictograma */
+  GdkPixbuf *imgbtPixBuf = fl_obtine_imagine_media_scalata(tpImg, 16, 16);
+  GtkWidget *imgbt = gtk_image_new_from_pixbuf(imgbtPixBuf);
+  g_object_unref(imgbtPixBuf);
+  gtk_button_set_image_position(GTK_BUTTON(btRezultat), GTK_POS_RIGHT);
+  gtk_button_set_image(GTK_BUTTON(btRezultat), imgbt);
+  
+  return btRezultat;
 }

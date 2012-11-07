@@ -32,6 +32,9 @@ fl_obtine_imagine_media_scalata(fl_media_type tp, gint w, gint h) {
     srand(time(NULL));
     sprintf(caleMediaCompleta, MEDIA_CALE_FINFO "/img_info_%d.png", (rand() % FINFO_INFO_ID_MAX) + FINFO_INFO_ID_MIN);
     break;
+  case FL_IMG_FINFO_ACTUALIZEAZA:
+    strcpy(caleMediaCompleta, MEDIA_CALE_FINFO "/bt_icoana_actualizeaza_ap.png");
+    break;
   case FL_IMG_FINFO_PARASESTE:
     strcpy(caleMediaCompleta, MEDIA_CALE_FINFO "/bt_icoana_paraseste_frm.png");
     break;

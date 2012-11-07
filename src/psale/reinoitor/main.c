@@ -57,6 +57,8 @@ int main(int argc, char *argv[]) {
   if(db_initializeaza()) {
 	
 	if(db_obtine_este_prima_rulare()) {
+	  g_debug("Afișez formularul de 'primă rulare' ...");
+	  
 	  GtkWidget *frmPrimaIntrebare = NULL;
 	  
 	  /* parese că este prima execuție a aplicației (de la instalare ?).
@@ -78,15 +80,16 @@ int main(int argc, char *argv[]) {
       g_signal_connect(frmPrimaIntrebare, "response", G_CALLBACK(frmPrimaIntrebare_click_raspuns), NULL);
       
 	  gtk_main();
+	} else {
+	  g_debug("Aceasta nu este prima execuție a aplicației ...");
 	}
 	
 	if(db_obtine_este_actualizare_automata()) {
-	  /* utilizatorul dorește actualizare automată ori de câte ori pornește aplicația */
+	  g_debug("Utilizatorul dorește actualizare automată ori de câte ori pornește aplicația.");
 	  if(dl_initializeaza(db_obtine_adresa_actualizare())) {
-        /* modulul de descărcări (downloads : 'dl') a fost inițializat */
+		g_debug("Modulul de descărcări (downloads : 'dl') a fost inițializat.");
         if(dl_exista_versiune_mai_buna_decat(db_obtine_versiune_curenta())) {
-	      /* s-a analizat și s-a găsit o versiune de aplicație mai bună. 
-	       * Începe procedeul de actualizare */
+		  g_debug("S-a analizat și s-a găsit o versiune de aplicație mai nouă. Începe procedeul de actualizare ...");
 	      dl_actualizeaza_aplicatia();
 	    } else {
 		  g_debug("Nu s-a găsit o versiune mai bună a aplicației.");

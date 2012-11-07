@@ -48,7 +48,10 @@ dl_initializeaza(const char *adresa) {
 
 void 
 dl_curata() {
-  if(NULL != pFisVersActuala)  fclose(pFisVersActuala);
+  if(NULL != pFisVersActuala)  {
+    fclose(pFisVersActuala);
+    remove(DL_TEMP_ARHIVA);
+  }
 }
 
 gboolean 
