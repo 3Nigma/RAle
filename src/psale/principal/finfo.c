@@ -10,9 +10,11 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <stdlib.h>
+#include <glib/gprintf.h>
 
 #include "fl.h"
 #include "db.h"
+#include "dl.h"
 
 #include "finfo.h"
 
@@ -123,14 +125,58 @@ btIesire_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
 
 static void 
 btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
-
+  if(dl_initializeaza(db_obtine_adresa_actualizare())) {
+    g_debug("Modulul de descărcări (downloads : 'dl') a fost inițializat.");
+    
+    GtkWidget *dlgIntrebareActualizare = NULL;
+    
+    if(dl_exista_versiune_mai_buna_decat(db_obtine_versiune_curenta())) {
+      g_debug("S-a analizat și s-a găsit o versiune de aplicație mai nouă. Întreabă utilizatorul privind acțiunea următoare ...");
+      
+      dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(fereastraParinte, GTK_DIALOG_MODAL, 
+                                                                   GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
+                                                                   "Am găsit o actualizare.\n"
+                                                                   "Se pare că ultima versiune este <b>" PSALE_FORMAT_VERSIUNE "</b> !\n\n"
+                                                                   "Doriți să treceți la această nouă versiune ?",
+                                                                    dl_obtine_vers_curenta_server());
+                                                                 
+      gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Întrebare");
+      gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Da", 0,
+                                                                  "Nu", 1,
+                                                                  NULL);
+      gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), 0);
+    } else {
+	  g_debug("Nu am găsit nici o actualizare sau s-a întâmplat ceva cu procesul de actualizare ... ");
+      
+      dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(fereastraParinte, GTK_DIALOG_MODAL, 
+                                                                   GTK_MESSAGE_INFO, GTK_BUTTONS_NONE,
+                                                                   "Nu am găsit nicio actualizare disponibilă.\n\n"
+                                                                   "Versiunea pe care o aveți, <b>" PSALE_FORMAT_VERSIUNE "</b>, este ultima.",
+                                                                    db_obtine_versiune_curenta());
+                                                                 
+      gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Rezultat");
+      gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Am înțeles", 2,
+                                                                  NULL);
+      gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), 2);
+	}
+    
+    if(gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare)) == 0) {
+	  
+	}
+	
+    gtk_widget_destroy(dlgIntrebareActualizare);
+    dl_curata();
+  }
 }
 
 static void 
 incarca_info_general(GtkWidget *cadruFrm) {
   GtkWidget *cadruTitluEtichete = NULL;
   GtkWidget *cadruValEtichete = NULL;
-
+  gchar versActualaLocala[10];
+  
+  g_sprintf(versActualaLocala, PSALE_FORMAT_VERSIUNE, db_obtine_versiune_curenta());
+  
   /* inițializăm cadrul etichetelor (titlu + valoare) */
   cadruTitluEtichete = gtk_vbox_new(FALSE, 4);
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruTitluEtichete, 1, 2, 0, 1);
@@ -151,7 +197,7 @@ incarca_info_general(GtkWidget *cadruFrm) {
   gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruValEtichete, 2, 3, 0, 1);
 
   GtkWidget *lblValAutor = gtk_label_new(PSALE_NUME_AUTOR);
-  GtkWidget *lblValVersiune = gtk_label_new(PSALE_VERSIUNE);
+  GtkWidget *lblValVersiune = gtk_label_new(versActualaLocala);
   GdkPixbuf *pixImgLicenta = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_LICENTA, -1, -1);
   GtkWidget *imgLicenta = gtk_image_new_from_pixbuf(pixImgLicenta);
   g_object_unref(pixImgLicenta);

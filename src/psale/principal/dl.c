@@ -34,6 +34,7 @@ static gboolean dl_descarca_fisier(const char *adresa, FILE *fisTinta);
 static FILE *pFisVersActuala;
 static char adrListaActualizare[256];
 static char adrPachetCurentActualizare[512];
+static double versActualaServer = 0.0;
 static char mesajVersiuneNoua[4096];
 
 gboolean 
@@ -57,8 +58,7 @@ dl_curata() {
 gboolean 
 dl_exista_versiune_mai_buna_decat(double versCurentaLocal) {
   g_assert(NULL != pFisVersActuala);
-	
-  double versActualaServer = 0.0;
+
   gchar buffLinie[4096];
   GRegex *tipar = NULL;
   GMatchInfo *containerPotriviri = NULL;
@@ -90,6 +90,11 @@ dl_exista_versiune_mai_buna_decat(double versCurentaLocal) {
   g_match_info_free(containerPotriviri);
 
   return existaActualizare;
+}
+
+extern double
+dl_obtine_vers_curenta_server() {
+  return versActualaServer;
 }
 
 gboolean 

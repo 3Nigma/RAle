@@ -66,7 +66,7 @@ db_obtine_versiune_curenta() {
     versActuala = sqlite3_value_double(rez);
     sqlite3_finalize(af);
   }
-
+  
   return versActuala;
 }
 

@@ -25,6 +25,9 @@ dl_exista_versiune_mai_buna_decat(double versCurentaLocal);
 extern void
 dl_curata();
 
+extern double
+dl_obtine_vers_curenta_server();
+
 extern gboolean 
 dl_actualizeaza_aplicatia();
 
