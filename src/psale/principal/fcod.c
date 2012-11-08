@@ -37,7 +37,8 @@
 #define PSALE_PREFIX_MODIFICARE_COD_TEXT        "*"
 #define PSALE_PREFIX_MODIFICARE_COD_FORMATAT    "<b>"PSALE_PREFIX_MODIFICARE_COD_TEXT"</b>"
 
-#define PSALE_CODS_IMPLICIT ".section text\n" \
+#define PSALE_CODS_IMPLICIT ".section .text\n" \
+  ".include \"ale.inc\"\n" \
   ".global main\n\n" \
   "main:\n" \
   "  ; introduceți codul dumneavoastră aici\n" \
@@ -237,26 +238,34 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   BaraInfoCod *bInfoFormularCurent;
   char denObiectRezultat[1024];
   char denHexRezultat[1024];
+  gchar *cDir = NULL;
   
   /* generăm fișierele temporale necesare */
   os_obtine_nume_fis_temporar(denObiectRezultat, sizeof(denObiectRezultat)/(sizeof(gchar)));
   os_obtine_nume_fis_temporar(denHexRezultat, sizeof(denHexRezultat)/(sizeof(gchar)));
   bInfoFormularCurent = &fc->bInfo;
+  cDir = g_get_current_dir();
   
 #ifdef G_OS_WIN32
-  gchar *cDir = g_get_current_dir();
-  
-  g_sprintf(textComandaGcc, "%s\\winavr\\bin\\avr-gcc.exe -Os -Wall -mmcu=attiny25 \"%s\" -o \"%s\"", cDir, denFisSursa, denObiectRezultat);
+  g_sprintf(textComandaGcc, "%s\\winavr\\bin\\avr-gcc.exe -Os -Wall %s-I\"%s\\%s\" -mmcu=attiny25 \"%s\" -o \"%s\"", 
+                            cDir, 
+                            fc->lmFolosit == C ? "" : "-Wa,"
+                            cDir, PSALE_SURSELE_MELE_DIR, 
+                            denFisSursa, denObiectRezultat);
   g_sprintf(textComandaObjcopy, "%s\\winavr\\bin\\avr-objcopy.exe -j .text -O ihex \"%s\" \"%s\"", cDir, denObiectRezultat, denHexRezultat);
-
-  g_free(cDir);
 #elif defined G_OS_UNIX
   /* Construiește instrucțiunile ce vor fi executate pe cod, prin sistemul de operare.
    * Redirecționarea de tip stderr > stdout ('2>&1') se realizează pentru a ajuta funcția popen care nu știe 
    * să lucreze decât cu stdout!*/
-  g_sprintf(textComandaGcc, "avr-gcc -Os -Wall -mmcu=attiny25 \"%s\" -o \"%s\" 2>&1", denFisSursa, denObiectRezultat);
+  g_sprintf(textComandaGcc, "avr-gcc -Os -Wall %s-I\"%s/%s\" -mmcu=attiny25 \"%s\" -o \"%s\" 2>&1", 
+                            fc->lmFolosit == C ? "" : "-Wa,",
+                            cDir, PSALE_SURSELE_MELE_DIR, 
+                            denFisSursa, denObiectRezultat);
   g_sprintf(textComandaObjcopy, "avr-objcopy -j .text -O ihex \"%s\" \"%s\"", denObiectRezultat, denHexRezultat);
 #endif
+
+  g_free(cDir);
+
   /* încearcă să compilezi sursa curentă trecând-o prin 'avr-gcc' și interpretând eventualele erori în bara de stare a formularului curent */
   if(os_executa_si_completeaza_bic_fc(textComandaGcc, bInfoFormularCurent)) {
     /* Compilarea a reușit. Încearcă o extragere a secțiunilor necesare pentru programator și construiește HEX-ul */

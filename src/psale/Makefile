@@ -11,11 +11,14 @@ include ./Makefile.defs
 PRINCIPAL_DIR    := ./principal
 REINOITOR_DIR    := ./reinoitor
 DIR_CONSTRUIT    := ./construit
+DIR_SURSE_MELE   := sursele\ mele
+FIS_ANTETELE_MELE:= ale.inc
 DIR_CARTULIE_ODT := ../../doc
 
 NUME_CERT_PEM    := cacert.pem
 
-DEPENDENTE_ALL := $(DIR_CONSTRUIT)/$(SQLITEDB_NAME) $(DIR_CONSTRUIT)/$(NUME_CERT_PEM)
+DEPENDENTE_ALL := $(DIR_CONSTRUIT)/$(SQLITEDB_NAME) $(DIR_CONSTRUIT)/$(NUME_CERT_PEM) \
+                  $(DIR_CONSTRUIT)/$(DIR_SURSE_MELE)/$(FIS_ANTETELE_MELE)
 TIPCONSTRUCTIE :=
 
 all : asigura_existenta_directoare $(DIR_CONSTRUIT)/$(CART_PDF_NAME) $(DEPENDENTE_ALL)
@@ -34,13 +37,15 @@ $(DIR_CONSTRUIT)/$(CART_PDF_NAME) : $(DIR_CARTULIE_ODT)/$(CART_ODT_NAME)
 
 .PHONY : asigura_existenta_directoare
 asigura_existenta_directoare :
-	mkdir -p $(DIR_CONSTRUIT)
-
+	@mkdir -p $(DIR_CONSTRUIT)
+	@mkdir -p $(DIR_CONSTRUIT)/$(DIR_SURSE_MELE)
+	
 $(DIR_CONSTRUIT)/$(NUME_CERT_PEM) : $(REINOITOR_DIR)/$(NUME_CERT_PEM)
 $(DIR_CONSTRUIT)/$(SQLITEDB_NAME) : $(PRINCIPAL_DIR)/$(SQLITEDB_NAME)
+$(DIR_CONSTRUIT)/$(DIR_SURSE_MELE)/$(FIS_ANTETELE_MELE) : $(PRINCIPAL_DIR)/$(DIR_SURSE_MELE)/$(FIS_ANTETELE_MELE)
 
 $(DEPENDENTE_ALL) :
-	cp $< $@
+	cp "$<" "$@"
 
 .PHONY : clean
 clean :
