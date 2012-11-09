@@ -249,7 +249,7 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
 #ifdef G_OS_WIN32
   g_sprintf(textComandaGcc, "%s\\winavr\\bin\\avr-gcc.exe -Os -Wall %s-I\"%s\\%s\" -mmcu=attiny25 \"%s\" -o \"%s\"", 
                             cDir, 
-                            fc->lmFolosit == C ? "" : "-Wa,"
+                            fc->lmFolosit == C ? "" : "-Wa,",
                             cDir, PSALE_SURSELE_MELE_DIR, 
                             denFisSursa, denObiectRezultat);
   g_sprintf(textComandaObjcopy, "%s\\winavr\\bin\\avr-objcopy.exe -j .text -O ihex \"%s\" \"%s\"", cDir, denObiectRezultat, denHexRezultat);

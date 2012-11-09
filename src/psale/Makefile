@@ -14,7 +14,7 @@ DIR_CONSTRUIT    := ./construit
 DIR_SURSE_MELE   := sursele\ mele
 FIS_ANTETELE_MELE:= ale.inc
 DIR_CARTULIE_ODT := ../../doc
-
+LIBREOFF_NUME_BIN:= libreoffice
 NUME_CERT_PEM    := cacert.pem
 
 DEPENDENTE_ALL := $(DIR_CONSTRUIT)/$(SQLITEDB_NAME) $(DIR_CONSTRUIT)/$(NUME_CERT_PEM) \
@@ -28,11 +28,12 @@ all : asigura_existenta_directoare $(DIR_CONSTRUIT)/$(CART_PDF_NAME) $(DEPENDENT
 	cp $(REINOITOR_DIR)/$(REIN_BIN_NAME) $(DIR_CONSTRUIT)/$(REIN_BIN_NAME)
 	
 win : TIPCONSTRUCTIE := win
+win : LIBREOFF_NUME_BIN := soffice
 win : all
 
 $(DIR_CONSTRUIT)/$(CART_PDF_NAME) : $(DIR_CARTULIE_ODT)/$(CART_ODT_NAME)
-	@echo "Construiesc cărțulia și o aduc lângă aplicație ..."
-	@libreoffice --invisible --convert-to pdf --outdir $(DIR_CONSTRUIT) $(DIR_CARTULIE_ODT)/$(CART_ODT_NAME)
+	@echo "Construiesc cartulia si o aduc langa aplicatie ..."
+	@$(LIBREOFF_NUME_BIN) --invisible --convert-to pdf --outdir $(DIR_CONSTRUIT) $(DIR_CARTULIE_ODT)/$(CART_ODT_NAME)
 	@mv $(DIR_CONSTRUIT)/$(subst .odt,.pdf,$(CART_ODT_NAME)) $(DIR_CONSTRUIT)/$(CART_PDF_NAME)
 
 .PHONY : asigura_existenta_directoare
