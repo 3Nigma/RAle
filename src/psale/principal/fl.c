@@ -25,6 +25,10 @@ fl_obtine_imagine_media_scalata(fl_media_type tp, gint w, gint h) {
     strcpy(caleMediaCompleta, MEDIA_CALE_FPRINCIPAL "/tuscale_small_logo_ale.png");
     break;
     
+  case FL_GENERAL_IMG_FORMULARE:
+    strcpy(caleMediaCompleta, MEDIA_CALE_GENERAL "/14.png");
+    break;
+   
   case FL_IMG_FINFO_LICENTA:
     strcpy(caleMediaCompleta, MEDIA_CALE_FINFO "/img_licenta.png");
     break;

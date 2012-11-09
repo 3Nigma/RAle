@@ -14,6 +14,7 @@
 #include <gtk/gtk.h>
 
 #define CALE_DIRECTOR_MEDIA        "./media"
+#define MEDIA_CALE_GENERAL         CALE_DIRECTOR_MEDIA "/general"
 #define MEDIA_CALE_FPRINCIPAL      CALE_DIRECTOR_MEDIA "/fprincipal"
 #define MEDIA_CALE_FINFO           CALE_DIRECTOR_MEDIA "/finfo"
 #define MEDIA_CALE_FCOD            CALE_DIRECTOR_MEDIA "/fcod"
@@ -26,6 +27,8 @@
 
 typedef enum {
   FL_IMG_TUSCALE_LOGO,
+  
+  FL_GENERAL_IMG_FORMULARE,
   
   FL_IMG_FINFO_LICENTA,
   FL_IMG_FINFO_INFO,
