@@ -52,6 +52,7 @@ fme_initializeaza(GtkWindow *parinte) {
   /* creează formularul principal */
   fe->frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(fe->frm), "psAle ~ Acțiuni ale memoriei speciale");
+  gtk_window_set_icon(GTK_WINDOW(fe->frm), fl_obtine_imagine_media_scalata(FL_GENERAL_IMG_FORMULARE, -1, -1));
   gtk_window_set_transient_for(GTK_WINDOW(fe->frm), parinte);
   gtk_window_set_position(GTK_WINDOW(fe->frm), GTK_WIN_POS_CENTER_ON_PARENT);
   zonaGenerala = gtk_vbox_new(FALSE, 3);

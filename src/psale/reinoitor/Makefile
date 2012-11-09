@@ -24,7 +24,7 @@ TIPCONSTRUCTIE :=
 .PHONY : all
 all: $(OBJS)
 	@$(CC) $(TIPCONSTRUCTIE) $(CFLAGS) $(OBJS) main.c -o $(REIN_BIN_NAME) $(LDFLAGS)
-	@echo "Asamblez aplicația reînoitor ..."
+	@echo "Asamblez aplicatia reinoitor ..."
 	
 win : TIPCONSTRUCTIE := -mwindows 
 win: all
@@ -35,4 +35,4 @@ $(OBIECTE_PSALE): psale_%.o: $(PSALE_CALE_SURSE)/%.c
 
 clean :
 	@rm -f $(REIN_BIN_NAME) $(OBJS) *~
-	@echo "Curăț directorul curent ..."
+	@echo "Curat directorul curent ..."

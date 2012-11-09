@@ -26,7 +26,7 @@ fl_obtine_imagine_media_scalata(fl_media_type tp, gint w, gint h) {
     break;
     
   case FL_GENERAL_IMG_FORMULARE:
-    strcpy(caleMediaCompleta, MEDIA_CALE_GENERAL "/14.png");
+    strcpy(caleMediaCompleta, MEDIA_CALE_GENERAL "/psale_img_formulare.png");
     break;
    
   case FL_IMG_FINFO_LICENTA:

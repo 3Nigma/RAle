@@ -549,6 +549,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
     gtk_window_set_title(GTK_WINDOW(frm), "[ASM] psAle ~ Fereastră de cod");
     break;
   }
+  gtk_window_set_icon(GTK_WINDOW(frm), fl_obtine_imagine_media_scalata(FL_GENERAL_IMG_FORMULARE, -1, -1));
   gtk_window_set_position(GTK_WINDOW(frm), GTK_WIN_POS_CENTER);
 
   /* inițializăm cadrul formularului de cod */

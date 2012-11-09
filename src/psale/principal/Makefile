@@ -19,11 +19,11 @@ TIPCONSTRUCTIE :=
 	
 all : $(OBJS)
 	@$(CC) $(TIPCONSTRUCTIE) $(CFLAGS) $(OBJS) main.c -o $(PRIN_BIN_NAME) $(LDFLAGS)
-	@echo "Asamblez aplicația principală ..."
+	@echo "Asamblez aplicatia principala ..."
 
 win : TIPCONSTRUCTIE := -mwindows 
 win : all
 
 clean :
 	@rm -f $(PRIN_BIN_NAME) $(OBJS) *~
-	@echo "Curăț directorul curent ..."
+	@echo "Curat directorul curent ..."
