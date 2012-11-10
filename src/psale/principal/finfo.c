@@ -88,9 +88,9 @@ finfo_initializeaza(GtkWindow *parinte) {
 static gboolean 
 imgLicenta_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
 #ifdef G_OS_WIN32
-  ShellExecute(NULL, "open", "http://creativecommons.org/licenses/by-nc-sa/3.0/", NULL, NULL, SW_SHOWNORMAL);
+  ShellExecute(NULL, "open", "http://creativecommons.org/licenses/by-nc-sa/3.0/ro/", NULL, NULL, SW_SHOWNORMAL);
 #elif defined G_OS_UNIX
-  system("xdg-open 'http://creativecommons.org/licenses/by-nc-sa/3.0/' &");
+  system("xdg-open 'http://creativecommons.org/licenses/by-nc-sa/3.0/ro/' &");
 #endif
 
   return TRUE;
