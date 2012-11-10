@@ -31,21 +31,20 @@ struct mcu{
 };
 
 static gint al_obtine_index_mcu();
+static const char *al_obtine_cale_applicatie();
 static gchar *pune_eeprom_in_fis_temporar(GtkListStore *lm);
 
 gboolean 
 al_este_placuta_conectata() {
-  gchar *cDir = g_get_current_dir();
   gchar avrDudeCom[1024];
-  
-  if(NULL != cDir) {
+ 
 #ifdef G_OS_WIN32
-  g_sprintf(avrDudeCom, "\"%s\\avrdude.exe\" -c usbtiny -p t25 -V", cDir);
+  g_sprintf(avrDudeCom, "%s -c usbtiny -p t25 -V", 
+                        al_obtine_cale_applicatie());
 #elif defined G_OS_UNIX
-  g_sprintf(avrDudeCom, "sudo \"%s/avrdude\" -c usbtiny -p t25 -V 2> /dev/null", cDir);
+  g_sprintf(avrDudeCom, "sudo %s -c usbtiny -p t25 -V 2> /dev/null", 
+                        al_obtine_cale_applicatie());
 #endif
-    g_free(cDir);
-  }
   
   return os_system(avrDudeCom) == 0;
 }
@@ -57,9 +56,13 @@ al_scrie_aplicatie(const gchar *caleFisHex) {
   
   if(NULL != cDir) {
 #ifdef G_OS_WIN32
-    g_sprintf(avrDudeCom, "\"%s\\avrdude.exe\" -c usbtiny -p t25 -U flash:w:\"%s\":i", cDir, caleFisHex);
+    g_sprintf(avrDudeCom, "%s -c usbtiny -p t25 -U flash:w:\"%s\":i", 
+                          al_obtine_cale_applicatie(), 
+                          caleFisHex);
 #elif defined G_OS_UNIX
-    g_sprintf(avrDudeCom, "sudo \"%s/avrdude\" -c usbtiny -p t25 -U flash:w:\"%s\":i 2> /dev/null", cDir, caleFisHex);
+    g_sprintf(avrDudeCom, "sudo %s -c usbtiny -p t25 -U flash:w:\"%s\":i 2> /dev/null", 
+                          al_obtine_cale_applicatie(), 
+                          caleFisHex);
 #endif
     g_free(cDir);
   }
@@ -89,9 +92,15 @@ al_citeste_eeprom(GtkListStore *lm) {
 	 
     tmpnam(hexRezultat);
 #ifdef G_OS_WIN32
-    g_sprintf(com, "\"%s\\avrdude.exe\" -c usbtiny -p %s -U eeprom:r:\"%s\":h", cDir, mcus[indexMCUPrezent].avrdudePart, hexRezultat);
+    g_sprintf(com, "%s -c usbtiny -p %s -U eeprom:r:\"%s\":h", 
+                   al_obtine_cale_applicatie(), 
+                   mcus[indexMCUPrezent].avrdudePart, 
+                   hexRezultat);
 #elif defined G_OS_UNIX
-    g_sprintf(com, "sudo \"%s/avrdude\" -c usbtiny -p %s -U eeprom:r:\"%s\":h 2>/dev/null", cDir, mcus[indexMCUPrezent].avrdudePart, hexRezultat);
+    g_sprintf(com, "sudo %s -c usbtiny -p %s -U eeprom:r:\"%s\":h 2>/dev/null", 
+                   al_obtine_cale_applicatie(), 
+                   mcus[indexMCUPrezent].avrdudePart, 
+                   hexRezultat);
 #endif
     if(os_system(com) == 0) {
 	  /* avem memoria în fișierul 'hexRezultat'.
@@ -150,9 +159,15 @@ al_scrie_eeprom(GtkListStore *lm) {
     fisTempHex = pune_eeprom_in_fis_temporar(lm);
   
 #ifdef G_OS_WIN32
-    g_sprintf(com, "\"%s\\avrdude.exe\" -c usbtiny -p %s -U eeprom:w:\"%s\":r", cDir, mcus[indexMCUPrezent].avrdudePart, fisTempHex);
+    g_sprintf(com, "%s -c usbtiny -p %s -U eeprom:w:\"%s\":r", 
+                   al_obtine_cale_applicatie(), 
+                   mcus[indexMCUPrezent].avrdudePart, 
+                   fisTempHex);
 #elif defined G_OS_UNIX
-    g_sprintf(com, "sudo \"%s/avrdude\" -c usbtiny -p %s -U eeprom:w:\"%s\":r 2>/dev/null", cDir, mcus[indexMCUPrezent].avrdudePart, fisTempHex);
+    g_sprintf(com, "sudo %s -c usbtiny -p %s -U eeprom:w:\"%s\":r 2>/dev/null", 
+                   al_obtine_cale_applicatie(), 
+                   mcus[indexMCUPrezent].avrdudePart, 
+                   fisTempHex);
 #endif
     /* trimitem memoria rezultată spre plăcuță */
     os_system(com);
@@ -206,15 +221,16 @@ pune_eeprom_in_fis_temporar(GtkListStore *lm) {
 static gint 
 al_obtine_index_mcu() {
   gint cnt = 0;
-  gchar *cDir = g_get_current_dir();
   gchar comAvrDude[255];
   gint indexMcu = -1;
   gchar *semnCompCitita = NULL;
   
 #ifdef G_OS_WIN32
-  g_sprintf(comAvrDude, "\"%s\\avrdude.exe\" -c usbtiny -p t25 -V 2>&1", cDir);
+  g_sprintf(comAvrDude, "%s -c usbtiny -p t25 -V 2>&1", 
+                        al_obtine_cale_applicatie());
 #elif defined G_OS_UNIX
-  g_sprintf(comAvrDude, "sudo \"%s/avrdude\" -c usbtiny -p t25 -V 2>&1", cDir);
+  g_sprintf(comAvrDude, "sudo %s -c usbtiny -p t25 -V 2>&1", 
+                        al_obtine_cale_applicatie());
 #endif
   semnCompCitita = os_obtine_cod_mcu_prezent(comAvrDude);
   for(cnt = 0; cnt < sizeof(mcus)/sizeof(struct mcu); ++cnt) {
@@ -224,8 +240,20 @@ al_obtine_index_mcu() {
 	}
   }
   
-  g_free(cDir);
   g_free(semnCompCitita);
   
   return indexMcu;
+}
+
+static const char *
+al_obtine_cale_applicatie() {
+  static gchar caleAvrDude[1024];
+  
+  #ifdef G_OS_WIN32
+    g_sprintf(caleAvrDude, "\"avrdude.exe\"");
+  #elif defined G_OS_UNIX
+    g_sprintf(caleAvrDude, "\"avrdude\"");
+  #endif
+  
+  return caleAvrDude;
 }

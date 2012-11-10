@@ -247,12 +247,14 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
   cDir = g_get_current_dir();
   
 #ifdef G_OS_WIN32
-  g_sprintf(textComandaGcc, "%s\\winavr\\bin\\avr-gcc.exe -Os -Wall %s-I\"%s\\%s\" -mmcu=attiny25 \"%s\" -o \"%s\"", 
-                            cDir, 
+  g_sprintf(textComandaGcc, "avr-gcc.exe -Os -Wall %s-I\"%s\\%s\" -mmcu=attiny25 \"%s\" -o \"%s\"", 
+                            //cDir, 
                             fc->lmFolosit == C ? "" : "-Wa,",
                             cDir, PSALE_SURSELE_MELE_DIR, 
                             denFisSursa, denObiectRezultat);
-  g_sprintf(textComandaObjcopy, "%s\\winavr\\bin\\avr-objcopy.exe -j .text -O ihex \"%s\" \"%s\"", cDir, denObiectRezultat, denHexRezultat);
+  g_sprintf(textComandaObjcopy, "avr-objcopy.exe -j .text -O ihex \"%s\" \"%s\"", 
+                                //cDir, 
+                                denObiectRezultat, denHexRezultat);
 #elif defined G_OS_UNIX
   /* Construiește instrucțiunile ce vor fi executate pe cod, prin sistemul de operare.
    * Redirecționarea de tip stderr > stdout ('2>&1') se realizează pentru a ajuta funcția popen care nu știe 
