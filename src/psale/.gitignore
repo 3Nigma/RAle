@@ -1,3 +1,13 @@
-construit/*
+construit/*.dll
+construit/limbaje
+construit/media
+construit/stiluri
+construit/sursele mele/*
+construit/winavr
+construit/*.pdf
+construit/*.pem
+construit/date.sqlite
+construit/*.exe
+construit/CD/*
 *.o
 *.exe

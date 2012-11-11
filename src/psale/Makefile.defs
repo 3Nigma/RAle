@@ -11,5 +11,8 @@ CART_ODT_NAME := CartulieALEv09Usoara_nonpwdp.odt
 CART_PDF_NAME := ale_creierase_pentru_toti.pdf
 PRIN_BIN_NAME := psale
 REIN_BIN_NAME := rpsale
+NUME_CERT_PEM := cacert.pem
+DIR_SURSE_MELE:= sursele\ mele
+NSIS_NUME_INST:=script_gen_instal.nsi
 
 CC := gcc

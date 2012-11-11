@@ -11,16 +11,14 @@ include ./Makefile.defs
 PRINCIPAL_DIR    := ./principal
 REINOITOR_DIR    := ./reinoitor
 DIR_CONSTRUIT    := ./construit
-DIR_SURSE_MELE   := sursele\ mele
 DIR_CARTULIE_ODT := ../../doc
 DIR_MEDIA_NUME   := media
 
-FIS_ANTETELE_MELE:= ale.inc
+FIS_ANTETELE_MELE:= ale.inc ale.h
 LIBREOFF_NUME_BIN:= libreoffice
-NUME_CERT_PEM    := cacert.pem
 
 DEPENDENTE_ALL := $(DIR_CONSTRUIT)/$(SQLITEDB_NAME) $(DIR_CONSTRUIT)/$(NUME_CERT_PEM) \
-                  $(DIR_CONSTRUIT)/$(DIR_SURSE_MELE)/$(FIS_ANTETELE_MELE)
+                  $(FIS_ANTETELE_MELE:%=$(DIR_CONSTRUIT)/$(DIR_SURSE_MELE)/%)
 TIPCONSTRUCTIE :=
 
 all : asigura_existenta_directoare $(DIR_CONSTRUIT)/$(CART_PDF_NAME) $(DEPENDENTE_ALL)
@@ -28,6 +26,7 @@ all : asigura_existenta_directoare $(DIR_CONSTRUIT)/$(CART_PDF_NAME) $(DEPENDENT
 	@cd $(REINOITOR_DIR); make $(TIPCONSTRUCTIE)
 	cp $(PRINCIPAL_DIR)/$(PRIN_BIN_NAME) $(DIR_CONSTRUIT)/$(PRIN_BIN_NAME)
 	cp $(REINOITOR_DIR)/$(REIN_BIN_NAME) $(DIR_CONSTRUIT)/$(REIN_BIN_NAME)
+	@cd $(DIR_CONSTRUIT); make $(TIPCONSTRUCTIE)
 	
 win : TIPCONSTRUCTIE := win
 win : LIBREOFF_NUME_BIN := soffice
@@ -46,7 +45,9 @@ asigura_existenta_directoare :
 
 $(DIR_CONSTRUIT)/$(NUME_CERT_PEM) : $(REINOITOR_DIR)/$(NUME_CERT_PEM)
 $(DIR_CONSTRUIT)/$(SQLITEDB_NAME) : $(PRINCIPAL_DIR)/$(SQLITEDB_NAME)
-$(DIR_CONSTRUIT)/$(DIR_SURSE_MELE)/$(FIS_ANTETELE_MELE) : $(PRINCIPAL_DIR)/$(DIR_SURSE_MELE)/$(FIS_ANTETELE_MELE)
+# TODO: Optimizează următoarele ținte
+$(DIR_CONSTRUIT)/$(DIR_SURSE_MELE)/ale.inc : $(PRINCIPAL_DIR)/$(DIR_SURSE_MELE)/ale.inc
+$(DIR_CONSTRUIT)/$(DIR_SURSE_MELE)/ale.h : $(PRINCIPAL_DIR)/$(DIR_SURSE_MELE)/ale.h
 
 $(DEPENDENTE_ALL) :
 	cp "$<" "$@"
@@ -55,3 +56,4 @@ $(DEPENDENTE_ALL) :
 clean :
 	@cd $(PRINCIPAL_DIR); make clean
 	@cd $(REINOITOR_DIR); make clean
+	@rm -f $(DIR_CONSTRUIT)/$(SQLITEDB_NAME)
