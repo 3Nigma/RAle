@@ -640,7 +640,7 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
   g_object_unref(imgSalveazaLucrulPixBuf);
   gtk_button_set_image(GTK_BUTTON(btSalveazaLucrul), imgSalveazaLucrul);
 
-  btReiaLucrul = gtk_button_new_with_label("Reia cod");
+  btReiaLucrul = gtk_button_new_with_label("Deschide cod");
   gtk_button_set_relief(GTK_BUTTON(btReiaLucrul), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(btReiaLucrul), FALSE);
   gtk_widget_set_tooltip_markup(btReiaLucrul, "Încarcă sursă din fișier extern.\nTaste scurte: <i>Ctrl + R</i>");

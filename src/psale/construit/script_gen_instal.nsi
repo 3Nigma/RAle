@@ -12,7 +12,7 @@ Icon "psale_icoana_cd.ico"
 UninstallIcon "psale_icoana_dezinstalare.ico"
 InstallDir "$PROGRAMFILES\tuScale\psAle"
 LoadLanguageFile "${NSISDIR}\Contrib\Language files\Romanian.nlf"
-LicenseData "psale_pac_lic.rtf"
+LicenseData "psale_licenta.rtf"
 AutoCloseWindow true
 
 XPStyle on

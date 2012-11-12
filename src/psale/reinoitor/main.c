@@ -110,15 +110,15 @@ int main(int argc, char *argv[]) {
 	  frmPrimaIntrebare = gtk_message_dialog_new_with_markup(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, 
                                                   GTK_BUTTONS_NONE, "Având în vedere că aceasta este prima dată când deschideți aplicația,\n\n"
                                                 "<b>cum doriți să se realizeze actualizările ?</b>\n\n"
-                                                "<i> > <b>În mod automat</b>: la fiecare pornire a aplicației,\n"
+                                                " > <b>Răspund mai târziu</b>: mă mai gândesc,\n"
                                                 " > <b>Manual</b>: prin butonul de pe formularul de informații, sau\n"
-                                                " > <b>Răspund mai târziu</b>: mă mai gândesc.</i>");
+                                                " > <b>În mod automat</b>: la fiecare pornire a aplicației.");
 	  gtk_window_set_title(GTK_WINDOW(frmPrimaIntrebare), "Întrebare");
 	  gtk_window_set_position(GTK_WINDOW(frmPrimaIntrebare), GTK_WIN_POS_CENTER);
 	  gtk_dialog_add_buttons(GTK_DIALOG(frmPrimaIntrebare), "Răspund mai târziu", RPS_PRIMA_INTREB_RASPUNS_MAI_TARZIU,
-													  "Actualizează manual", RPS_PRIMA_INTREB_RASPUNS_MANUAL,
-													  "Actualizează automat", RPS_PRIMA_INTREB_RASPUNS_AUTOMAT,
-													  NULL);
+													        "Actualizez manual", RPS_PRIMA_INTREB_RASPUNS_MANUAL,
+													        "Actualizează automat", RPS_PRIMA_INTREB_RASPUNS_AUTOMAT,
+													        NULL);
 	  gtk_dialog_set_default_response(GTK_DIALOG(frmPrimaIntrebare), RPS_PRIMA_INTREB_RASPUNS_AUTOMAT);
       gtk_widget_show_all(frmPrimaIntrebare);
       g_signal_connect(frmPrimaIntrebare, "response", G_CALLBACK(frmPrimaIntrebare_click_raspuns), NULL);
