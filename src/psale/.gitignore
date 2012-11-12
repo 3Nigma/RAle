@@ -1,3 +1,4 @@
+# Tipare de excludere normale
 construit/*.dll
 construit/limbaje
 construit/media
@@ -7,7 +8,9 @@ construit/winavr
 construit/*.pdf
 construit/*.pem
 construit/date.sqlite
-construit/*.exe
 construit/CD/*
 *.o
 *.exe
+
+# Tipare de excludere negate
+!construit/CD/autorun.inf
