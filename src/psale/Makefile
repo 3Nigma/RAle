@@ -56,4 +56,5 @@ $(DEPENDENTE_ALL) :
 clean :
 	@cd $(PRINCIPAL_DIR); make clean
 	@cd $(REINOITOR_DIR); make clean
-	@rm -f $(DIR_CONSTRUIT)/$(SQLITEDB_NAME)
+	@cd $(DIR_CONSTRUIT); make clean
+	@rm -f $(DIR_CONSTRUIT)/$(SQLITEDB_NAME) $(DIR_CONSTRUIT)/$(CART_PDF_NAME)

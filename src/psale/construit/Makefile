@@ -8,9 +8,12 @@
 
 include ../Makefile.defs
 
-CALE_ARHIVA_IESIRE  := ./CD/pachete/psAle.zip
+PSALE_CALE_ARHIVA      := ./CD/pachete/psAle.zip
+COMPILATOR_CALE_ARHIVA := ./CD/pachete/compilator.zip
+
 SUBDIRECTOARE_PSALE := ./limbaje/ ./stiluri/ ./media/ 
 PSALE_ALTE_DEP      := ./*.dll ./psale_icoana_ap.ico ./$(DIR_SURSE_MELE)/
+COMPILATOR_ALTE_DEP := 
 
 all : FISIERE_PACHET_PSALE := 
 all :
@@ -19,12 +22,15 @@ all :
 win : FISIERE_PACHET_PSALE := ./$(PRIN_BIN_NAME).exe ./$(REIN_BIN_NAME).exe \
       ./$(CART_PDF_NAME) $(SQLITEDB_NAME) ./$(NUME_CERT_PEM) \
       $(SUBDIRECTOARE_PSALE) $(PSALE_ALTE_DEP)
+win : FISIERE_PACHET_COMPILATOR := ./winavr
 win :
 	#Documentatia 7za se poate gasi in 'wtooluri/7-zip.chm'
-	@wtooluri/7za.exe u $(CALE_ARHIVA_IESIRE) $(FISIERE_PACHET_PSALE)
+	@wtooluri/7za.exe u $(PSALE_CALE_ARHIVA) $(FISIERE_PACHET_PSALE)
+	@wtooluri/7za.exe u $(COMPILATOR_CALE_ARHIVA) $(FISIERE_PACHET_COMPILATOR)
 	# Documentatie MakeNSIS se gaseste in User Manual-ul NSIS-ului
 	@makensis.exe //V1 $(NSIS_NUME_INST)
 	
 .PHONY : clean
 clean :
-	rm -f $(CALE_ARHIVA_IESIRE)
+	@echo "Curat directorul curent ..."
+	@rm -f $(PSALE_CALE_ARHIVA) $(COMPILATOR_CALE_ARHIVA)

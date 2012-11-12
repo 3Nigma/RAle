@@ -59,7 +59,7 @@ Section "Documentație" docsInstall_ID
   DetailPrint "Instalez bibliografia ..."
   
   CreateDirectory "$INSTDIR\documente"
-  CopyFiles "$EXEDIR\documentatie\*" "$INSTDIR\documente"
+  CopyFiles "$EXEDIR\documentatie\*" "$INSTDIR\documente" 37798
   
   DetailPrint "S-a terminat de construit bibliografia."
 SectionEnd
@@ -68,8 +68,8 @@ Section "Creează legături" creeazaLegaturi_ID
   /* Creează scurtături la regiunea de Start */
   CreateDirectory "$SMPROGRAMS\psAle"
   ${If} ${SectionIsSelected} ${docsInstall_ID}
-    CreateDirectory "$SMPROGRAMS\psAle\Bilbiografie"
-    CreateShortCut "$SMPROGRAMS\psAle\Bibliografie\foi de catalog.lnk" "$INSTDIR\documente\foi de catalog"
+    CreateDirectory "$SMPROGRAMS\psAle\Bibliografie"
+    CreateShortCut "$SMPROGRAMS\psAle\Bibliografie\Foi de Catalog.lnk" "$INSTDIR\documente\foi de catalog"
     CreateShortCut "$SMPROGRAMS\psAle\Bibliografie\Aplicații.lnk" "$INSTDIR\documente\soft"
   ${EndIf}
   	
