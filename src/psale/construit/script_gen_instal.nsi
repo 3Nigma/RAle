@@ -22,7 +22,6 @@ UninstallIcon "psale_icoana_dezinstalare.ico"
 InstallDir "$PROGRAMFILES\tuScale\psAle"
 LoadLanguageFile "${NSISDIR}\Contrib\Language files\Romanian.nlf"
 LicenseData "psale_licenta.rtf"
-AutoCloseWindow true
 
 XPStyle on
 CRCCheck on
@@ -36,7 +35,9 @@ Page instfiles
 Section /o "-Driverele necesare aplicației" drvInstall_ID
   Push $R0
   
-  ExecWait '"$EXEDIR\drivere\DPInst.exe" /sw /c /lm /sh /path "$EXEDIR\drivere"' $R0
+  MessageBox MB_OK|MB_ICONINFORMATION "Sunt pe cale să instalez driverele pentru plăcuță.$\n$\nÎnainte de a continua, asigurați-vă că plăcuța este conectată la calculator și apoi apăsați butonul 'Ok'." IDOK 0
+  
+  ExecWait '"$EXEDIR\drivere\DPInst.exe" /sw /c /lm /sh' $R0
   DetailPrint "Rezultatul instalării driverelor: $R0"
  
   Pop $R0
@@ -129,8 +130,8 @@ Function .onInit
   
   /* Definim dimensiunile fiecărei secțiuni în parte */
   SectionSetSize ${drvInstall_ID} 70
-  SectionSetSize ${wAvrAppInstall_ID} 241647
-  SectionSetSize ${docsInstall_ID} 9134
+  SectionSetSize ${wAvrAppInstall_ID} 241648
+  SectionSetSize ${docsInstall_ID} 37798
   SectionSetSize ${psAleInstall_ID} 38115
   
   /* Adaugă detalii la secțiuni */
