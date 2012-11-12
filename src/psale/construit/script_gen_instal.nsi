@@ -27,7 +27,7 @@ Page instfiles
 Section /o "-Driverele necesare aplicației" drvInstall_ID
   Push $R0
   
-  ExecWait '"$EXEDIR\drivere\DPInst.exe" /sw /c /lm /sh /path "$EXEDIR\drivere\usbtiny 1.12"' $R0
+  ExecWait '"$EXEDIR\drivere\DPInst.exe" /sw /c /lm /sh /path "$EXEDIR\drivere"' $R0
   DetailPrint "Rezultatul instalării driverelor: $R0"
  
   Pop $R0
@@ -64,16 +64,13 @@ Section "Documentație" docsInstall_ID
   DetailPrint "S-a terminat de construit bibliografia."
 SectionEnd
 
-/* Creează o secțiune dummy, ascunsă, pentru a face alte operațiuni la instalare */
-Section "-sect. ascunsa"
-  WriteUninstaller "$INSTDIR\dezinstaleaza.exe"
-SectionEnd
-
-Section "Creează legături"
+Section "Creează legături" creeazaLegaturi_ID
   /* Creează scurtături la regiunea de Start */
   CreateDirectory "$SMPROGRAMS\psAle"
   ${If} ${SectionIsSelected} ${docsInstall_ID}
-    CreateShortCut "$SMPROGRAMS\psAle\Bibliografie.lnk" "$INSTDIR\documente\"
+    CreateDirectory "$SMPROGRAMS\psAle\Bilbiografie"
+    CreateShortCut "$SMPROGRAMS\psAle\Bibliografie\foi de catalog.lnk" "$INSTDIR\documente\foi de catalog"
+    CreateShortCut "$SMPROGRAMS\psAle\Bibliografie\Aplicații.lnk" "$INSTDIR\documente\soft"
   ${EndIf}
   	
   CreateShortCut "$SMPROGRAMS\psAle\Editor.lnk" "$INSTDIR\rpsale.exe" "" "$INSTDIR\psale_icoana_ap.ico"
@@ -81,12 +78,20 @@ Section "Creează legături"
 	
   /* Creează scurtături pe 'Desktop' */
   CreateShortCut "$DESKTOP\psAle.lnk" "$INSTDIR\rpsale.exe" "" "$INSTDIR\psale_icoana_ap.ico"
-	
-  /* Acordă privilegii de administrator pentru următoarele legături */
-  ${If} ${AtLeastWinVista}
-	; ShellLink::SetRunAsAdministrator "$SMPROGRAMS\Aplicatii RAle\PN.lnk"
-	; ShellLink::SetRunAsAdministrator "$DESKTOP\Programmer's Notepad.lnk"
-  ${Endif}
+SectionEnd
+
+/* Creează o secțiune dummy, ascunsă, pentru a face alte operațiuni la instalare */
+Section "-sect. ascunsa"
+  push $0
+  
+  call existaCelPutinOSelectieDeComponente
+  pop $0
+
+  ${If} $0 == true
+    WriteUninstaller "$INSTDIR\dezinstaleaza.exe"
+  ${EndIf}
+  
+  pop $0
 SectionEnd
 
 Section "Uninstall"
@@ -112,7 +117,7 @@ Function .onInit
   
   /* Definim dimensiunile fiecărei secțiuni în parte */
   SectionSetSize ${drvInstall_ID} 70
-  SectionSetSize ${wAvrAppInstall_ID} 273440
+  SectionSetSize ${wAvrAppInstall_ID} 241647
   SectionSetSize ${docsInstall_ID} 9134
   SectionSetSize ${psAleInstall_ID} 38115
   
@@ -161,4 +166,28 @@ FunctionEnd
 
 Function esteRuntimeGtkInstalat
   /* TODO: se va completa ulterior, dacă este posibil */
+FunctionEnd
+
+Function existaCelPutinOSelectieDeComponente
+  ${If} ${SectionIsSelected} ${wAvrAppInstall_ID}
+    goto existaCelPutinOSelectie
+  ${Else}
+    ${If} ${SectionIsSelected} ${docsInstall_ID}
+      goto existaCelPutinOSelectie
+    ${Else}
+       ${If} ${SectionIsSelected} ${psAleInstall_ID}
+         goto existaCelPutinOSelectie
+       ${Else} 
+         ${If} ${SectionIsSelected} ${creeazaLegaturi_ID}
+           goto existaCelPutinOSelectie
+         ${EndIf}
+       ${EndIf}
+    ${EndIf}
+  ${EndIf}
+  
+  Push false
+  Return
+  
+  existaCelPutinOSelectie:
+  Push true
 FunctionEnd
