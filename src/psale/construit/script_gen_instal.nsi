@@ -46,6 +46,8 @@ Section "Aplicația principală" psAleInstall_ID
   DetailPrint "Instalez psAle ..."
   nsisunz::UnzipToLog "$EXEDIR\pachete\psAle.zip" "$INSTDIR"
  
+  WriteRegStr HKLM "Software\tuScale\psAle" "CaleInstalare" "$INSTDIR"
+ 
   Pop $0
   DetailPrint "Rezultatul operațiunii : $0"
   DetailPrint "S-a terminat de instalat aplicația principală psAle."
@@ -104,7 +106,8 @@ Section "-sect. ascunsa"
 SectionEnd
 
 Section "Uninstall"
-  /* Șterge  legăturile din regiștri a WinAvr-ului doar dacă noi l-am instalat */
+  /* Șterge  legăturile din regiștri a aplicației principale precum și a WinAvr-ului doar dacă noi l-am instalat */
+  DeleteRegKey HKLM "Software\tuScale\psAle"
   IfFileExists $INSTDIR\winavr\*.* 0 dupa_curatarea_registrilor
     DeleteRegKey HKLM "Software\WinAVR"
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\winavr\bin"
@@ -151,6 +154,11 @@ Function .onInit
     !insertmacro UnselectSection ${wAvrAppInstall_ID}
   ${Endif}
   
+  Call obtineCalePsAle_dinReg
+  ${If} $1 != ""
+    !insertmacro UnselectSection ${psAleInstall_ID}
+  ${Endif}
+  
 FunctionEnd
 
 Function un.onInit
@@ -175,6 +183,16 @@ FunctionEnd
 
 Function esteRuntimeGtkInstalat
   /* TODO: se va completa ulterior, dacă este posibil */
+FunctionEnd
+
+Function obtineCalePsAle_dinReg
+  /* $1 va conține calea de instalare a lui psAle, culeasă din registry */
+  Push $0
+  
+  EnumRegValue $0 HKLM "Software\tuScale\psAle" 0
+  ReadRegStr $1 HKLM "Software\tuScale\psAle" $0
+  
+  Pop $0
 FunctionEnd
 
 Function existaCelPutinOSelectieDeComponente
