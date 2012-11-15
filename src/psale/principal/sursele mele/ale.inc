@@ -1,7 +1,7 @@
 ; Autor : Victor ADĂSCĂLIȚEI @ 2012
 
 ; Fișierul curent conține declarații utile pentru creierașul plăcuței Ale v0.9, așa cum este ea achiziționată.
-; Subrutine prezente aici împreună rolul și modul lor de apel :
+; Subrutine prezente aici împreună cu rolul și modul lor de apel :
 ;   -> afiseaza_r16      : afișează pe LED-urile plăcuței valoarea ce este prezentă în registrul general R16
 ;   -> citeste_taste_r17 : surprinde starea butonașelor plăcuței și o depozitează în registrul R17
 ;   -> intarzie_un_pic   : introdu o întârziere sensibilă în punctul de apel
