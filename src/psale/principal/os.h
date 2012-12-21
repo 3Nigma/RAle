@@ -30,19 +30,15 @@ extern DWORD
 os_win_executa_com_fara_redirectionari(gchar *command);
 #endif
 
-extern unsigned long
-os_system(gchar *command);
+extern unsigned long os_system(gchar *command);
 
-extern gboolean
-os_rpsale_forteaza_actualizare(const IntrareActualizare *ia);
+extern gdouble os_rpsale_obtine_versiune_server();
+extern gboolean os_rpsale_forteaza_actualizare(const IntrareActualizare *ia);
 
-extern gboolean
-os_compilator_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta);
+extern gboolean os_compilator_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta);
 
-extern void
-os_obtine_nume_fis_temporar(gchar *buff, gint buffLen);
+extern void os_obtine_nume_fis_temporar(gchar *buff, gint buffLen);
 
-extern gchar *
-os_obtine_cod_mcu_prezent(gchar *comanda);
+extern gchar *os_avrdude_obtine_cod_mcu_prezent(gchar *comanda);
 
 #endif

@@ -81,6 +81,7 @@ static void os_elibereaza_rezultat_consola(RezultatOpConsola **rez) {
     if ((*rez)->stdErrBuff != NULL) g_free((*rez)->stdErrBuff);
     g_free(*rez);
 }
+
 RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
     g_assert(com != NULL);
     RezultatOpConsola *rezConsola = NULL;
@@ -263,7 +264,7 @@ gboolean os_compilator_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod
     return gccCompilatCuSucces;
 }
 
-double os_rpsale_obtine_versiune_server() {
+gdouble os_rpsale_obtine_versiune_server() {
     double verpsAle = 0.0;
 
 
@@ -328,7 +329,7 @@ void os_obtine_nume_fis_temporar(gchar *buff, gint buffLen) {
     g_debug("Am creeat fișierul temporal '%s'", buff);
 }
 
-extern gchar *os_obtine_cod_mcu_prezent(gchar *comanda) {
+extern gchar *os_avrdude_obtine_cod_mcu_prezent(gchar *comanda) {
     gchar *codMCUGasit = NULL;
     GRegex *tipar = NULL;
     GMatchInfo *containerPotriviri = NULL;
