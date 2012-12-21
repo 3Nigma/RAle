@@ -41,8 +41,9 @@ dl_initializeaza(const char *adresa) {
   pFisVersActuala = tmpfile();
 
   intrareaCeaMaiRecenta = (IntrareActualizare *)malloc(sizeof(IntrareActualizare));
-  intrareaCeaMaiRecenta->adrPachetNou = (char *)calloc(1024, sizeof(char));
-  intrareaCeaMaiRecenta->vers = 0.0;
+  intrareaCeaMaiRecenta->adresaDeDescarcare = (char *)calloc(1024, sizeof(char));
+  intrareaCeaMaiRecenta->vers.major = 0;
+  intrareaCeaMaiRecenta->vers.minor = 0;
   intrareaCeaMaiRecenta->mesajModificari = (char *)calloc(4096, sizeof(char));
 
   return pFisVersActuala != NULL;
@@ -55,7 +56,7 @@ dl_curata() {
     remove(DL_TEMP_ARHIVA);
   
     if(NULL != intrareaCeaMaiRecenta) {
-	  free(intrareaCeaMaiRecenta->adrPachetNou);
+	  free(intrareaCeaMaiRecenta->adresaDeDescarcare);
 	  free(intrareaCeaMaiRecenta->mesajModificari);
 	  free(intrareaCeaMaiRecenta);
 	}
@@ -63,7 +64,7 @@ dl_curata() {
 }
 
 gboolean 
-dl_exista_versiune_mai_buna_decat(double versCurentaLocal) {
+dl_exista_versiune_mai_buna_decat(Versiune versCurentaLocal) {
   g_assert(NULL != pFisVersActuala);
   g_assert(NULL != intrareaCeaMaiRecenta);
   
@@ -75,18 +76,20 @@ dl_exista_versiune_mai_buna_decat(double versCurentaLocal) {
   dl_descarca_fisier(adrListaActualizare, pFisVersActuala);
   g_debug("Am descărcat fișierul-listă de actualizări de la adresa '%s'.", adrListaActualizare);
   rewind(pFisVersActuala);
-  tipar = g_regex_new("([0-9\\.]+):\"([http|www]\\S+)\":\"(.+)\"\\\\0", 0, 0, NULL);
+  tipar = g_regex_new("([0-9]+)\\.([0-9]+):\"([http|www]\\S+)\":\"(.+)\"\\\\0", 0, 0, NULL);
   while(fgets(buffLinie, sizeof(buffLinie), pFisVersActuala) != NULL) {
 	/* extragem informația utilă pentru verificarea versiunii */
 	g_debug("Linia curentă interpretată : %s", buffLinie);
 	g_regex_match(tipar, buffLinie, 0, &containerPotriviri);
 	if(g_match_info_matches(containerPotriviri)) {
-	  /* [1] = versiune, [2] = adresă de descărcare, [3] = mesaj modificări */
-      intrareaCeaMaiRecenta->vers = g_ascii_strtod(g_match_info_fetch(containerPotriviri, 1), NULL);
-      if(intrareaCeaMaiRecenta->vers > versCurentaLocal) {
-        /* păstrăm entitățile necesare */
-        g_sprintf(intrareaCeaMaiRecenta->adrPachetNou, "%s", g_match_info_fetch(containerPotriviri, 2));
-        g_sprintf(intrareaCeaMaiRecenta->mesajModificari, "%s", g_match_info_fetch(containerPotriviri, 3));
+	  /* [1] = versiune majoră, [2] = versiune minoră, [3] = adresă de descărcare, [4] = mesaj al modificării */
+      intrareaCeaMaiRecenta->vers.major = g_ascii_strtoull(g_match_info_fetch(containerPotriviri, 1), NULL, 10);
+      intrareaCeaMaiRecenta->vers.minor = g_ascii_strtoull(g_match_info_fetch(containerPotriviri, 2), NULL, 10);
+      if(intrareaCeaMaiRecenta->vers.major > versCurentaLocal.major ||
+              (intrareaCeaMaiRecenta->vers.major == versCurentaLocal.major && intrareaCeaMaiRecenta->vers.minor > versCurentaLocal.minor)) {
+        /* s-a găsit o versiune mai bună, păstrăm entitățile necesare. */
+        g_sprintf(intrareaCeaMaiRecenta->adresaDeDescarcare, "%s", g_match_info_fetch(containerPotriviri, 3));
+        g_sprintf(intrareaCeaMaiRecenta->mesajModificari, "%s", g_match_info_fetch(containerPotriviri, 4));
         
         existaActualizare = TRUE;
         break;
@@ -110,7 +113,7 @@ dl_seteaza_ultima_intrare_actualizare(IntrareActualizare *iac) {
   intrareaCeaMaiRecenta = iac;
 }
 
-double
+Versiune
 dl_obtine_vers_curenta_server() {
   return intrareaCeaMaiRecenta->vers;
 }
@@ -118,7 +121,7 @@ dl_obtine_vers_curenta_server() {
 gboolean 
 dl_actualizeaza_aplicatia() {
   g_assert(NULL != pFisVersActuala);
-  g_assert(strlen(intrareaCeaMaiRecenta->adrPachetNou) != 0);
+  g_assert(strlen(intrareaCeaMaiRecenta->adresaDeDescarcare) != 0);
  
   /* ajungând aici avem certitudinea că există o versiunea de aplicație mai bună decât cea locală,
    * iar datele necesare sunt încărcate în variabilele de modul. */
@@ -127,7 +130,7 @@ dl_actualizeaza_aplicatia() {
   gboolean rezultatOp = FALSE;
 
   if((tempFisArhiva = fopen(DL_TEMP_ARHIVA, "wb")) != NULL) {
-    if(dl_descarca_fisier(intrareaCeaMaiRecenta->adrPachetNou, tempFisArhiva)) {
+    if(dl_descarca_fisier(intrareaCeaMaiRecenta->adresaDeDescarcare, tempFisArhiva)) {
 	  fclose(tempFisArhiva);
       /* am obținut arhiva dorită. mergi mai departe și despacheteaz-o */
       if(dl_despacheteaza_pachet_in_situ(DL_TEMP_ARHIVA)) {

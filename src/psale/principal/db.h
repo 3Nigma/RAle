@@ -11,12 +11,8 @@
 #ifndef _DB_H_
 #define _DB_H_
 
+#include "sd.h"
 #include <gtk/gtk.h>
-
-#define PSALE_BD_NUME_FIS     "date.sqlite"
-#define DB_NUME_TABEL_EXEMPLE "exemple"
-#define DB_NUME_TABEL_MEDIA   "media"
-#define DB_NUME_TABEL_META    "meta"
 
 extern gboolean 
 db_initializeaza();
@@ -27,7 +23,7 @@ db_curata();
 extern const char *
 db_obtine_adresa_actualizare();
 
-extern double 
+extern Versiune 
 db_obtine_versiune_curenta();
 
 extern gboolean 

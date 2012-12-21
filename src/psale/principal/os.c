@@ -264,17 +264,37 @@ gboolean os_compilator_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod
     return gccCompilatCuSucces;
 }
 
-gdouble os_rpsale_obtine_versiune_server() {
-    double verpsAle = 0.0;
+Versiune os_rpsale_obtine_versiune_server() {
+    Versiune verUltimapsAle = {0, 0};
+    char comandaAp[256];
+    char *tmpRaspuns;
+    char *ptAuxRaspuns;
+    RezultatOpConsola *rezOperatiunii = NULL;
 
+    sprintf(comandaAp, "%s --afiseaza --fara-ig --versiune-server", OS_CALE_RPSALE);
+    if ((rezOperatiunii = os_executa_comanda_si_obtine_rezultat(comandaAp)) != NULL && rezOperatiunii->octetiInStdOut != 0) {
+        tmpRaspuns = (char *) strdup(rezOperatiunii->stdOutBuff);
 
+        /* obținem partea majoră */
+        if ((ptAuxRaspuns = strtok(tmpRaspuns, ".")) != NULL) {
+            verUltimapsAle.major = atoi(ptAuxRaspuns);
+        }
 
-    return verpsAle;
+        /* obținem partea minoră a versiunii */
+        if ((ptAuxRaspuns = strtok(NULL, ".")) != NULL) {
+            verUltimapsAle.minor = atoi(ptAuxRaspuns);
+        }
+    }
+
+    os_elibereaza_rezultat_consola(&rezOperatiunii);
+    return verUltimapsAle;
 }
 
-gboolean os_rpsale_forteaza_actualizare(const IntrareActualizare *ia) {
+gboolean os_rpsale_forteaza_actualizare(Versiune vers) {
     gboolean stareExecutieActualizator = TRUE;
-
+    char sirVers[10];
+    
+    sprintf(sirVers, PSALE_FORMAT_VERSIUNE, vers.major, vers.minor);
 #ifdef G_OS_WIN32
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInformation;
@@ -285,19 +305,17 @@ gboolean os_rpsale_forteaza_actualizare(const IntrareActualizare *ia) {
 
     startupInfo.cb = sizeof (startupInfo);
 
-    g_sprintf(listaArgumente, "-v \"%lf\" -a \"%s\" -m \"%s\"", ia->vers, ia->adrPachetNou, ia->mesajModificari);
+    g_sprintf(listaArgumente, "--actualizeaza-direct --versiune-server %s", sirVers);
     if (!CreateProcess(OS_CALE_RPSALE, listaArgumente, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation)) {
         g_warning("Nu am putut porni actualizatorul 'rpsAle'!");
         stareExecutieActualizator = FALSE;
     }
 #elif defined G_OS_UNIX
     pid_t IdProcCopil;
-    char sirVers[10];
-
-    sprintf(sirVers, "%lf", ia->vers);
+    
     if ((IdProcCopil = fork()) != 0) {
         /* suntem în firul copil */
-        if (execlp(OS_CALE_RPSALE, OS_NUME_RPSALE, "-v", sirVers, "-a", ia->adrPachetNou, "-m", ia->mesajModificari, NULL) == -1) {
+        if (execlp(OS_CALE_RPSALE, OS_NUME_RPSALE, "--actualizeaza-direct", "--versiune-server", sirVers, NULL) == -1) {
             g_warning("Nu am putut porni actualizatorul 'rpsAle'! : %s", strerror(errno));
             stareExecutieActualizator = FALSE;
         }

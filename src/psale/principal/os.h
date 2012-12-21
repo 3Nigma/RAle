@@ -13,6 +13,7 @@
 
 #include <gtk/gtk.h>
 
+#include "sd.h"
 #include "bic.h"
 #include "dl.h"
 
@@ -32,8 +33,8 @@ os_win_executa_com_fara_redirectionari(gchar *command);
 
 extern unsigned long os_system(gchar *command);
 
-extern gdouble os_rpsale_obtine_versiune_server();
-extern gboolean os_rpsale_forteaza_actualizare(const IntrareActualizare *ia);
+extern Versiune os_rpsale_obtine_versiune_server();
+extern gboolean os_rpsale_forteaza_actualizare(Versiune vers);
 
 extern gboolean os_compilator_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta);
 

@@ -12,21 +12,16 @@
 #define _DL_H_
 
 #include <gtk/gtk.h>
+#include "sd.h"
 
 #define DL_TEMP_ARHIVA     "temp.zip"
 #define DL_CURL_TIMEOUT    5
-
-typedef struct {
-  char *adrPachetNou;
-  double vers;
-  char *mesajModificari;
-} IntrareActualizare;
 
 extern gboolean 
 dl_initializeaza(const char *adresa);
 
 extern gboolean 
-dl_exista_versiune_mai_buna_decat(double versCurentaLocal);
+dl_exista_versiune_mai_buna_decat(Versiune versCurentaLocal);
 
 extern void
 dl_curata();
@@ -37,7 +32,7 @@ dl_obtine_ultima_intrare_actualizare();
 extern void
 dl_seteaza_ultima_intrare_actualizare(IntrareActualizare *iac);
 
-extern double
+extern Versiune
 dl_obtine_vers_curenta_server();
 
 extern gboolean 

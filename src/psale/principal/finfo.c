@@ -12,10 +12,10 @@
 #include <stdlib.h>
 #include <glib/gprintf.h>
 
+#include "sd.h"
 #include "fl.h"
 #include "db.h"
 #include "os.h"
-#include "dl.h"
 
 #include "finfo.h"
 
@@ -131,63 +131,59 @@ btIesire_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
 
 static void
 btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
-    if (dl_initializeaza(db_obtine_adresa_actualizare())) {
-        g_debug("Modulul de descărcări (downloads : 'dl') a fost inițializat.");
+    gboolean actualizareConfirmata = FALSE;
+    GtkWidget *dlgIntrebareActualizare = NULL;
+    Versiune versServer = os_rpsale_obtine_versiune_server();
+    Versiune versLocala = db_obtine_versiune_curenta();
 
-        gboolean actualizareConfirmata = FALSE;
-        GtkWidget *dlgIntrebareActualizare = NULL;
+    if (versServer.major > versLocala.major ||
+            (versServer.major == versLocala.major && versServer.minor > versLocala.minor)) {
+        g_debug("S-a analizat și s-a găsit o versiune de aplicație mai nouă. Întreabă utilizatorul privind acțiunea următoare ...");
 
-        if (dl_exista_versiune_mai_buna_decat(db_obtine_versiune_curenta())) {
-            g_debug("S-a analizat și s-a găsit o versiune de aplicație mai nouă. Întreabă utilizatorul privind acțiunea următoare ...");
+        dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(fereastraParinte, GTK_DIALOG_MODAL,
+                GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
+                "Am găsit o actualizare.\n"
+                "Se pare că ultima versiune este <b>" PSALE_FORMAT_VERSIUNE "</b> !\n\n"
+                "Doriți să treceți <i>acum</i> la această nouă versiune ?\n\n"
+                "<b>Atenție!</b> Dacă răspundeți <b><i>Da</i></b> atunci aplicația curentă <u>se va închide</u>! "
+                "Asigurați-vă că nu pierdeți nimic din lucrul curent.",
+                versServer.major, versServer.minor);
 
-            dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(fereastraParinte, GTK_DIALOG_MODAL,
-                    GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
-                    "Am găsit o actualizare.\n"
-                    "Se pare că ultima versiune este <b>" PSALE_FORMAT_VERSIUNE "</b> !\n\n"
-                    "Doriți să treceți <i>acum</i> la această nouă versiune ?\n\n"
-                    "<b>Atenție!</b> Dacă răspundeți <b><i>Da</i></b> atunci aplicația curentă <u>se va închide</u>! "
-                    "Asigurați-vă că nu pierdeți nimic din lucrul curent.",
-                    dl_obtine_vers_curenta_server());
-
-            gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Întrebare");
-            gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Da", FINFO_ACTCONF_DLG_DA,
-                    "Nu", FINFO_ACTCONF_DLG_NU,
-                    NULL);
-            gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_DA);
-            if (gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare)) == FINFO_ACTCONF_DLG_DA) {
-                actualizareConfirmata = TRUE;
-            }
-        } else {
-            g_debug("Nu am găsit nici o actualizare sau s-a întâmplat ceva cu procesul de actualizare ... ");
-
-            dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(fereastraParinte, GTK_DIALOG_MODAL,
-                    GTK_MESSAGE_INFO, GTK_BUTTONS_NONE,
-                    "Nu am găsit nicio actualizare disponibilă.\n\n"
-                    "Versiunea pe care o aveți, <b>" PSALE_FORMAT_VERSIUNE "</b>, este ultima.",
-                    db_obtine_versiune_curenta());
-
-            gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Rezultat");
-            gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Am înțeles", FINFO_ACTCONF_DLG_INREGULA,
-                    NULL);
-            gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_INREGULA);
-            gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare));
+        gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Întrebare");
+        gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Da", FINFO_ACTCONF_DLG_DA,
+                "Nu", FINFO_ACTCONF_DLG_NU,
+                NULL);
+        gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_DA);
+        if (gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare)) == FINFO_ACTCONF_DLG_DA) {
+            actualizareConfirmata = TRUE;
         }
+    } else {
+        g_debug("Nu am găsit nici o actualizare sau s-a întâmplat ceva cu procesul de actualizare ... ");
 
-        gtk_widget_destroy(dlgIntrebareActualizare);
+        dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(fereastraParinte, GTK_DIALOG_MODAL,
+                GTK_MESSAGE_INFO, GTK_BUTTONS_NONE,
+                "Nu am găsit nicio actualizare disponibilă.\n\n"
+                "Versiunea pe care o aveți, <b>" PSALE_FORMAT_VERSIUNE "</b>, este ultima.",
+                versLocala.major, versLocala.minor);
 
-        if (TRUE == actualizareConfirmata) {
-            /* avem actualizare și acordul utilizatorului de a o aplica. Îi dăm drumul lui 'rpsAle' să treacă la treabă! */
-            os_rpsale_forteaza_actualizare(dl_obtine_ultima_intrare_actualizare());
-        }
+        gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Rezultat");
+        gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Am înțeles", FINFO_ACTCONF_DLG_INREGULA,
+                NULL);
+        gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_INREGULA);
+        gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare));
+    }
 
-        /* curățăm modulul */
-        dl_curata();
+    gtk_widget_destroy(dlgIntrebareActualizare);
 
-        if (TRUE == actualizareConfirmata) {
-            /* totul este pregătit pentru actualizare. 'rpsAle' e pornit, iar nouă nu ne mai rămâne decât să închidem 'psAle'
-             * și să lăsăm actualizatorul să-și facă treaba */
-            gtk_main_quit();
-        }
+    if (TRUE == actualizareConfirmata) {
+        /* avem actualizare și acordul utilizatorului de a o aplica. Îi dăm drumul lui 'rpsAle' să treacă la treabă! */
+        os_rpsale_forteaza_actualizare(versServer);
+    }
+
+    if (TRUE == actualizareConfirmata) {
+        /* totul este pregătit pentru actualizare. 'rpsAle' e pornit, iar nouă nu ne mai rămâne decât să închidem 'psAle'
+         * și să lăsăm actualizatorul să-și facă treaba */
+        gtk_main_quit();
     }
 }
 
@@ -196,8 +192,9 @@ incarca_info_general(GtkWidget *cadruFrm) {
     GtkWidget *cadruTitluEtichete = NULL;
     GtkWidget *cadruValEtichete = NULL;
     gchar versActualaLocala[10];
-
-    g_sprintf(versActualaLocala, PSALE_FORMAT_VERSIUNE, db_obtine_versiune_curenta());
+    Versiune versCurenta = db_obtine_versiune_curenta();
+    
+    g_sprintf(versActualaLocala, PSALE_FORMAT_VERSIUNE, versCurenta.major, versCurenta.minor);
 
     /* inițializăm cadrul etichetelor (titlu + valoare) */
     cadruTitluEtichete = gtk_vbox_new(FALSE, 4);
