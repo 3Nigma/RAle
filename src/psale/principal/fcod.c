@@ -266,7 +266,7 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
     g_free(cDir);
 
     /* încearcă să compilezi sursa curentă trecând-o prin 'avr-gcc' și interpretând eventualele erori în bara de stare a formularului curent */
-    if (os_executa_si_completeaza_bic_fc(textComandaGcc, bInfoFormularCurent)) {
+    if (os_compilator_executa_si_completeaza_bic_fc(textComandaGcc, bInfoFormularCurent)) {
         /* Compilarea a reușit. Încearcă o extragere a secțiunilor necesare pentru programator și construiește HEX-ul */
         os_system(textComandaObjcopy);
         bic_ascunde(bInfoFormularCurent);

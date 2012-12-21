@@ -81,56 +81,6 @@ static void os_elibereaza_rezultat_consola(RezultatOpConsola **rez) {
     if ((*rez)->stdErrBuff != NULL) g_free((*rez)->stdErrBuff);
     g_free(*rez);
 }
-
-unsigned long os_system(gchar *command) {
-#ifdef G_OS_WIN32
-    return os_win_executa_com_fara_redirectionari(command);
-#elif defined G_OS_UNIX
-    int retVal = system(command);
-
-    if (WIFEXITED(retVal)) {
-        return WEXITSTATUS(retVal);
-    } else {
-        return -1;
-    }
-#endif
-}
-
-gboolean os_executa_actualizator(const IntrareActualizare *ia) {
-    gboolean stareExecutieActualizator = TRUE;
-
-#ifdef G_OS_WIN32
-    STARTUPINFO startupInfo;
-    PROCESS_INFORMATION processInformation;
-    gchar listaArgumente[5120];
-
-    ZeroMemory(&startupInfo, sizeof (startupInfo));
-    ZeroMemory(&processInformation, sizeof (processInformation));
-
-    startupInfo.cb = sizeof (startupInfo);
-
-    g_sprintf(listaArgumente, "-v \"%lf\" -a \"%s\" -m \"%s\"", ia->vers, ia->adrPachetNou, ia->mesajModificari);
-    if (!CreateProcess(OS_CALE_RPSALE, listaArgumente, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation)) {
-        g_warning("Nu am putut porni actualizatorul 'rpsAle'!");
-        stareExecutieActualizator = FALSE;
-    }
-#elif defined G_OS_UNIX
-    pid_t IdProcCopil;
-    char sirVers[10];
-
-    sprintf(sirVers, "%lf", ia->vers);
-    if ((IdProcCopil = fork()) != 0) {
-        /* suntem în firul copil */
-        if (execlp(OS_CALE_RPSALE, OS_NUME_RPSALE, "-v", sirVers, "-a", ia->adrPachetNou, "-m", ia->mesajModificari, NULL) == -1) {
-            g_warning("Nu am putut porni actualizatorul 'rpsAle'! : %s", strerror(errno));
-            stareExecutieActualizator = FALSE;
-        }
-    }
-#endif
-
-    return stareExecutieActualizator;
-}
-
 RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
     g_assert(com != NULL);
     RezultatOpConsola *rezConsola = NULL;
@@ -274,7 +224,21 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
     return rezConsola;
 }
 
-gboolean os_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta) {
+unsigned long os_system(gchar *command) {
+#ifdef G_OS_WIN32
+    return os_win_executa_com_fara_redirectionari(command);
+#elif defined G_OS_UNIX
+    int retVal = system(command);
+
+    if (WIFEXITED(retVal)) {
+        return WEXITSTATUS(retVal);
+    } else {
+        return -1;
+    }
+#endif
+}
+
+gboolean os_compilator_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta) {
     g_assert(comanda != NULL);
     g_assert(baraInfoTinta != NULL);
 
@@ -299,12 +263,47 @@ gboolean os_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoT
     return gccCompilatCuSucces;
 }
 
-double os_obtine_vers_psale_server() {
+double os_rpsale_obtine_versiune_server() {
     double verpsAle = 0.0;
 
 
 
     return verpsAle;
+}
+
+gboolean os_rpsale_forteaza_actualizare(const IntrareActualizare *ia) {
+    gboolean stareExecutieActualizator = TRUE;
+
+#ifdef G_OS_WIN32
+    STARTUPINFO startupInfo;
+    PROCESS_INFORMATION processInformation;
+    gchar listaArgumente[5120];
+
+    ZeroMemory(&startupInfo, sizeof (startupInfo));
+    ZeroMemory(&processInformation, sizeof (processInformation));
+
+    startupInfo.cb = sizeof (startupInfo);
+
+    g_sprintf(listaArgumente, "-v \"%lf\" -a \"%s\" -m \"%s\"", ia->vers, ia->adrPachetNou, ia->mesajModificari);
+    if (!CreateProcess(OS_CALE_RPSALE, listaArgumente, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation)) {
+        g_warning("Nu am putut porni actualizatorul 'rpsAle'!");
+        stareExecutieActualizator = FALSE;
+    }
+#elif defined G_OS_UNIX
+    pid_t IdProcCopil;
+    char sirVers[10];
+
+    sprintf(sirVers, "%lf", ia->vers);
+    if ((IdProcCopil = fork()) != 0) {
+        /* suntem în firul copil */
+        if (execlp(OS_CALE_RPSALE, OS_NUME_RPSALE, "-v", sirVers, "-a", ia->adrPachetNou, "-m", ia->mesajModificari, NULL) == -1) {
+            g_warning("Nu am putut porni actualizatorul 'rpsAle'! : %s", strerror(errno));
+            stareExecutieActualizator = FALSE;
+        }
+    }
+#endif
+
+    return stareExecutieActualizator;
 }
 
 void os_obtine_nume_fis_temporar(gchar *buff, gint buffLen) {

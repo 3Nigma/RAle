@@ -177,7 +177,7 @@ btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
 
         if (TRUE == actualizareConfirmata) {
             /* avem actualizare și acordul utilizatorului de a o aplica. Îi dăm drumul lui 'rpsAle' să treacă la treabă! */
-            os_executa_actualizator(dl_obtine_ultima_intrare_actualizare());
+            os_rpsale_forteaza_actualizare(dl_obtine_ultima_intrare_actualizare());
         }
 
         /* curățăm modulul */

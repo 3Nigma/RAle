@@ -34,10 +34,10 @@ extern unsigned long
 os_system(gchar *command);
 
 extern gboolean
-os_executa_actualizator(const IntrareActualizare *ia);
+os_rpsale_forteaza_actualizare(const IntrareActualizare *ia);
 
 extern gboolean
-os_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta);
+os_compilator_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta);
 
 extern void
 os_obtine_nume_fis_temporar(gchar *buff, gint buffLen);
