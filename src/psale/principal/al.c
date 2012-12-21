@@ -42,7 +42,7 @@ al_este_placuta_conectata() {
   g_sprintf(avrDudeCom, "%s -c usbtiny -p t25 -V", 
                         al_obtine_cale_applicatie());
 #elif defined G_OS_UNIX
-  g_sprintf(avrDudeCom, "sudo %s -c usbtiny -p t25 -V 2> /dev/null", 
+  g_sprintf(avrDudeCom, "sudo %s -c usbtiny -p t25 -V 2>/dev/null", 
                         al_obtine_cale_applicatie());
 #endif
   
@@ -60,7 +60,7 @@ al_scrie_aplicatie(const gchar *caleFisHex) {
                           al_obtine_cale_applicatie(), 
                           caleFisHex);
 #elif defined G_OS_UNIX
-    g_sprintf(avrDudeCom, "sudo %s -c usbtiny -p t25 -U flash:w:\"%s\":i 2> /dev/null", 
+    g_sprintf(avrDudeCom, "sudo %s -c usbtiny -p t25 -U flash:w:\"%s\":i", 
                           al_obtine_cale_applicatie(), 
                           caleFisHex);
 #endif
@@ -97,7 +97,7 @@ al_citeste_eeprom(GtkListStore *lm) {
                    mcus[indexMCUPrezent].avrdudePart, 
                    hexRezultat);
 #elif defined G_OS_UNIX
-    g_sprintf(com, "sudo %s -c usbtiny -p %s -U eeprom:r:\"%s\":h 2>/dev/null", 
+    g_sprintf(com, "sudo %s -c usbtiny -p %s -U eeprom:r:\"%s\":h", 
                    al_obtine_cale_applicatie(), 
                    mcus[indexMCUPrezent].avrdudePart, 
                    hexRezultat);
@@ -164,7 +164,7 @@ al_scrie_eeprom(GtkListStore *lm) {
                    mcus[indexMCUPrezent].avrdudePart, 
                    fisTempHex);
 #elif defined G_OS_UNIX
-    g_sprintf(com, "sudo %s -c usbtiny -p %s -U eeprom:w:\"%s\":r 2>/dev/null", 
+    g_sprintf(com, "sudo %s -c usbtiny -p %s -U eeprom:w:\"%s\":r 2>&1", 
                    al_obtine_cale_applicatie(), 
                    mcus[indexMCUPrezent].avrdudePart, 
                    fisTempHex);
@@ -226,10 +226,10 @@ al_obtine_index_mcu() {
   gchar *semnCompCitita = NULL;
   
 #ifdef G_OS_WIN32
-  g_sprintf(comAvrDude, "%s -c usbtiny -p t25 -V 2>&1", 
+  g_sprintf(comAvrDude, "%s -c usbtiny -p t25 -V", 
                         al_obtine_cale_applicatie());
 #elif defined G_OS_UNIX
-  g_sprintf(comAvrDude, "sudo %s -c usbtiny -p t25 -V 2>&1", 
+  g_sprintf(comAvrDude, "sudo %s -c usbtiny -p t25 -V", 
                         al_obtine_cale_applicatie());
 #endif
   semnCompCitita = os_obtine_cod_mcu_prezent(comAvrDude);
