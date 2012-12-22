@@ -10,7 +10,7 @@ include ../Makefile.defs
 
 CFLAGS := -g -Wall `pkg-config --cflags gtk+-2.0 gtksourceview-2.0 sqlite3 poppler-glib libzip`
 LDFLAGS := `pkg-config --libs gtk+-2.0 gtksourceview-2.0 sqlite3 libcurl poppler-glib libzip`
-OBJS := fprin.o os.o fl.o db.o finfo.o dl.o feeprom.o fcod.o bic.o al.o vc.o
+OBJS := sda.o fprin.o os.o fl.o db.o finfo.o feeprom.o fcod.o bic.o al.o vc.o
 TIPCONSTRUCTIE :=
 
 .c.o :

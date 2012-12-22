@@ -56,20 +56,21 @@ db_obtine_adresa_actualizare() {
     return adresaReinoire;
 }
 
-Versiune
-db_obtine_versiune_curenta() {
-    Versiune versActuala = {0, 0};
+Versiune *db_obtine_versiune_curenta() {
+    Versiune *versActuala = NULL;
     sqlite3_stmt *af = NULL;
     sqlite3_value *rez = NULL;
 
     if ((af = db_aplica_afirmatie("select VersMajoraCurenta,VersMinoraCurenta FROM " DB_NUME_TABEL_META)) != NULL) {
+        versActuala = g_new(Versiune, 1);
+        
         /* obține partea majoră a versiunii */
         rez = sqlite3_column_value(af, 0);
-        versActuala.major = sqlite3_value_int(rez);
+        versActuala->major = sqlite3_value_int(rez);
         
         /* obține partea minoră a versiunii */
         rez = sqlite3_column_value(af, 1);
-        versActuala.minor = sqlite3_value_int(rez);
+        versActuala->minor = sqlite3_value_int(rez);
         
         sqlite3_finalize(af);
     }

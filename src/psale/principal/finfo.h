@@ -11,7 +11,7 @@
 #ifndef _FINFO_H_
 #define _FINFO_H_
 
-#include "sd.h"
+#include "sda.h"
 #include <gtk/gtk.h>
 
 extern GtkWidget *

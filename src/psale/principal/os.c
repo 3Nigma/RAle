@@ -264,37 +264,25 @@ gboolean os_compilator_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod
     return gccCompilatCuSucces;
 }
 
-Versiune os_rpsale_obtine_versiune_server() {
-    Versiune verUltimapsAle = {0, 0};
+Versiune *os_rpsale_obtine_versiune_server() {
+    Versiune *verUltimapsAle = NULL;
     char comandaAp[256];
-    char *tmpRaspuns;
-    char *ptAuxRaspuns;
     RezultatOpConsola *rezOperatiunii = NULL;
 
     sprintf(comandaAp, "%s --afiseaza --fara-ig --versiune-server", OS_CALE_RPSALE);
     if ((rezOperatiunii = os_executa_comanda_si_obtine_rezultat(comandaAp)) != NULL && rezOperatiunii->octetiInStdOut != 0) {
-        tmpRaspuns = (char *) strdup(rezOperatiunii->stdOutBuff);
-
-        /* obținem partea majoră */
-        if ((ptAuxRaspuns = strtok(tmpRaspuns, ".")) != NULL) {
-            verUltimapsAle.major = atoi(ptAuxRaspuns);
-        }
-
-        /* obținem partea minoră a versiunii */
-        if ((ptAuxRaspuns = strtok(NULL, ".")) != NULL) {
-            verUltimapsAle.minor = atoi(ptAuxRaspuns);
-        }
+        verUltimapsAle = sda_obtineVersiuneDinSir(rezOperatiunii->stdOutBuff);
     }
 
     os_elibereaza_rezultat_consola(&rezOperatiunii);
     return verUltimapsAle;
 }
 
-gboolean os_rpsale_forteaza_actualizare(Versiune vers) {
+gboolean os_rpsale_forteaza_actualizare(Versiune *vers) {
     gboolean stareExecutieActualizator = TRUE;
     char sirVers[10];
     
-    sprintf(sirVers, PSALE_FORMAT_VERSIUNE, vers.major, vers.minor);
+    sprintf(sirVers, PSALE_FORMAT_VERSIUNE_PRINTF, vers->major, vers->minor);
 #ifdef G_OS_WIN32
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInformation;

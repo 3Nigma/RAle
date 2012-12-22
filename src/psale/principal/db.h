@@ -11,7 +11,7 @@
 #ifndef _DB_H_
 #define _DB_H_
 
-#include "sd.h"
+#include "sda.h"
 #include <gtk/gtk.h>
 
 extern gboolean 
@@ -23,7 +23,7 @@ db_curata();
 extern const char *
 db_obtine_adresa_actualizare();
 
-extern Versiune 
+extern Versiune *
 db_obtine_versiune_curenta();
 
 extern gboolean 

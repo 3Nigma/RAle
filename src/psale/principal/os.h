@@ -13,12 +13,9 @@
 
 #include <gtk/gtk.h>
 
-#include "sd.h"
+#include "sda.h"
 #include "bic.h"
-#include "dl.h"
 
-#define OS_NUME_RPSALE "rpsale"
-#define OS_CALE_RPSALE "./"OS_NUME_RPSALE
 #define OS_BUCATA_CONS_BUFF 4096
 
 #ifdef G_OS_WIN32
@@ -33,8 +30,8 @@ os_win_executa_com_fara_redirectionari(gchar *command);
 
 extern unsigned long os_system(gchar *command);
 
-extern Versiune os_rpsale_obtine_versiune_server();
-extern gboolean os_rpsale_forteaza_actualizare(Versiune vers);
+extern Versiune *os_rpsale_obtine_versiune_server();
+extern gboolean os_rpsale_forteaza_actualizare(Versiune *vers);
 
 extern gboolean os_compilator_executa_si_completeaza_bic_fc(gchar *comanda, BaraInfoCod *baraInfoTinta);
 
