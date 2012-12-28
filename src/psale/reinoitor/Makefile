@@ -8,12 +8,12 @@
 
 include ../Makefile.defs
 
-OBIECTE_PSALE := psale_db.o psale_dl.o
+OBIECTE_PSALE := psale_sda.o psale_db.o
 PSALE_CALE_SURSE := ../principal
 
 CFLAGS := -g -Wall -I$(PSALE_CALE_SURSE) `pkg-config --cflags gtk+-2.0 sqlite3 libzip`
 LDFLAGS := `pkg-config --libs gtk+-2.0 sqlite3 libcurl libzip`
-OBJS = $(OBIECTE_PSALE)
+OBJS = $(OBIECTE_PSALE) dl.o dz.o par_aplicatie.o fprimarulare.o factualizare.o
 
 TIPCONSTRUCTIE :=
 
