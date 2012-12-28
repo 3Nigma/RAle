@@ -144,18 +144,17 @@ btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
         return;
     }
 
-    if (versServer->major > versLocala->major ||
-            (versServer->major == versLocala->major && versServer->minor > versLocala->minor)) {
+    if (sda_comparaVersiuni(versServer, &versLocala) == 1) {
         g_debug("S-a analizat și s-a găsit o versiune de aplicație mai nouă. Întreabă utilizatorul privind acțiunea următoare ...");
 
         dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(fereastraParinte, GTK_DIALOG_MODAL,
                 GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
                 "Am găsit o actualizare.\n"
-                "Se pare că ultima versiune este <b>" PSALE_FORMAT_VERSIUNE_PRINTF "</b> !\n\n"
+                "Se pare că ultima versiune este <b>%s</b> !\n\n"
                 "Doriți să treceți <i>acum</i> la această nouă versiune ?\n\n"
                 "<b>Atenție!</b> Dacă răspundeți <b><i>Da</i></b> atunci aplicația curentă <u>se va închide</u>! "
                 "Asigurați-vă că nu pierdeți nimic din lucrul curent.",
-                versServer->major, versServer->minor);
+                sda_versiune_printf(versServer));
 
         gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Întrebare");
         gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Da", FINFO_ACTCONF_DLG_DA,
@@ -171,8 +170,8 @@ btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
         dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(fereastraParinte, GTK_DIALOG_MODAL,
                 GTK_MESSAGE_INFO, GTK_BUTTONS_NONE,
                 "Nu am găsit nicio actualizare disponibilă.\n\n"
-                "Versiunea pe care o aveți, <b>" PSALE_FORMAT_VERSIUNE_PRINTF "</b>, este ultima.",
-                versLocala->major, versLocala->minor);
+                "Versiunea pe care o aveți, <b>%s</b>, este ultima.",
+                sda_versiune_printf(versLocala));
 
         gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Rezultat");
         gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Am înțeles", FINFO_ACTCONF_DLG_INREGULA,
@@ -205,7 +204,7 @@ incarca_info_general(GtkWidget *cadruFrm) {
     Versiune *versCurenta = NULL;
 
     if ((versCurenta = db_obtine_versiune_curenta()) != NULL) {
-        g_sprintf(versActualaLocala, PSALE_FORMAT_VERSIUNE_PRINTF, versCurenta->major, versCurenta->minor);
+        g_sprintf(versActualaLocala, "%s", sda_versiune_printf(versCurenta));
         g_free(versCurenta);
     } else {
         g_debug("Nu am putut obține versiunea curentă din baza de date pentru a o afișa în formularul de informații!");
