@@ -53,7 +53,7 @@ ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
                 }
                 break;
             case 'v': /* versiune-server */
-                if ((parAp->versServer = sda_obtineVersiuneDinSir(optarg)) == NULL) {
+                if (optarg != NULL && (parAp->versServer = sda_obtineVersiuneDinSir(optarg)) == NULL) {
                     g_warning("Formatul versiunii este incorect! Aplicația consideră următorul tipar valid: '%s'", PSALE_FORMAT_VERSIUNE_PRINTF);
                     pa_afiseaza_meniu();
                     pa_curata(&parAp);
