@@ -15,9 +15,10 @@
 gboolean dz_despacheteaza_pachet(const char *numeArhiva, const char *caleDezarhivare) {
     struct zip *zFile = NULL;
     gboolean stareOp = FALSE;
+    int zipCodEroare = 0;
 
     /* deschidem arhiva */
-    if ((zFile = zip_open(numeArhiva, 0, NULL)) != NULL) {
+    if ((zFile = zip_open(numeArhiva, ZIP_CHECKCONS, &zipCodEroare)) != NULL) {
         zip_uint64_t nrFisInArhiva = zip_get_num_entries(zFile, 0);
         zip_uint64_t fIndex = 0;
         struct zip_file *fisInternArhiva = NULL;
@@ -27,47 +28,52 @@ gboolean dz_despacheteaza_pachet(const char *numeArhiva, const char *caleDezarhi
         char buffTransfer[2048];
         char caleCompletaFisTinta[1024];
 
-        for (fIndex = 0; fIndex < nrFisInArhiva; ++fIndex) {
-            /* obține informații despre fișierul cu indexul curent */
-            zip_stat_init(&fZStat);
-            zip_stat_index(zFile, fIndex, 0, &fZStat);
+        if (nrFisInArhiva == 0) {
+            g_warning("Pachetul nu conține nici-un element!");
+        } else {
+            for (fIndex = 0; fIndex < nrFisInArhiva; ++fIndex) {
+                /* obține informații despre fișierul cu indexul curent */
+                zip_stat_init(&fZStat);
+                zip_stat_index(zFile, fIndex, 0, &fZStat);
 
-            /* despachetează fișierul */
-            fisInternArhiva = zip_fopen_index(zFile, fIndex, 0);
-            sprintf(caleCompletaFisTinta, "%s/%s", caleDezarhivare, fZStat.name);
-            if (sda_este_cale_fisier_valida(caleCompletaFisTinta)) {
-                if ((fisDecompresat = sda_fopen_mkdir(caleCompletaFisTinta, "wb")) != NULL) {
-                    restOctetiDeDecompresat = fZStat.size;
-                    do {
-                        /* preluăm din arhivă și punem în fișierul despachetat */
-                        if (restOctetiDeDecompresat > sizeof (buffTransfer)) {
-                            zip_fread(fisInternArhiva, buffTransfer, sizeof (buffTransfer));
-                            fwrite(buffTransfer, sizeof (char), sizeof (buffTransfer), fisDecompresat);
-                            restOctetiDeDecompresat -= sizeof (buffTransfer);
-                        } else {
-                            zip_fread(fisInternArhiva, buffTransfer, restOctetiDeDecompresat);
-                            fwrite(buffTransfer, sizeof (char), restOctetiDeDecompresat, fisDecompresat);
-                            restOctetiDeDecompresat = 0;
-                        }
+                /* despachetează fișierul */
+                fisInternArhiva = zip_fopen_index(zFile, fIndex, 0);
+                sprintf(caleCompletaFisTinta, "%s/%s", caleDezarhivare, fZStat.name);
+                if (sda_este_cale_fisier_valida(caleCompletaFisTinta)) {
+                    if ((fisDecompresat = sda_fopen_mkdir(caleCompletaFisTinta, "wb")) != NULL) {
+                        restOctetiDeDecompresat = fZStat.size;
+                        do {
+                            /* preluăm din arhivă și punem în fișierul despachetat */
+                            if (restOctetiDeDecompresat > sizeof (buffTransfer)) {
+                                zip_fread(fisInternArhiva, buffTransfer, sizeof (buffTransfer));
+                                fwrite(buffTransfer, sizeof (char), sizeof (buffTransfer), fisDecompresat);
+                                restOctetiDeDecompresat -= sizeof (buffTransfer);
+                            } else {
+                                zip_fread(fisInternArhiva, buffTransfer, restOctetiDeDecompresat);
+                                fwrite(buffTransfer, sizeof (char), restOctetiDeDecompresat, fisDecompresat);
+                                restOctetiDeDecompresat = 0;
+                            }
 
-                    } while (restOctetiDeDecompresat != 0);
+                        } while (restOctetiDeDecompresat != 0);
 
-                    /* am încheiat operația. Putem închide fișierele */
-                    zip_fclose(fisInternArhiva);
-                    fclose(fisDecompresat);
+                        /* am încheiat operația. Putem închide fișierele */
+                        zip_fclose(fisInternArhiva);
+                        fclose(fisDecompresat);
+                    } else {
+                        g_warning("Nu am putut crea calea '%s' ce va ține fișierul din pachet!", caleCompletaFisTinta);
+                    }
                 } else {
-                    g_warning("Nu am putut crea calea '%s' ce va ține fișierul din pachet!", caleCompletaFisTinta);
+                    g_debug("Sar peste entitatea '%s'. Se pare că nu este o cale de fișier valid (o fi director?).", caleCompletaFisTinta);
                 }
-            } else {
-                g_debug("Sar peste entitatea '%s'. Se pare că nu este o cale de fișier valid (o fi director?).", caleCompletaFisTinta);
             }
+            stareOp = TRUE;
         }
         /* curățăm memoria */
         zip_close(zFile);
-
-        stareOp = TRUE;
     } else {
-        g_warning("Nu am putut deschide arhiva pentru despachetare!");
+        char errBuff[128];
+        zip_error_to_str(errBuff, sizeof(errBuff)/sizeof(char), zipCodEroare, errno);
+        g_warning("Nu am putut deschide pachetul: %s!", errBuff);
     }
 
     return stareOp;

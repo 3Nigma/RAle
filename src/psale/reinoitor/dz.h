@@ -16,10 +16,11 @@ extern "C" {
 #endif
 
 #include <gtk/gtk.h>
+#include <errno.h>
 #include "sda.h"
 
 #define DZ_CALE_DESPACHETARE "."
-    
+
     extern gboolean dz_despacheteaza_pachet(const char *numeArhiva, const char *cale);
 
 #ifdef	__cplusplus
