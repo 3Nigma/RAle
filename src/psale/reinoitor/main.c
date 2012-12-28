@@ -22,7 +22,6 @@ int main(int argc, char *argv[]) {
     /* încărcăm eventualele informații venite din exterior (în parametrii dați prin linia de comandă) */
     if ((optiuniExterne = pa_incarca_parametrii(argc, argv)) != NULL) {
         if (db_initializeaza()) {
-
             if (db_obtine_este_prima_rulare() &&
                     optiuniExterne->tipOp == ACTUALIZEAZA_NORMAL) {
                 g_debug("Afișez formularul de 'primă rulare' ...");
@@ -48,7 +47,9 @@ int main(int argc, char *argv[]) {
                 g_debug("Aceasta nu este prima execuție a aplicației ...");
             }
 
-            if (db_obtine_este_actualizare_automata() || optiuniExterne->tipOp == ACTUALIZEAZA_DIRECT) {
+            if (db_obtine_este_actualizare_automata() ||
+                    optiuniExterne->tipOp == ACTUALIZEAZA_DIRECT ||
+                    optiuniExterne->tipOp == AFISEAZA) {
                 FAInstanta *fSesiuneActualizare = fa_initializeaza(optiuniExterne);
 
                 fa_lanseaza_sesiune_actualizare(fSesiuneActualizare);
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
         }
         pa_curata(&optiuniExterne);
     } else {
-        g_debug("S-a dorit lansarea cu parametrii din linia de comandă, dar operația a fost anulată deoarece ");
+        g_warning("S-a dorit lansarea cu parametrii din linia de comandă, dar operația nu s-a putut finaliza pentru că au existat probleme la interpretarea parametrilor!");
     }
 
     return 0;
