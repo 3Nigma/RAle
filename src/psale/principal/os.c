@@ -280,9 +280,7 @@ Versiune *os_rpsale_obtine_versiune_server() {
 
 gboolean os_rpsale_forteaza_actualizare(Versiune *vers) {
     gboolean stareExecutieActualizator = TRUE;
-    char sirVers[10];
-    
-    sprintf(sirVers, PSALE_FORMAT_VERSIUNE_PRINTF, vers->major, vers->minor);
+
 #ifdef G_OS_WIN32
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInformation;
@@ -293,7 +291,7 @@ gboolean os_rpsale_forteaza_actualizare(Versiune *vers) {
 
     startupInfo.cb = sizeof (startupInfo);
 
-    g_sprintf(listaArgumente, "--actualizeaza-direct --versiune-server %s", sirVers);
+    g_sprintf(listaArgumente, "--actualizeaza-direct --versiune-server %s", sda_versiune_printf(vers));
     if (!CreateProcess(OS_CALE_RPSALE, listaArgumente, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation)) {
         g_warning("Nu am putut porni actualizatorul 'rpsAle'!");
         stareExecutieActualizator = FALSE;
@@ -303,7 +301,7 @@ gboolean os_rpsale_forteaza_actualizare(Versiune *vers) {
     
     if ((IdProcCopil = fork()) != 0) {
         /* suntem în firul copil */
-        if (execlp(OS_CALE_RPSALE, OS_NUME_RPSALE, "--actualizeaza-direct", "--versiune-server", sirVers, NULL) == -1) {
+        if (execlp(OS_CALE_RPSALE, OS_NUME_RPSALE, "--actualizeaza-direct", "--versiune-server", sda_versiune_printf(vers), NULL) == -1) {
             g_warning("Nu am putut porni actualizatorul 'rpsAle'! : %s", strerror(errno));
             stareExecutieActualizator = FALSE;
         }
