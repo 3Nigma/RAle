@@ -31,7 +31,7 @@ extern gboolean dl_contine_lista_actualizari_elemente(DLInstanta *dli);
 extern void dl_incarca_ultima_versiune_server(DLInstanta *dli);
 extern gboolean dl_incarca_versiune_specifica_server(DLInstanta *dli, Versiune *versDorita);
 extern gboolean dl_exista_versiune_mai_buna_decat(DLInstanta *dli, Versiune *versCurentaLocal);
-extern Versiune *dl_obtine_vers_curenta_server();
+extern IntrareActualizare *dl_obtine_vers_curenta_server(DLInstanta *dli);
 extern char *dl_descarca_actualizare_tinta_local(DLInstanta *dli);
 
 #endif

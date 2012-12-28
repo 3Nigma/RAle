@@ -142,6 +142,9 @@ static void fa_progres_seteaza_stare(FAInstanta *fai, StareActualizare stareNoua
             fa_progres_actualizeaza_atentie(fai, "NU am putut aplica actualizarea");
             break;
 
+        case FA_DL_AFISARE_CU_SUCCES:
+            fa_progres_actualizeaza_normal(fai, "am afișat ce s-a dorit");
+            break;
         case FA_DL_VERSIUNE_ESTE_ULTIMA:
             fa_progres_actualizeaza_normal(fai, "nicio versiune nouă");
             break;
@@ -223,8 +226,13 @@ static gboolean fa_proceseaza_sesiune(FAInstanta *fai) {
                 case ACTUALIZEAZA_DIRECT:
                 case ACTUALIZEAZA_NORMAL:
                     fa_progres_seteaza_stare(fai, FA_DL_PREGATESTE_VERSIUNE_TINTA);
+                    break;
                 case AFISEAZA:
-                    /* TODO: de gestionat caz */
+                    fa_progres_seteaza_stare(fai, FA_DL_AFISARE_CU_SUCCES);
+                    IntrareActualizare *ultimaIntrareServer=dl_obtine_vers_curenta_server(fai->masinaActualizanta->date);
+                    Versiune *ultimaVersiuneServer = &ultimaIntrareServer->vers;
+                    g_print("%s", sda_versiune_printf(ultimaVersiuneServer));
+                    g_debug("Am afișat cu succes informația cerută.");
                     break;
                 default:
                     g_warning("Acțiunea specificată nu este recunoscută de către actualizator!");
@@ -294,6 +302,7 @@ static gboolean fa_proceseaza_sesiune(FAInstanta *fai) {
         case FA_DL_ATENTIE_PROBLEME_LA_DESCARCARE:
         case FA_DL_ATENTIE_PROBLEME_LA_APLICARE:
 
+        case FA_DL_AFISARE_CU_SUCCES:
         case FA_DL_VERSIUNE_ESTE_ULTIMA:
         case FA_DL_AM_ACTUALIZAT_LA_VERS_TINTA:
         case FA_DL_ANULARE:

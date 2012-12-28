@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 
             if (db_obtine_este_actualizare_automata() || optiuniExterne->tipOp == ACTUALIZEAZA_DIRECT) {
                 FAInstanta *fSesiuneActualizare = fa_initializeaza(optiuniExterne);
-                
+
                 fa_lanseaza_sesiune_actualizare(fSesiuneActualizare);
                 fa_curata(&fSesiuneActualizare);
             }
@@ -59,8 +59,10 @@ int main(int argc, char *argv[]) {
             g_warning("Nu am putut inițializa modulul bazei de date. Procesul de actualizare nu a putut avea loc!");
         }
 
+        if (optiuniExterne->tipOp != AFISEAZA) {
+            lanseazaPSAle();
+        }
         pa_curata(&optiuniExterne);
-        lanseazaPSAle();
     } else {
         g_debug("S-a dorit lansarea cu parametrii din linia de comandă, dar operația a fost anulată deoarece ");
     }

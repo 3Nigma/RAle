@@ -21,7 +21,7 @@ extern "C" {
 #include "dl.h"
 
 #define FA_MS_INTRE_STARI 1000
-    
+
     typedef enum {
         FA_DL_INITIALIZARE,
         FA_DL_DESC_LISTA_ACTUALIZARI,
@@ -39,6 +39,7 @@ extern "C" {
         FA_DL_ATENTIE_PROBLEME_LA_DESCARCARE,
         FA_DL_ATENTIE_PROBLEME_LA_APLICARE,
 
+        FA_DL_AFISARE_CU_SUCCES,
         FA_DL_VERSIUNE_ESTE_ULTIMA,
         FA_DL_AM_ACTUALIZAT_LA_VERS_TINTA,
 

@@ -8,7 +8,6 @@ static enum OperatieInstanta obtineTipulOp(gchar *sirTipOp);
 ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
     ParametriiRulareAplicatie *parAp = NULL;
     char optiune;
-    int index_optiune;
 
     struct option opt_lungi_aplicatie[] = {
         {
@@ -22,6 +21,9 @@ ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
         },
         {
             "ajutor", no_argument, NULL, 'a'
+        },
+        {
+            NULL, 0, NULL, 0
         }
     };
 
@@ -30,7 +32,7 @@ ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
     parAp->versServer = NULL;
     parAp->folsesteIG = TRUE;
     
-    while ((optiune = getopt_long(argc, argv, "t:v::fa", opt_lungi_aplicatie, &index_optiune)) != -1) {
+    while ((optiune = getopt_long(argc, argv, "t:v::fa", opt_lungi_aplicatie, NULL)) != -1) {
         switch (optiune) {
             case 't': /* tipul-operatiei */
                 if ((parAp->tipOp = obtineTipulOp(optarg)) == INVALID) {
@@ -86,9 +88,9 @@ static enum OperatieInstanta obtineTipulOp(gchar *sirTipOp) {
     gchar *sirTipOpMinuscule = g_ascii_strdown(sirTipOp, -1);
     enum OperatieInstanta tipOp = INVALID;
 
-    if (g_strcmp0(sirTipOpMinuscule, "actualizeaza-direct")) {
+    if (g_strcmp0(sirTipOpMinuscule, "actualizeaza-direct") == 0) {
         tipOp = ACTUALIZEAZA_DIRECT;
-    } else if (g_strcmp0(sirTipOpMinuscule, "afiseaza")) {
+    } else if (g_strcmp0(sirTipOpMinuscule, "afiseaza") == 0) {
         tipOp = AFISEAZA;
     }
 

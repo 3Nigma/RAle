@@ -129,18 +129,9 @@ gboolean dl_contine_lista_actualizari_elemente(DLInstanta *dli) {
 }
 
 void dl_incarca_ultima_versiune_server(DLInstanta *dli) {
-    g_assert(dli->intrariActualizare != NULL);
-
-    GSList *ptElemDinLista = dli->intrariActualizare;
-    IntrareActualizare *elemDeIntrare = NULL;
-
-    while (ptElemDinLista != NULL) {
-        elemDeIntrare = (IntrareActualizare *) ptElemDinLista->data;
-        if (sda_comparaVersiuni(&elemDeIntrare->vers, &dli->versiuneaServerTinta->vers) == 1) {
-            sda_intrare_actualizare_copiaza(elemDeIntrare, dli->versiuneaServerTinta);
-        }
-        ptElemDinLista = g_slist_next(ptElemDinLista);
-    }
+    g_assert(dli != NULL);
+    
+    sda_intrare_actualizare_copiaza(dl_obtine_vers_curenta_server(dli), dli->versiuneaServerTinta);
 }
 
 gboolean dl_incarca_versiune_specifica_server(DLInstanta *dli, Versiune *versDorita) {
@@ -160,6 +151,25 @@ gboolean dl_exista_versiune_mai_buna_decat(DLInstanta *dli, Versiune *versCurent
     g_assert(NULL != dli->versiuneaServerTinta);
 
     return sda_comparaVersiuni(&dli->versiuneaServerTinta->vers, versCurentaLocal) == 1;
+}
+
+IntrareActualizare *dl_obtine_vers_curenta_server(DLInstanta *dli) {
+    g_assert(dli != NULL);
+    g_assert(dli->versiuneaServerTinta != NULL);
+    
+    GSList *ptElemDinLista = dli->intrariActualizare;
+    IntrareActualizare *elemDeIntrare = NULL;
+    IntrareActualizare *infoUltimaVers = ((IntrareActualizare *) ptElemDinLista->data);
+    
+    while (ptElemDinLista != NULL) {
+        elemDeIntrare = (IntrareActualizare *) ptElemDinLista->data;
+        if (sda_comparaVersiuni(&elemDeIntrare->vers, &infoUltimaVers->vers) == 1) {
+            infoUltimaVers = elemDeIntrare;
+        }
+        ptElemDinLista = g_slist_next(ptElemDinLista);
+    }
+    
+    return infoUltimaVers;
 }
 
 char *dl_descarca_actualizare_tinta_local(DLInstanta *dli) {
