@@ -67,10 +67,13 @@ ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
                 pa_afiseaza_meniu();
                 pa_curata(&parAp);
                 return NULL;
+                break;   
+            case '?': /* argumentul este necunoscut */
+                g_warning("Nu recunosc argumentul prezentat așa că îl ignor! Invocați aplicația cu arugmentul '--ajutor' pentru a afla combinațiile posibile.");
                 break;
         }
     }
-
+    
     return parAp;
 }
 
