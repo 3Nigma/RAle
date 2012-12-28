@@ -47,7 +47,7 @@ db_obtine_adresa_actualizare() {
     sqlite3_stmt *af = NULL;
     sqlite3_value *rez = NULL;
 
-    if ((af = db_aplica_afirmatie("select LinkReinoire FROM " DB_NUME_TABEL_META)) != NULL) {
+    if ((af = db_aplica_afirmatie("select LinkReinoire from " DB_NUME_TABEL_META)) != NULL) {
         rez = sqlite3_column_value(af, 0);
         strcpy(adresaReinoire, (const char *) sqlite3_value_text(rez));
         sqlite3_finalize(af);
@@ -61,7 +61,7 @@ Versiune *db_obtine_versiune_curenta() {
     sqlite3_stmt *af = NULL;
     sqlite3_value *rez = NULL;
 
-    if ((af = db_aplica_afirmatie("select VersMajoraCurenta,VersMinoraCurenta FROM " DB_NUME_TABEL_META)) != NULL) {
+    if ((af = db_aplica_afirmatie("select VersMajoraCurenta, VersMinoraCurenta from " DB_NUME_TABEL_META)) != NULL) {
         versActuala = g_new(Versiune, 1);
         
         /* obține partea majoră a versiunii */
@@ -85,7 +85,7 @@ db_obtine_este_prima_rulare() {
     sqlite3_stmt *af = NULL;
     sqlite3_value *rez = NULL;
 
-    if ((af = db_aplica_afirmatie("select EstePrimaRulare FROM " DB_NUME_TABEL_META)) != NULL) {
+    if ((af = db_aplica_afirmatie("select EstePrimaRulare from " DB_NUME_TABEL_META)) != NULL) {
         rez = sqlite3_column_value(af, 0);
         rezInterogare = (sqlite3_value_int(rez) == 1);
         sqlite3_finalize(af);
@@ -96,7 +96,7 @@ db_obtine_este_prima_rulare() {
 
 gboolean
 db_consuma_prima_rulare() {
-    return db_executa_comanda("update " DB_NUME_TABEL_META " set EstePrimaRulare=0");
+    return db_executa_comanda("update " DB_NUME_TABEL_META " set EstePrimaRulare = 0");
 }
 
 gboolean
@@ -106,7 +106,7 @@ db_obtine_este_actualizare_automata() {
     sqlite3_stmt *af = NULL;
     sqlite3_value *rez = NULL;
 
-    if ((af = db_aplica_afirmatie("select ActualizariAutomate FROM " DB_NUME_TABEL_META)) != NULL) {
+    if ((af = db_aplica_afirmatie("select ActualizariAutomate from " DB_NUME_TABEL_META)) != NULL) {
         rez = sqlite3_column_value(af, 0);
         rezInterogare = (sqlite3_value_int(rez) == 1);
         sqlite3_finalize(af);
@@ -117,12 +117,12 @@ db_obtine_este_actualizare_automata() {
 
 gboolean
 db_seteaza_actualizare_automata() {
-    return db_executa_comanda("update " DB_NUME_TABEL_META " set ActualizariAutomate=1");
+    return db_executa_comanda("update " DB_NUME_TABEL_META " set ActualizariAutomate = 1");
 }
 
 gboolean
 db_seteaza_actualizare_manuala() {
-    return db_executa_comanda("update " DB_NUME_TABEL_META " set ActualizariAutomate=0");
+    return db_executa_comanda("update " DB_NUME_TABEL_META " set ActualizariAutomate = 0");
 }
 
 int
