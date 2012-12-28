@@ -31,7 +31,7 @@ Versiune *sda_obtineVersiuneDinSir(gchar *sir) {
     if (g_match_info_matches(containerPotriviri)) {
         vers = g_new0(Versiune, 1);
         vers->major = g_ascii_strtoull(g_match_info_fetch(containerPotriviri, 1), NULL, 10);
-        vers->major = g_ascii_strtoull(g_match_info_fetch(containerPotriviri, 2), NULL, 10);
+        vers->minor = g_ascii_strtoull(g_match_info_fetch(containerPotriviri, 2), NULL, 10);
     }
 
     g_regex_unref(tipar);
