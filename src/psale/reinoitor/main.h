@@ -25,13 +25,8 @@ extern "C" {
 #include "fprimarulare.h"
 #include "factualizare.h"
 
-#ifdef G_OS_WIN32
-#include <windows.h>
-#elif defined G_OS_UNIX
-#include <unistd.h>
 #include <errno.h>
-#endif
-
+    
 #define RPS_NUME_PSALE "psale"
 #define RPS_CALE_PSALE "./"RPS_NUME_PSALE
 
