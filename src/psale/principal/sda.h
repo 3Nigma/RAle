@@ -33,6 +33,10 @@ extern "C" {
 #define OS_NUME_RPSALE "rpsale"
 #define OS_CALE_RPSALE "./"OS_NUME_RPSALE
 
+#define DL_LUNGIME_MAX_URL            1024
+#define DL_LUNGIME_MAX_MESAJ_VERSIUNE 3000
+#define DL_CURL_TIMEOUT               5
+
     typedef struct {
         guint major;
         guint minor;
@@ -44,8 +48,16 @@ extern "C" {
         char *mesajModificari;
     } IntrareActualizare;
 
-extern Versiune *sda_obtineVersiuneDinSir(gchar *sir);
+    extern Versiune *sda_obtineVersiuneDinSir(gchar *sir);
+    extern gint sda_comparaVersiuni(Versiune *v1, Versiune *v2);
 
+    extern IntrareActualizare *sda_intrare_actualizare_initializeaza();
+    extern void sda_intrare_actualizare_curata(IntrareActualizare **iai);
+    extern void sda_intrare_actualizare_copiaza(IntrareActualizare *sursa, IntrareActualizare *destinatie);
+    extern gchar *sda_versiune_printf(Versiune *vers);
+    extern FILE *sda_fopen_mkdir(const char *caleFis, const char *mode);
+    extern gboolean sda_este_cale_fisier_valida(const char *caleFis);
+    
 #ifdef	__cplusplus
 }
 #endif
