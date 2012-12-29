@@ -93,7 +93,7 @@ void finfo_curata(FInfoInstanta **fii) {
     if (fii == NULL) return;
 
     gtk_widget_destroy((*fii)->frm);
-    g_free(fii);
+    g_free(*fii);
 }
 
 void finfo_arata(FInfoInstanta *fii) {
