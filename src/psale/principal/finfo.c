@@ -135,16 +135,27 @@ btActualizeaza_clicked(GtkWidget *widget, GtkWindow *fereastraParinte) {
     GtkWidget *dlgIntrebareActualizare = NULL;
     Versiune *versServer = NULL;
     Versiune *versLocala = NULL;
-
+    GtkWidget *dlgEsecInActualziare = NULL;
+            
     if ((versServer = os_rpsale_obtine_versiune_server()) == NULL) {
-        g_debug("Nu am putut obține starea versiunilor de pe server astfel încât actualizarea nu s-a putut realiza!");
+        g_warning("Nu am putut obține starea versiunilor de pe server astfel încât actualizarea nu s-a putut realiza!");
+        dlgEsecInActualziare = gtk_message_dialog_new_with_markup(fereastraParinte, GTK_DIALOG_MODAL,
+                GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE,
+                "Am întâmpinat dificultăți în etapa de obținere a versiunii curente de pe server!\n"
+                "Vă rugăm încercați din nou un pic mai târziu ...");
+
+        gtk_window_set_title(GTK_WINDOW(dlgEsecInActualziare), "Ne-realizat");
+        gtk_dialog_add_buttons(GTK_DIALOG(dlgEsecInActualziare), "În regulă", 0, NULL);
+        gtk_dialog_set_default_response(GTK_DIALOG(dlgEsecInActualziare), 0);
+        gtk_dialog_run(GTK_DIALOG(dlgEsecInActualziare));
+        gtk_widget_destroy(dlgEsecInActualziare);
         return;
     } else if ((versLocala = db_obtine_versiune_curenta()) == NULL) {
-        g_debug("Nu am putut determina versiunea curentă a pachetului SW, iar pentru asta am oprit secvența de actualizare!");
+        g_warning("Nu am putut determina versiunea curentă a pachetului SW, iar pentru asta am oprit secvența de actualizare!");
         return;
     }
 
-    if (sda_comparaVersiuni(versServer, &versLocala) == 1) {
+    if (sda_comparaVersiuni(versServer, versLocala) == 1) {
         g_debug("S-a analizat și s-a găsit o versiune de aplicație mai nouă. Întreabă utilizatorul privind acțiunea următoare ...");
 
         dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(fereastraParinte, GTK_DIALOG_MODAL,
