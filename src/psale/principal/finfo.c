@@ -32,7 +32,6 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm);
 static gboolean frmInfo_delev(GtkWidget *widget, GdkEvent *event, gpointer data);
 static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FInfoInstanta *fii);
 static void btIesire_clicked(GtkWidget *widget, FInfoInstanta *fii);
-static void btActualizeaza_clicked(GtkWidget *widget, FInfoInstanta *fii);
 static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActualizare stareNoua, gchar *argvPrint);
 static gboolean frmInfo_la_click_uri_lblActualizare(GtkLabel *lbl, gchar *uri, FInfoInstanta *fii);
 static gboolean frmInfo_cauta_actualizari(FInfoInstanta *fii);
@@ -76,12 +75,6 @@ FInfoInstanta *finfo_initializeaza(GtkWindow *parinte) {
         gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo, 0, 2, 0, 1);
 
         /* inițializăm butoanele formularului */
-        fii->btActualizeaza = finfo_creeaza_buton(GTK_WINDOW(fii->frm),
-                "Actualizează", FL_IMG_FINFO_ACTUALIZEAZA,
-                "Verifică și aplică eventualele îmbunătățiri ale aplicației.\nTaste scurte: <i>Ctrl + R</i>");
-        g_signal_connect(fii->btActualizeaza, "clicked", G_CALLBACK(btActualizeaza_clicked), fii);
-        gtk_table_attach_defaults(GTK_TABLE(cadruFrm), fii->btActualizeaza, 2, 3, 3, 4);
-
         fii->btParasesteFrm = finfo_creeaza_buton(GTK_WINDOW(fii->frm),
                 "Părăsește formular", FL_IMG_FINFO_PARASESTE,
                 "Închide formularul de informații.\nTastă scurtă: <i>Esc</i>");
@@ -132,7 +125,7 @@ static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, 
             case GDK_KEY_R:
             case GDK_KEY_r:
                 /* Ctrl + R apăsat. Declanșează secvența de actualizare. */
-                btActualizeaza_clicked(widget, fii);
+                frmInfo_la_click_uri_lblActualizare(GTK_LABEL(fii->lblStareActualizare), FI_ACTUALIZARE_URI_PORNESTE, fii);
                 break;
         }
     }
@@ -142,10 +135,6 @@ static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, 
 
 static void btIesire_clicked(GtkWidget *widget, FInfoInstanta *fii) {
     finfo_curata(&fii);
-}
-
-static void btActualizeaza_clicked(GtkWidget *widget, FInfoInstanta *fii) {
-
 }
 
 static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
@@ -208,7 +197,7 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
     GtkTextBuffer *txtBuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(fii->txtInfoVersiuni));
 
     gtk_text_buffer_set_text(txtBuffer, PSALE_TEXT_DESPRE, -1);
-    gtk_widget_set_size_request(fii->txtInfoVersiuni, 380, 200);
+    gtk_widget_set_size_request(fii->txtInfoVersiuni, 450, 200);
     gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(fii->txtInfoVersiuni), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(fii->txtInfoVersiuni), GTK_WRAP_WORD);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(fii->txtInfoVersiuni), FALSE);
@@ -238,7 +227,7 @@ static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActuali
         case FI_ACTUALIZARE_INITIALIZARE:
             pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_REPAUS, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
             gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgStareActualizare), pxBufSimplu);
-            g_sprintf(mesajLblStare, "Apăsați <a href='"FI_ACTUALIZARE_URI_PORNESTE"'>aici</a> pentru a căuta o versiune mai nouă.");
+            g_sprintf(mesajLblStare, "Apăsați <a href='"FI_ACTUALIZARE_URI_PORNESTE"'>aici</a> sau '<i>CTRL + R</i>' pentru a căuta o versiune mai nouă.");
             break;
         case FI_ACTUALIZARE_IN_CURS:
             pxBufAnimatie = fl_obtine_animatie_media(FL_ANIM_FINFO_ACTUALIZARE_PROGRES);
