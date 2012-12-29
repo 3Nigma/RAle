@@ -14,7 +14,16 @@
 #include "sda.h"
 #include <gtk/gtk.h>
 
-extern GtkWidget *
-finfo_initializeaza(GtkWindow *parinte);
+typedef struct {
+    GtkWidget *frm;
+    GtkWidget *txtInfoVersiuni;
+    GtkWidget *btActualizeaza;
+    GtkWidget *btParasesteFrm;
+} FInfoInstanta;
+
+extern FInfoInstanta *finfo_initializeaza(GtkWindow *parinte);
+extern void finfo_curata(FInfoInstanta **fii);
+
+extern void finfo_arata(FInfoInstanta *fii);
 
 #endif
