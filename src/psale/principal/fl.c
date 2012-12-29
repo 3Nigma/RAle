@@ -14,8 +14,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-GdkPixbuf *
-fl_obtine_imagine_media_scalata(fl_media_type tp, gint w, gint h) {
+GdkPixbuf *fl_obtine_imagine_media_scalata(FLImgTipMedia tp, gint w, gint h) {
     GdkPixbuf *bufImg = NULL;
     char caleMediaCompleta[256];
     GError *eroareRaportata = NULL;
@@ -47,9 +46,6 @@ fl_obtine_imagine_media_scalata(fl_media_type tp, gint w, gint h) {
             break;
         case FL_IMG_FINFO_ACTUALIZARE_SUCCES:
             strcpy(caleMediaCompleta, MEDIA_CALE_FINFO "/img_actualizare_succes.png");
-            break;
-        case FL_IMG_FINFO_ACTUALIZARE_ANIM_PROGRES:
-            strcpy(caleMediaCompleta, MEDIA_CALE_FINFO "/img_actualizare_anim_in_curs.gif");
             break;
         case FL_IMG_FINFO_ACTUALIZARE_REPAUS:
             strcpy(caleMediaCompleta, MEDIA_CALE_FINFO "/img_actualizare_repaus.png");
@@ -109,4 +105,29 @@ fl_obtine_imagine_media_scalata(fl_media_type tp, gint w, gint h) {
     }
 
     return bufImg;
+}
+
+extern GdkPixbufAnimation *fl_obtine_animatie_media(FLAnimTipMedia tp) {
+    GdkPixbufAnimation *bufAnim = NULL;
+    char caleMediaCompleta[256];
+    GError *eroareRaportata = NULL;
+
+    switch (tp) {
+        case FL_ANIM_FINFO_ACTUALIZARE_PROGRES:
+            strcpy(caleMediaCompleta, MEDIA_CALE_FINFO "/img_actualizare_anim_in_curs.gif");
+            break;
+
+        default:
+            /* TODO: nu ar trebui să ajungă aici. Trimite o imagine implicită ? */
+            break;
+    }
+
+    bufAnim = gdk_pixbuf_animation_new_from_file(caleMediaCompleta, &eroareRaportata);
+    if (NULL != eroareRaportata) {
+        g_warning("Nu am putut încărca animația '%s'! Motiv : %s", caleMediaCompleta, eroareRaportata->message);
+        g_error_free(eroareRaportata);
+        /* TODO: întoarce o imagine implcită ? */
+    }
+
+    return bufAnim;
 }

@@ -36,7 +36,6 @@ typedef enum {
   FL_IMG_FINFO_PARASESTE,
   FL_IMG_FINFO_ACTUALIZARE_ESUATA,
   FL_IMG_FINFO_ACTUALIZARE_SUCCES,
-  FL_IMG_FINFO_ACTUALIZARE_ANIM_PROGRES,
   FL_IMG_FINFO_ACTUALIZARE_REPAUS,
           
   FL_IMG_FCOD_TRIMITE_LA_ALE,
@@ -54,9 +53,13 @@ typedef enum {
   FL_IMG_FVIZC_PAG_PREC,
   FL_IMG_FVIZC_PAG_URM,
   FL_IMG_FVIZC_PAG_SALT_CUPRINS
-} fl_media_type;
+} FLImgTipMedia;
 
-extern GdkPixbuf *
-fl_obtine_imagine_media_scalata(fl_media_type tp, gint w, gint h);
+typedef enum {
+    FL_ANIM_FINFO_ACTUALIZARE_PROGRES
+} FLAnimTipMedia;
+
+extern GdkPixbuf *fl_obtine_imagine_media_scalata(FLImgTipMedia tp, gint w, gint h);
+extern GdkPixbufAnimation *fl_obtine_animatie_media(FLAnimTipMedia tp);
 
 #endif
