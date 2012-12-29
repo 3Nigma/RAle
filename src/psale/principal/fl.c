@@ -50,6 +50,7 @@ GdkPixbuf *fl_obtine_imagine_media_scalata(FLImgTipMedia tp, gint w, gint h) {
         case FL_IMG_FINFO_ACTUALIZARE_REPAUS:
             strcpy(caleMediaCompleta, MEDIA_CALE_FINFO "/img_actualizare_repaus.png");
             break;
+            
         case FL_IMG_FCOD_TRIMITE_LA_ALE:
             strcpy(caleMediaCompleta, MEDIA_CALE_FCOD "/bt_icoana_trimite_la_ale.png");
             break;

@@ -33,8 +33,11 @@ static gboolean frmInfo_delev(GtkWidget *widget, GdkEvent *event, gpointer data)
 static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FInfoInstanta *fii);
 static void btIesire_clicked(GtkWidget *widget, FInfoInstanta *fii);
 static void btActualizeaza_clicked(GtkWidget *widget, FInfoInstanta *fii);
+static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActualizare stareNoua, gchar *argvPrint);
+static gboolean frmInfo_la_click_uri_lblActualizare(GtkLabel *lbl, gchar *uri, FInfoInstanta *fii);
+static gboolean frmInfo_cauta_actualizari(FInfoInstanta *fii);
 static GtkWidget *finfo_creeaza_buton(GtkWindow *fereastraParinte,
-        const gchar *textAfisat, fl_media_type tpImg,
+        const gchar *textAfisat, FLImgTipMedia tpImg,
         const gchar *textIndicatie);
 
 FInfoInstanta *finfo_initializeaza(GtkWindow *parinte) {
@@ -59,7 +62,7 @@ FInfoInstanta *finfo_initializeaza(GtkWindow *parinte) {
         g_signal_connect(fii->frm, "delete-event", G_CALLBACK(frmInfo_delev), NULL);
 
         /* inițializăm cadrul formularului */
-        cadruFrm = gtk_table_new(4, 4, FALSE);
+        cadruFrm = gtk_table_new(5, 4, FALSE);
         gtk_table_set_row_spacings(GTK_TABLE(cadruFrm), 3);
         gtk_table_set_col_spacings(GTK_TABLE(cadruFrm), 2);
         gtk_container_add(GTK_CONTAINER(fii->frm), cadruFrm);
@@ -70,7 +73,7 @@ FInfoInstanta *finfo_initializeaza(GtkWindow *parinte) {
         GdkPixbuf *pixInfoPictograma = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_INFO, -1, -1);
         imgInfo = gtk_image_new_from_pixbuf(pixInfoPictograma);
         g_object_unref(pixInfoPictograma);
-        gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo, 0, 1, 0, 1);
+        gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo, 0, 2, 0, 1);
 
         /* inițializăm butoanele formularului */
         fii->btActualizeaza = finfo_creeaza_buton(GTK_WINDOW(fii->frm),
@@ -142,80 +145,7 @@ static void btIesire_clicked(GtkWidget *widget, FInfoInstanta *fii) {
 }
 
 static void btActualizeaza_clicked(GtkWidget *widget, FInfoInstanta *fii) {
-    gboolean actualizareConfirmata = FALSE;
-    GtkWidget *dlgIntrebareActualizare = NULL;
-    Versiune *versServer = NULL;
-    Versiune *versLocala = NULL;
-    GtkWidget *dlgEsecInActualziare = NULL;
 
-    if ((versServer = os_rpsale_obtine_versiune_server()) == NULL) {
-        g_warning("Nu am putut obține starea versiunilor de pe server astfel încât actualizarea nu s-a putut realiza!");
-        dlgEsecInActualziare = gtk_message_dialog_new_with_markup(GTK_WINDOW(fii->frm), GTK_DIALOG_MODAL,
-                GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE,
-                "Am întâmpinat dificultăți în etapa de obținere a versiunii curente de pe server!\n"
-                "Vă rugăm încercați din nou un pic mai târziu ...");
-
-        gtk_window_set_title(GTK_WINDOW(dlgEsecInActualziare), "Ne-realizat");
-        gtk_dialog_add_buttons(GTK_DIALOG(dlgEsecInActualziare), "În regulă", 0, NULL);
-        gtk_dialog_set_default_response(GTK_DIALOG(dlgEsecInActualziare), 0);
-        gtk_dialog_run(GTK_DIALOG(dlgEsecInActualziare));
-        gtk_widget_destroy(dlgEsecInActualziare);
-        return;
-    } else if ((versLocala = db_obtine_versiune_curenta()) == NULL) {
-        g_warning("Nu am putut determina versiunea curentă a pachetului SW, iar pentru asta am oprit secvența de actualizare!");
-        return;
-    }
-
-    if (sda_comparaVersiuni(versServer, versLocala) == 1) {
-        g_debug("S-a analizat și s-a găsit o versiune de aplicație mai nouă. Întreabă utilizatorul privind acțiunea următoare ...");
-
-        dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(GTK_WINDOW(fii->frm), GTK_DIALOG_MODAL,
-                GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
-                "Am găsit o actualizare.\n"
-                "Se pare că ultima versiune este <b>%s</b> !\n\n"
-                "Doriți să treceți <i>acum</i> la această nouă versiune ?\n\n"
-                "<b>Atenție!</b> Dacă răspundeți <b><i>Da</i></b> atunci aplicația curentă <u>se va închide</u>! "
-                "Asigurați-vă că nu pierdeți nimic din lucrul curent.",
-                sda_versiune_printf(versServer));
-
-        gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Întrebare");
-        gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Da", FINFO_ACTCONF_DLG_DA,
-                "Nu", FINFO_ACTCONF_DLG_NU,
-                NULL);
-        gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_DA);
-        if (gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare)) == FINFO_ACTCONF_DLG_DA) {
-            actualizareConfirmata = TRUE;
-        }
-    } else {
-        g_debug("Nu am găsit nici o actualizare sau s-a întâmplat ceva cu procesul de actualizare ... ");
-
-        dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(GTK_WINDOW(fii->frm), GTK_DIALOG_MODAL,
-                GTK_MESSAGE_INFO, GTK_BUTTONS_NONE,
-                "Nu am găsit nicio actualizare disponibilă.\n\n"
-                "Versiunea pe care o aveți, <b>%s</b>, este ultima.",
-                sda_versiune_printf(versLocala));
-
-        gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Rezultat");
-        gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Am înțeles", FINFO_ACTCONF_DLG_INREGULA,
-                NULL);
-        gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_INREGULA);
-        gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare));
-    }
-
-    gtk_widget_destroy(dlgIntrebareActualizare);
-
-    if (TRUE == actualizareConfirmata) {
-        /* avem actualizare și acordul utilizatorului de a o aplica. Îi dăm drumul lui 'rpsAle' să treacă la treabă! */
-        os_rpsale_forteaza_actualizare(versServer);
-    }
-    g_free(versLocala);
-    g_free(versServer);
-
-    if (TRUE == actualizareConfirmata) {
-        /* totul este pregătit pentru actualizare. 'rpsAle' e pornit, iar nouă nu ne mai rămâne decât să închidem 'psAle'
-         * și să lăsăm actualizatorul să-și facă treaba */
-        gtk_main_quit();
-    }
 }
 
 static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
@@ -233,7 +163,7 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
     }
     /* inițializăm cadrul etichetelor (titlu + valoare) */
     cadruTitluEtichete = gtk_vbox_new(FALSE, 4);
-    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruTitluEtichete, 1, 2, 0, 1);
+    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruTitluEtichete, 2, 3, 0, 1);
 
     GtkWidget *lblTitluAutor = gtk_label_new("Autor : ");
     GtkWidget *lblTitluVersiune = gtk_label_new("Versiune : ");
@@ -248,7 +178,7 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
     gtk_container_add(GTK_CONTAINER(cadruTitluEtichete), lblTitluLicenta);
 
     cadruValEtichete = gtk_vbox_new(FALSE, 4);
-    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruValEtichete, 2, 3, 0, 1);
+    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruValEtichete, 3, 4, 0, 1);
 
     GtkWidget *lblValAutor = gtk_label_new(PSALE_NUME_AUTOR);
     GtkWidget *lblValVersiune = gtk_label_new(versActualaLocala);
@@ -272,20 +202,144 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
     GtkWidget *lblDespre = gtk_label_new("Despre : ");
 
     gtk_misc_set_alignment(GTK_MISC(lblDespre), 1.0f, 0.02f);
-    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), lblDespre, 1, 2, 1, 2);
+    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), lblDespre, 0, 1, 1, 2);
 
     fii->txtInfoVersiuni = gtk_text_view_new();
     GtkTextBuffer *txtBuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(fii->txtInfoVersiuni));
 
     gtk_text_buffer_set_text(txtBuffer, PSALE_TEXT_DESPRE, -1);
+    gtk_widget_set_size_request(fii->txtInfoVersiuni, 380, 200);
     gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(fii->txtInfoVersiuni), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(fii->txtInfoVersiuni), GTK_WRAP_WORD);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(fii->txtInfoVersiuni), FALSE);
-    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), fii->txtInfoVersiuni, 2, 4, 1, 2);
+    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), fii->txtInfoVersiuni, 1, 4, 1, 2);
+
+    /* inițializăm regiunea de actualizare manuală */
+    GtkWidget *cadruInfoActualizare = gtk_hbox_new(FALSE, 7);
+
+    fii->imgStareActualizare = gtk_image_new();
+    gtk_box_pack_start(GTK_BOX(cadruInfoActualizare), fii->imgStareActualizare, FALSE, FALSE, 3);
+    fii->lblStareActualizare = gtk_label_new(NULL);
+    gtk_box_pack_start(GTK_BOX(cadruInfoActualizare), fii->lblStareActualizare, FALSE, FALSE, 3);
+    frmInfo_seteaza_stare_actualizare(fii, FI_ACTUALIZARE_INITIALIZARE, NULL);
+    g_signal_connect(fii->lblStareActualizare, "activate-link", G_CALLBACK(frmInfo_la_click_uri_lblActualizare), fii);
+
+    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), cadruInfoActualizare, 1, 4, 2, 3);
+}
+
+static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActualizare stareNoua, gchar *argvPrint) {
+    g_assert(fii != NULL);
+
+    GdkPixbuf *pxBufSimplu = NULL;
+    GdkPixbufAnimation *pxBufAnimatie = NULL;
+    gchar mesajLblStare[128];
+    
+    switch (stareNoua) {
+        case FI_ACTUALIZARE_INITIALIZARE:
+            pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_REPAUS, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
+            gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgStareActualizare), pxBufSimplu);
+            g_sprintf(mesajLblStare, "Apăsați <a href='"FI_ACTUALIZARE_URI_PORNESTE"'>aici</a> pentru a căuta o versiune mai nouă.");
+            break;
+        case FI_ACTUALIZARE_IN_CURS:
+            pxBufAnimatie = fl_obtine_animatie_media(FL_ANIM_FINFO_ACTUALIZARE_PROGRES);
+            gtk_image_set_from_animation(GTK_IMAGE(fii->imgStareActualizare), pxBufAnimatie);
+            g_sprintf(mesajLblStare, "Caut o versiune mai nouă ...");
+            break;
+        case FI_ACTUALIZARE_SUCCES_VERSNOUA:
+            pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_SUCCES, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
+            gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgStareActualizare), pxBufSimplu);
+            g_sprintf(mesajLblStare, "'%s' este o versiune <u>mai nouă</u>. <a href='"FI_ACTUALIZARE_URI_ACTUALIZEAZA":%s'>Treceți la această versiune</a>.",
+                    (argvPrint == NULL ? "0.0" : argvPrint),
+                    (argvPrint == NULL ? "0.0" : argvPrint));
+            break;
+        case FI_ACTUALIZARE_SUCCES_VERSNESCHIMBATA:
+            pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_SUCCES, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
+            gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgStareActualizare), pxBufSimplu);
+            g_sprintf(mesajLblStare, "Versiunea pe care o aveți <u>este ultima</u>.");
+            break;
+        case FI_ACTUALIZARE_ESEC:
+            pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_ESUATA, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
+            gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgStareActualizare), pxBufSimplu);
+            g_sprintf(mesajLblStare, "S-a ivit o problemă (%s)! Vă rugăm încercați mai târziu.", (argvPrint == NULL ? "-1" : argvPrint));
+            break;
+        default:
+            g_warning("Nu recunosc starea actualizării furnizate!");
+            break;
+    }
+    gtk_label_set_markup(GTK_LABEL(fii->lblStareActualizare), mesajLblStare);
+    if (pxBufSimplu != NULL) g_object_unref(pxBufSimplu);
+    if (pxBufAnimatie != NULL) g_object_unref(pxBufAnimatie);
+}
+
+static gboolean frmInfo_la_click_uri_lblActualizare(GtkLabel *lbl, gchar *uri, FInfoInstanta *fii) {
+    if (g_strcmp0(uri, FI_ACTUALIZARE_URI_PORNESTE) == 0) {
+        frmInfo_seteaza_stare_actualizare(fii, FI_ACTUALIZARE_IN_CURS, NULL);
+        g_idle_add((GSourceFunc) (& frmInfo_cauta_actualizari), fii);
+    } else if (g_str_has_prefix(uri, FI_ACTUALIZARE_URI_ACTUALIZEAZA)) {
+        GtkWidget *dlgIntrebareActualizare = NULL;
+
+        dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(GTK_WINDOW(fii->frm), GTK_DIALOG_MODAL,
+                GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
+                "Această operațiune de <b>actualizare directă</b> presupune închiderea aplicației curente.\n"
+                "Înainte de a aplica această actualizare, asigurați-vă că toate sursele dumneavoastră sunt salvate pentru a nu pierde din lucru.\n\n"
+                "<b>În aceste condiții, pot să încep actualizarea ?</b>");
+
+        gtk_window_set_title(GTK_WINDOW(dlgIntrebareActualizare), "Întrebare");
+        gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareActualizare), "Da", FINFO_ACTCONF_DLG_DA,
+                "Nu", FINFO_ACTCONF_DLG_NU,
+                NULL);
+        gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_DA);
+        if (gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare)) == FINFO_ACTCONF_DLG_DA) {
+            gchar **elemInUri = g_strsplit(uri, ":", 2);
+            Versiune *versTinta = sda_obtineVersiuneDinSir(elemInUri[1]);
+
+            if (versTinta != NULL) {
+                os_rpsale_forteaza_actualizare(versTinta);
+            } else {
+                g_warning("Nu am putut reconstitui versiunea țintă pentru actualizarea directă cerută!");
+            }
+            
+            g_strfreev(elemInUri);
+            g_free(versTinta);
+            
+            if(versTinta != NULL) {
+                gtk_main_quit();
+            }
+        }
+    }
+
+    return TRUE;
+}
+
+static gboolean frmInfo_cauta_actualizari(FInfoInstanta *fii) {
+    gboolean reactiveazaFunctia = FALSE;
+    Versiune *versServer = NULL;
+    Versiune *versLocala = NULL;
+
+    if ((versServer = os_rpsale_obtine_versiune_server()) == NULL) {
+        g_warning("Nu am putut obține starea versiunilor de pe server astfel încât actualizarea nu s-a putut realiza!");
+        frmInfo_seteaza_stare_actualizare(fii, FI_ACTUALIZARE_ESEC, "verServ");
+    } else if ((versLocala = db_obtine_versiune_curenta()) == NULL) {
+        g_warning("Nu am putut determina versiunea curentă a pachetului SW, iar pentru asta am oprit secvența de actualizare!");
+        frmInfo_seteaza_stare_actualizare(fii, FI_ACTUALIZARE_ESEC, "verLocal");
+    } else {
+        if (sda_comparaVersiuni(versServer, versLocala) == 1) {
+            g_debug("S-a analizat și s-a găsit o versiune de aplicație mai nouă. Întreabă utilizatorul privind acțiunea următoare ...");
+            frmInfo_seteaza_stare_actualizare(fii, FI_ACTUALIZARE_SUCCES_VERSNOUA, sda_versiune_printf(versServer));
+        } else {
+            g_debug("Nu am găsit nicio actualizare disponibilă ... ");
+            frmInfo_seteaza_stare_actualizare(fii, FI_ACTUALIZARE_SUCCES_VERSNESCHIMBATA, NULL);
+        }
+
+        g_free(versLocala);
+        g_free(versServer);
+    }
+
+    return reactiveazaFunctia;
 }
 
 static GtkWidget *finfo_creeaza_buton(GtkWindow *fereastraParinte,
-        const gchar *textAfisat, fl_media_type tpImg,
+        const gchar *textAfisat, FLImgTipMedia tpImg,
         const gchar *textIndicatie) {
     GtkWidget *btRezultat = NULL;
 

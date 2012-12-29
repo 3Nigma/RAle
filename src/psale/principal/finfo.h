@@ -19,7 +19,22 @@ typedef struct {
     GtkWidget *txtInfoVersiuni;
     GtkWidget *btActualizeaza;
     GtkWidget *btParasesteFrm;
+    GtkWidget *lblStareActualizare;
+    GtkWidget *imgStareActualizare;
 } FInfoInstanta;
+
+typedef enum {
+    FI_ACTUALIZARE_INITIALIZARE,
+    FI_ACTUALIZARE_IN_CURS,
+    FI_ACTUALIZARE_SUCCES_VERSNOUA,
+    FI_ACTUALIZARE_SUCCES_VERSNESCHIMBATA,
+    FI_ACTUALIZARE_ESEC,
+} FIStareActualizare;
+
+#define FI_IMG_STARE_ACTUALIZARE_LUNGIME 16
+#define FI_IMG_STARE_ACTUALIZARE_INALTIME 16
+#define FI_ACTUALIZARE_URI_PORNESTE "actualizeaza_manual"
+#define FI_ACTUALIZARE_URI_ACTUALIZEAZA "actualizeaza_direct"
 
 extern FInfoInstanta *finfo_initializeaza(GtkWindow *parinte);
 extern void finfo_curata(FInfoInstanta **fii);
