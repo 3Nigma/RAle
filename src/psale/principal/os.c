@@ -173,9 +173,9 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
             }
         } else {
             waitpid(pidComanda, NULL, 0);
-            if (close(0) == -1 || close(1) == -1) {
+            /*if (close(0) == -1 || close(1) == -1) {
                 g_warning("Nu am putut închide descriptorii de fișiere proprii (cei redirecționați): %s", strerror(errno));
-            } else if (dup2(stdOutVechi, 1) == -1 || dup2(stdErrVechi, 2) == -1) {
+            } else*/ if (dup2(stdOutVechi, 1) == -1 || dup2(stdErrVechi, 2) == -1) {
                 g_warning("Nu am putut restaura vechii descriptori de fișiere: %s", strerror(errno));
             } else if (close(stdOutFD[1]) == -1 || close(stdErrFD[1]) == -1) {
                 g_warning("Nu am putut închide capetele de scriere ale țevilor proprii: %s", strerror(errno));
@@ -269,7 +269,7 @@ Versiune *os_rpsale_obtine_versiune_server() {
     char comandaAp[256];
     RezultatOpConsola *rezOperatiunii = NULL;
 
-    sprintf(comandaAp, "%s --afiseaza --fara-ig --versiune-server", OS_CALE_RPSALE);
+    sprintf(comandaAp, "\"%s\" --tipul-operatiei afiseaza --fara-ig --versiune-server", OS_CALE_RPSALE);
     if ((rezOperatiunii = os_executa_comanda_si_obtine_rezultat(comandaAp)) != NULL && rezOperatiunii->octetiInStdOut != 0) {
         verUltimapsAle = sda_obtineVersiuneDinSir(rezOperatiunii->stdOutBuff);
     }
