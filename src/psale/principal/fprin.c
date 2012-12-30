@@ -23,7 +23,6 @@
 #include "db.h"
 #include "al.h"
 #include "vc.h"
-#include "finfo.h"
 #include "fcod.h"
 #include "fprin.h"
 
@@ -40,13 +39,11 @@ static Limbaj lmbCodExemple = ASM;
 static gboolean dlgCodForteazaActualizConex;
 static VizualizatorCartulie *vizAle;
 
-static void
-placuta_sa_deconectat() {
+static void placuta_sa_deconectat() {
     dlgCodForteazaActualizConex = TRUE;
 }
 
-static gboolean
-imgLogo_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
+static gboolean imgLogo_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
 #ifdef G_OS_WIN32
     ShellExecute(NULL, "open", "http://tuscale.ro", NULL, NULL, SW_SHOWNORMAL);
 #elif defined G_OS_UNIX
@@ -56,8 +53,7 @@ imgLogo_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
     return TRUE;
 }
 
-static void
-cmbxCodNou_selectat(GtkComboBox *widget, FormularPrincipal *fp) {
+static void cmbxCodNou_selectat(GtkComboBox *widget, FormularPrincipal *fp) {
     /* interpretăm selecția doar dacă ea este una validă (se dorește un limbaj valid) */
     if (gtk_combo_box_get_active(widget) != 0) {
         FormularCod *dlgCod = NULL;
@@ -81,8 +77,7 @@ cmbxCodNou_selectat(GtkComboBox *widget, FormularPrincipal *fp) {
     }
 }
 
-static void
-cmbxCodCarte_la_selectie(GtkComboBox *widget, FormularPrincipal *fp) {
+static void cmbxCodCarte_la_selectie(GtkComboBox *widget, FormularPrincipal *fp) {
     FormularCod *dlgCod = NULL;
     GtkTreeIter iter;
     GtkTreeModel *model = NULL;
@@ -107,8 +102,7 @@ cmbxCodCarte_la_selectie(GtkComboBox *widget, FormularPrincipal *fp) {
     }
 }
 
-static void
-btCartulie_click(GtkWidget *widget, FormularPrincipal *fp) {
+static void btCartulie_click(GtkWidget *widget, FormularPrincipal *fp) {
     if (NULL == vizAle) {
         vizAle = vc_initializeaza();
 
@@ -121,28 +115,30 @@ btCartulie_click(GtkWidget *widget, FormularPrincipal *fp) {
     }
 }
 
-static void
-btInfo_click(GtkWidget *widget, FormularPrincipal *fp) {
-    FInfoInstanta *dlgInfo = NULL;
+static void btInfo_click(GtkWidget *widget, FormularPrincipal *fp) {
+    g_assert(fp != NULL);
+    
+    if(fp->infoAplicatie == NULL) {
+       fp->infoAplicatie = finfo_initializeaza(GTK_WINDOW(fp->frm));
+    }
 
-    if ((dlgInfo = finfo_initializeaza(GTK_WINDOW(fp->frm))) != NULL) {
-        finfo_arata(dlgInfo);
+    if (fp->infoAplicatie != NULL) {
+        finfo_arata(fp->infoAplicatie);
+    } else {
+        g_warning("Nu am putut arăta formularul info pentru că el nu s-a putut aloca!");
     }
 }
 
-static gboolean
-frmPrincipal_delev(GtkWidget *widget, GdkEvent *event, gpointer data) {
+static gboolean frmPrincipal_delev(GtkWidget *widget, GdkEvent *event, gpointer data) {
 
     return FALSE;
 }
 
-static void
-frmPrincipal_destroy(GtkWidget *widget, gpointer data) {
+static void frmPrincipal_destroy(GtkWidget *widget, gpointer data) {
     gtk_main_quit();
 }
 
-static GtkWidget *
-creeaza_cmbxExemple() {
+static GtkWidget *creeaza_cmbxExemple() {
     GtkWidget *deRet = NULL;
     GtkListStore *magazie = NULL;
     GtkCellRenderer *afisorCel0 = NULL;
@@ -169,8 +165,7 @@ creeaza_cmbxExemple() {
     return deRet;
 }
 
-static void
-populeaza_cmbxExemple(GtkComboBox *cmbx, Limbaj lmb) {
+static void populeaza_cmbxExemple(GtkComboBox *cmbx, Limbaj lmb) {
     g_assert(cmbx != NULL);
 
     GtkListStore *magazie = NULL;
@@ -193,8 +188,7 @@ populeaza_cmbxExemple(GtkComboBox *cmbx, Limbaj lmb) {
     gtk_combo_box_set_active(cmbx, 0);
 }
 
-static gboolean
-la_interval_tick(FormularPrincipal *fp) {
+static gboolean la_interval_tick(FormularPrincipal *fp) {
     gboolean stareConexCurenta;
 
     if (dlgCodForteazaActualizConex ||
@@ -219,8 +213,7 @@ la_interval_tick(FormularPrincipal *fp) {
     return TRUE;
 }
 
-static gboolean
-frmPrincipal_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FormularPrincipal *fp) {
+static gboolean frmPrincipal_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FormularPrincipal *fp) {
     gboolean evGestionat = FALSE;
 
     if (evGestionat == FALSE &&
@@ -259,15 +252,13 @@ frmPrincipal_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FormularPri
     return evGestionat;
 }
 
-static void
-btIesire_clicked(GtkWidget *widget, FormularPrincipal *fp) {
+static void btIesire_clicked(GtkWidget *widget, FormularPrincipal *fp) {
     g_assert(NULL != fp);
 
     gtk_widget_destroy(GTK_WIDGET(fp->frm));
 }
 
-FormularPrincipal *
-fp_initializeaza_formular_principal() {
+FormularPrincipal *fp_initializeaza_formular_principal() {
     FormularPrincipal *fp = NULL;
     GtkWidget *cadruFormPrincipal = NULL;
     GtkWidget *frm = NULL;
@@ -368,17 +359,18 @@ fp_initializeaza_formular_principal() {
     return fp;
 }
 
-void
-fp_arata(FormularPrincipal *fp) {
+void fp_arata(FormularPrincipal *fp) {
     g_assert(NULL != fp);
 
     gtk_widget_show_all(fp->frm);
 }
 
-void
-fp_curata(FormularPrincipal *fp) {
+void fp_curata(FormularPrincipal *fp) {
+    if(fp == NULL) return;
+    
     /* curățăm valori locale */
     g_slist_free(fp->listaDlgCod);
+    finfo_curata(&fp->infoAplicatie);
     g_free(fp);
 
     /* eliberăm alte module utilizate */

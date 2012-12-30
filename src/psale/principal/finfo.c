@@ -32,8 +32,8 @@
 #define FINFO_ACTCONF_DLG_INREGULA 2
 
 static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm);
-static gboolean frmInfo_delev(GtkWidget *widget, GdkEvent *event, gpointer data);
 static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FInfoInstanta *fii);
+static void frmInfo_incarca_imagine_aleatoare_formular(FInfoInstanta *fii);
 static void btIesire_clicked(GtkWidget *widget, FInfoInstanta *fii);
 static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActualizare stareNoua, gchar *argvPrint);
 static void frmInfo_seteaza_stare_actualizare_fp(FInfoInstanta *fii, FIStareActualizare stareNoua, gchar *argvPrint);
@@ -46,7 +46,6 @@ static GtkWidget *finfo_creeaza_buton(GtkWindow *fereastraParinte,
 FInfoInstanta *finfo_initializeaza(GtkWindow *parinte) {
     FInfoInstanta *fii = NULL;
     GtkWidget *cadruFrm = NULL;
-    GtkWidget *imgInfo = NULL;
 
     if ((fii = g_new0(FInfoInstanta, 1)) == NULL) {
         g_warning("Nu am putut aloca structura formularului de informații!");
@@ -62,7 +61,7 @@ FInfoInstanta *finfo_initializeaza(GtkWindow *parinte) {
         gtk_window_set_modal(GTK_WINDOW(fii->frm), TRUE);
         gtk_window_set_resizable(GTK_WINDOW(fii->frm), FALSE);
         g_signal_connect(fii->frm, "key-release-event", G_CALLBACK(frmInfo_la_dezapasare_taste), fii);
-        g_signal_connect(fii->frm, "delete-event", G_CALLBACK(frmInfo_delev), NULL);
+        g_signal_connect(fii->frm, "delete-event", G_CALLBACK(gtk_widget_hide_on_delete), NULL);
 
         /* inițializăm cadrul formularului */
         cadruFrm = gtk_table_new(4, 4, FALSE);
@@ -73,10 +72,8 @@ FInfoInstanta *finfo_initializeaza(GtkWindow *parinte) {
         incarca_info_general(fii, cadruFrm);
 
         /* inițializăm imaginea de informație */
-        GdkPixbuf *pixInfoPictograma = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_INFO, -1, -1);
-        imgInfo = gtk_image_new_from_pixbuf(pixInfoPictograma);
-        g_object_unref(pixInfoPictograma);
-        gtk_table_attach_defaults(GTK_TABLE(cadruFrm), imgInfo, 0, 2, 0, 1);
+        frmInfo_incarca_imagine_aleatoare_formular(fii);
+        gtk_table_attach_defaults(GTK_TABLE(cadruFrm), fii->imgPictogramaFrm, 0, 2, 0, 1);
 
         /* inițializăm butoanele formularului */
         fii->btParasesteFrm = finfo_creeaza_buton(GTK_WINDOW(fii->frm),
@@ -92,15 +89,17 @@ FInfoInstanta *finfo_initializeaza(GtkWindow *parinte) {
 void finfo_curata(FInfoInstanta **fii) {
     if (fii == NULL) return;
 
-    gtk_widget_destroy((*fii)->frm);
+    if (GTK_IS_WIDGET((*fii)->frm)) {
+        gtk_widget_destroy((*fii)->frm);
+    }
     g_free(*fii);
 }
 
 void finfo_arata(FInfoInstanta *fii) {
     g_assert(fii != NULL);
 
+    frmInfo_incarca_imagine_aleatoare_formular(fii);
     gtk_widget_show_all(fii->frm);
-    //gtk_main();
 }
 
 static gboolean imgLicenta_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
@@ -111,10 +110,6 @@ static gboolean imgLicenta_click(GtkWidget *widget, GdkEvent *event, gpointer us
 #endif
 
     return TRUE;
-}
-
-static gboolean frmInfo_delev(GtkWidget *widget, GdkEvent *event, gpointer data) {
-    return FALSE;
 }
 
 static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FInfoInstanta *fii) {
@@ -137,8 +132,21 @@ static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, 
     return evGestionat;
 }
 
+static void frmInfo_incarca_imagine_aleatoare_formular(FInfoInstanta *fii) {
+    g_assert(fii != NULL);
+
+    GdkPixbuf *pixInfoPictograma = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_INFO, -1, -1);
+
+    if (fii->imgPictogramaFrm == NULL) {
+        fii->imgPictogramaFrm = gtk_image_new_from_pixbuf(pixInfoPictograma);
+    } else {
+        gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgPictogramaFrm), pixInfoPictograma);
+    }
+    g_object_unref(pixInfoPictograma);
+}
+
 static void btIesire_clicked(GtkWidget *widget, FInfoInstanta *fii) {
-    finfo_curata(&fii);
+    gtk_widget_hide_all(fii->frm);
 }
 
 static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
@@ -156,7 +164,7 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
     GtkWidget *cadruImgLicenta = NULL;
     gchar sirVersActualaLocala[32];
     Versiune *versCurenta = NULL;
-            
+
     if ((versCurenta = db_obtine_versiune_curenta()) != NULL) {
         g_sprintf(sirVersActualaLocala, "<b>%s</b> ,", sda_versiune_printf(versCurenta));
         g_free(versCurenta);
@@ -172,19 +180,19 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
     cadruEtichAutor = gtk_hbox_new(FALSE, 0);
     lblTitluAutor = gtk_label_new("Autor : ");
     lblValAutor = gtk_label_new(PSALE_NUME_AUTOR);
-    
+
     gtk_widget_set_size_request(lblTitluAutor, 100, -1);
     gtk_misc_set_alignment(GTK_MISC(lblTitluAutor), 1, 0);
     gtk_box_pack_start(GTK_BOX(cadruEtichAutor), lblTitluAutor, FALSE, FALSE, 0);
     gtk_misc_set_alignment(GTK_MISC(lblValAutor), 1, 0);
     gtk_box_pack_start(GTK_BOX(cadruEtichAutor), lblValAutor, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(cadruEtichete), cadruEtichAutor, TRUE, TRUE, 0);
-    
+
     /* construim și adăugăm informații despre versiune */
     cadruEtichVersiune = gtk_hbox_new(FALSE, 0);
     lblTitluVersiune = gtk_label_new("Versiune : ");
     lblValVersiune = gtk_label_new(NULL);
- 
+
     gtk_widget_set_size_request(lblTitluVersiune, 100, -1);
     gtk_misc_set_alignment(GTK_MISC(lblTitluVersiune), 1, 0);
     gtk_box_pack_start(GTK_BOX(cadruEtichVersiune), lblTitluVersiune, FALSE, FALSE, 0);
@@ -198,10 +206,10 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
     gtk_misc_set_alignment(GTK_MISC(fii->imgStareActualizare), 1, 0);
     gtk_box_pack_start(GTK_BOX(cadruEtichVersiune), fii->imgStareActualizare, FALSE, FALSE, 0);
     frmInfo_seteaza_stare_actualizare(fii, FI_ACTUALIZARE_INITIALIZARE, NULL);
-    
+
     g_signal_connect(fii->lblStareActualizare, "activate-link", G_CALLBACK(frmInfo_la_click_uri_lblActualizare), fii);
     gtk_box_pack_start(GTK_BOX(cadruEtichete), cadruEtichVersiune, TRUE, TRUE, 0);
-    
+
     /* construim și adăugăm informații despre licență */
     cadruEtichLicenta = gtk_hbox_new(FALSE, 0);
     lblTitluLicenta = gtk_label_new("Licență : ");
@@ -209,14 +217,14 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
     imgLicenta = gtk_image_new_from_pixbuf(pixImgLicenta);
     g_object_unref(pixImgLicenta);
     cadruImgLicenta = gtk_event_box_new();
-    
+
     gtk_widget_set_size_request(lblTitluLicenta, 100, -1);
     gtk_misc_set_alignment(GTK_MISC(lblTitluLicenta), 1, 0);
     gtk_misc_set_alignment(GTK_MISC(imgLicenta), 1, 0);
     gtk_widget_set_tooltip_markup(cadruImgLicenta, "Prezintă informații sumare despre licența aplicației.\n<i>(click pentru a o deschide online)</i>");
     g_signal_connect(cadruImgLicenta, "button-press-event", G_CALLBACK(imgLicenta_click), NULL);
     gtk_container_add(GTK_CONTAINER(cadruImgLicenta), imgLicenta);
-    
+
     gtk_box_pack_start(GTK_BOX(cadruEtichLicenta), lblTitluLicenta, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(cadruEtichLicenta), cadruImgLicenta, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(cadruEtichete), cadruEtichLicenta, TRUE, TRUE, 0);
@@ -244,17 +252,17 @@ static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActuali
     GdkPixbuf *pxBufSimplu = NULL;
     GdkPixbufAnimation *pxBufAnimatie = NULL;
     gchar mesajLblStare[128];
-    
+
     switch (stareNoua) {
         case FI_ACTUALIZARE_INITIALIZARE:
             pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_REPAUS, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
             gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgStareActualizare), pxBufSimplu);
-            g_sprintf(mesajLblStare, "<a href='"FI_ACTUALIZARE_URI_PORNESTE"'>verificați</a>");
+            g_sprintf(mesajLblStare, "<a href='"FI_ACTUALIZARE_URI_PORNESTE"'>verificați</a>.");
             break;
         case FI_ACTUALIZARE_IN_CURS:
             pxBufAnimatie = fl_obtine_animatie_media(FL_ANIM_FINFO_ACTUALIZARE_PROGRES);
             gtk_image_set_from_animation(GTK_IMAGE(fii->imgStareActualizare), pxBufAnimatie);
-            g_sprintf(mesajLblStare, "caut");
+            g_sprintf(mesajLblStare, "caut ...");
             break;
         case FI_ACTUALIZARE_SUCCES_VERSNOUA:
             pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_SUCCES_VNOUA, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
@@ -266,12 +274,12 @@ static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActuali
         case FI_ACTUALIZARE_SUCCES_VERSNESCHIMBATA:
             pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_SUCCES_VNENOUA, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
             gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgStareActualizare), pxBufSimplu);
-            g_sprintf(mesajLblStare, "este ultima");
+            g_sprintf(mesajLblStare, "este ultima.");
             break;
         case FI_ACTUALIZARE_ESEC:
             pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_ESUATA, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
             gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgStareActualizare), pxBufSimplu);
-            g_sprintf(mesajLblStare, "Problemă (%s), încercați mai târziu.", (argvPrint == NULL ? "-1" : argvPrint));
+            g_sprintf(mesajLblStare, "problemă actualizare (%s). <a href='"FI_ACTUALIZARE_URI_PORNESTE"'>Reîncercați</a>.", (argvPrint == NULL ? "-1" : argvPrint));
             break;
         default:
             g_warning("Nu recunosc starea actualizării furnizate!");
@@ -293,8 +301,8 @@ static gboolean frmInfo_la_click_uri_lblActualizare(GtkLabel *lbl, gchar *uri, F
     if (g_strcmp0(uri, FI_ACTUALIZARE_URI_PORNESTE) == 0) {
         GThread *firCautatorDeActualizari = NULL;
         GError *err = NULL;
-        
-        if((firCautatorDeActualizari = g_thread_try_new("cautActualizari", (GThreadFunc)(&frmInfo_cauta_actualizari), fii, &err)) == NULL) {
+
+        if ((firCautatorDeActualizari = g_thread_try_new("cautActualizari", (GThreadFunc) (&frmInfo_cauta_actualizari), fii, &err)) == NULL) {
             g_warning("Nu am putut creea firul căutător de actualizări!Motiv : %s", err->message);
             g_error_free(err);
         }
@@ -321,11 +329,11 @@ static gboolean frmInfo_la_click_uri_lblActualizare(GtkLabel *lbl, gchar *uri, F
             } else {
                 g_warning("Nu am putut reconstitui versiunea țintă pentru actualizarea directă cerută!");
             }
-            
+
             g_strfreev(elemInUri);
             g_free(versTinta);
-            
-            if(versTinta != NULL) {
+
+            if (versTinta != NULL) {
                 gtk_main_quit();
             }
         }
@@ -358,7 +366,7 @@ static gboolean frmInfo_cauta_actualizari(FInfoInstanta *fii) {
         g_free(versLocala);
         g_free(versServer);
     }
-    
+
     return deReturnat;
 }
 

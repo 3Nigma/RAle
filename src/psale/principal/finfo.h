@@ -16,6 +16,7 @@
 
 typedef struct {
     GtkWidget *frm;
+    GtkWidget *imgPictogramaFrm;
     GtkWidget *txtInfoVersiuni;
     GtkWidget *btParasesteFrm;
     GtkWidget *lblStareActualizare;

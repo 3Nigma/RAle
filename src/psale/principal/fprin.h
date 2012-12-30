@@ -12,9 +12,11 @@
 #define _FPRIN_H_
 
 #include <gtk/gtk.h>
+#include "finfo.h"
 
 typedef struct {
   GtkWidget *frm;
+  FInfoInstanta *infoAplicatie;
   GtkWidget *cmbxExemple;
   GSList *listaDlgCod;
 } FormularPrincipal;
