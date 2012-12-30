@@ -44,12 +44,15 @@ int main(int argc, char *argv[]) {
     g_debug("Am realizat cu succes înlocuirea actualizatorului cu o versiune mai nouă.");
   }
   
+  gdk_threads_init();
   gtk_init (&argc, &argv);
   
   fprin = fp_initializeaza_formular_principal();
   fp_arata(fprin);
   
+  gdk_threads_enter();
   gtk_main();
+  gdk_threads_leave();
   fp_curata(fprin);
   return 0;
 }
