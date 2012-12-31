@@ -19,7 +19,6 @@ static size_t citeste_date_actualizare_recurent(void *ptr, size_t size, size_t n
 static gboolean dl_descarca_lista_actualizari(DLInstanta *dli, FILE *fisLocal);
 static gboolean dl_descarca_actualizare_tinta(DLInstanta *dli, FILE *fisLocal);
 static gboolean dl_descarca_fisier(CURL *legaturaRetea, const char *adresaInternet, FILE *fisLocal);
-static gint dl_fct_comparator_cautare_versiune_sepcifica(IntrareActualizare *elemDinListaDeActualizari, Versiune *versTinta);
 static int instiintare_progres_retea(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 
 DLInstanta *dl_initializeaza(const char *adresa) {
@@ -138,11 +137,19 @@ gboolean dl_incarca_versiune_specifica_server(DLInstanta *dli, Versiune *versDor
     g_assert(dli != NULL);
     g_assert(versDorita != NULL);
 
-    dli->versiuneaServerTinta = (IntrareActualizare *) (g_slist_find_custom(dli->intrariActualizare,
-            versDorita,
-            (GCompareFunc) (&dl_fct_comparator_cautare_versiune_sepcifica)));
-
-    return dli->versiuneaServerTinta != NULL;
+    GSList *ptElemDinLista = dli->intrariActualizare;
+    IntrareActualizare *elemDeIntrare = NULL;
+    
+    while (ptElemDinLista != NULL) {
+        elemDeIntrare = (IntrareActualizare *) ptElemDinLista->data;
+        if (sda_comparaVersiuni(&elemDeIntrare->vers, versDorita) == 0) {
+            dli->versiuneaServerTinta = elemDeIntrare;
+            break;
+        }
+        ptElemDinLista = g_slist_next(ptElemDinLista);
+    }
+    
+    return ptElemDinLista != NULL;
 }
 
 gboolean dl_exista_versiune_mai_buna_decat(DLInstanta *dli, Versiune *versCurentaLocal) {
@@ -241,11 +248,4 @@ static gboolean dl_descarca_fisier(CURL *legaturaRetea, const char *adresaIntern
     }
 
     return opIncheiataCuSucces;
-}
-
-static gint dl_fct_comparator_cautare_versiune_sepcifica(IntrareActualizare *elemDinListaDeActualizari, Versiune *versTinta) {
-    g_assert(elemDinListaDeActualizari != NULL);
-    g_assert(versTinta != NULL);
-
-    return sda_comparaVersiuni(&elemDinListaDeActualizari->vers, versTinta);
 }
