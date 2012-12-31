@@ -355,7 +355,7 @@ static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActuali
 
     GdkPixbuf *pxBufSimplu = NULL;
     GdkPixbufAnimation *pxBufAnimatie = NULL;
-    gchar mesajLblStare[128];
+    gchar mesajLblStare[256];
 
     switch (stareNoua) {
         case FI_ACTUALIZARE_INITIALIZARE:
@@ -371,14 +371,14 @@ static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActuali
         case FI_ACTUALIZARE_SUCCES_VERSNOUA:
             pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_SUCCES_VNOUA, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
             gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgStareActualizare), pxBufSimplu);
-            g_sprintf(mesajLblStare, "disponbilă: '<b><u>%s</u></b>'. <a href='"FI_ACTUALIZARE_URI_ACTUALIZEAZA":%s'>Actualizați</a>.",
+            g_sprintf(mesajLblStare, "disponbilă: '<span foreground='#336600' font_weight='ultrabold'>%s</span>'. <a href='"FI_ACTUALIZARE_URI_ACTUALIZEAZA":%s'>Actualizați</a>.",
                     (argvPrint == NULL ? "0.0" : argvPrint),
                     (argvPrint == NULL ? "0.0" : argvPrint));
             break;
         case FI_ACTUALIZARE_SUCCES_VERSNESCHIMBATA:
             pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_SUCCES_VNENOUA, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
             gtk_image_set_from_pixbuf(GTK_IMAGE(fii->imgStareActualizare), pxBufSimplu);
-            g_sprintf(mesajLblStare, "este ultima.");
+            g_sprintf(mesajLblStare, "este ultima. <a href='"FI_ACTUALIZARE_URI_PORNESTE"'>Căutați din nou</a>.");
             break;
         case FI_ACTUALIZARE_ESEC:
             pxBufSimplu = fl_obtine_imagine_media_scalata(FL_IMG_FINFO_ACTUALIZARE_ESUATA, FI_IMG_STARE_ACTUALIZARE_LUNGIME, FI_IMG_STARE_ACTUALIZARE_INALTIME);
@@ -412,6 +412,8 @@ static gboolean frmInfo_la_click_uri_lblActualizare(GtkLabel *lbl, gchar *uri, F
         }
     } else if (g_str_has_prefix(uri, FI_ACTUALIZARE_URI_ACTUALIZEAZA)) {
         GtkWidget *dlgIntrebareActualizare = NULL;
+        gchar **elemInUri = NULL;
+        Versiune *versTinta = NULL;
 
         dlgIntrebareActualizare = gtk_message_dialog_new_with_markup(GTK_WINDOW(fii->frm), GTK_DIALOG_MODAL,
                 GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
@@ -425,21 +427,23 @@ static gboolean frmInfo_la_click_uri_lblActualizare(GtkLabel *lbl, gchar *uri, F
                 NULL);
         gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_DA);
         if (gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare)) == FINFO_ACTCONF_DLG_DA) {
-            gchar **elemInUri = g_strsplit(uri, ":", 2);
-            Versiune *versTinta = sda_obtineVersiuneDinSir(elemInUri[1]);
-
-            if (versTinta != NULL) {
-                os_rpsale_forteaza_actualizare(versTinta);
-            } else {
+            if((elemInUri = g_strsplit(uri, ":", 2)) == NULL ) {
+                g_warning("Nu am putut extrage elementele esențiale din uri din cauza formatului invalid a acestuia!");
+            } else if ((versTinta = sda_obtineVersiuneDinSir(elemInUri[1])) == NULL) {
                 g_warning("Nu am putut reconstitui versiunea țintă pentru actualizarea directă cerută!");
             }
+        }
+        gtk_widget_destroy(dlgIntrebareActualizare);
 
-            g_strfreev(elemInUri);
-            g_free(versTinta);
+        if (versTinta != NULL) {
+            os_rpsale_forteaza_actualizare(versTinta);
+        }
 
-            if (versTinta != NULL) {
-                gtk_main_quit();
-            }
+        g_strfreev(elemInUri);
+        g_free(versTinta);
+
+        if (versTinta != NULL) {
+            gtk_main_quit();
         }
     }
 

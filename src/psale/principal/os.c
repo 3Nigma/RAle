@@ -291,17 +291,19 @@ gboolean os_rpsale_forteaza_actualizare(Versiune *vers) {
 
     startupInfo.cb = sizeof (startupInfo);
 
-    g_sprintf(listaArgumente, "--actualizeaza-direct --versiune-server %s", sda_versiune_printf(vers));
+    g_sprintf(listaArgumente, "--tipul-operatiei actualizeaza-direct --versiune-server%s", sda_versiune_printf(vers));
     if (!CreateProcess(OS_CALE_RPSALE, listaArgumente, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation)) {
         g_warning("Nu am putut porni actualizatorul 'rpsAle'!");
         stareExecutieActualizator = FALSE;
     }
 #elif defined G_OS_UNIX
     pid_t IdProcCopil;
+    gchar optVersTinta[32];
     
+    g_sprintf(optVersTinta, "--versiune-server=%s", sda_versiune_printf(vers));
     if ((IdProcCopil = fork()) != 0) {
         /* suntem în firul copil */
-        if (execlp(OS_CALE_RPSALE, OS_NUME_RPSALE, "--actualizeaza-direct", "--versiune-server", sda_versiune_printf(vers), NULL) == -1) {
+        if (execlp(OS_CALE_RPSALE, OS_NUME_RPSALE, "--tipul-operatiei", "actualizeaza-direct", optVersTinta, NULL) == -1) {
             g_warning("Nu am putut porni actualizatorul 'rpsAle'! : %s", strerror(errno));
             stareExecutieActualizator = FALSE;
         }
