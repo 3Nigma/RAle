@@ -20,16 +20,18 @@ extern "C" {
 #define PSALE_NUME_AUTOR "Victor ADĂSCĂLIȚEI"
 #define PSALE_FORMAT_VERSIUNE_PRINTF "%u.%u"
 #define PSALE_FORMAT_VERSIUNE_REGEX "([0-9]+)\\.([0-9]+)"
-#define PSALE_TEXT_DESPRE "Bună!\n" \
+#define PSALE_TEXT_DESPRE_TITLU "Bună,\n"
+#define PSALE_TEXT_DESPRE_CORP \
   "Aplicația de față a fost construită pentru a fi utilizată împreună cu 'Pachetul educațional Ale' a comunității tuscale.ro.\n"\
   "Scopul ei este acela de a facilita interacțiunea, într-o manieră ușoară și intuitivă, cu plăcuța proiectului.\n\n"\
-  "Pentru orice nedumeriri/sugestii/reclamații ne găsiți și vă răspundem cu drag în comunitatea proiectului."
+  "Pentru orice nedumeriri/sugestii/reclamații ne găsiți și vă răspundem cu drag în comunitatea proiectului.\n\n"
 
-#define PSALE_BD_NUME_FIS     "date.sqlite"
-#define DB_NUME_TABEL_EXEMPLE "exemple"
-#define DB_NUME_TABEL_MEDIA   "media"
-#define DB_NUME_TABEL_META    "meta"
-
+#define PSALE_BD_NUME_FIS        "date.sqlite"
+#define DB_NUME_TABEL_EXEMPLE    "exemple"
+#define DB_NUME_TABEL_MEDIA      "media"
+#define DB_NUME_TABEL_META       "meta"
+#define DB_NUME_TABEL_MODIFICARI "modificari"
+    
 #define OS_NUME_RPSALE "rpsale"
 #define OS_CALE_RPSALE "./"OS_NUME_RPSALE
 
@@ -48,6 +50,11 @@ extern "C" {
         char *mesajModificari;
     } IntrareActualizare;
 
+    typedef struct {
+        Versiune vers;
+        gchar *detalii;
+    } BDIntrareTabelModificare;
+    
     extern Versiune *sda_obtineVersiuneDinSir(gchar *sir);
     extern gint sda_comparaVersiuni(Versiune *v1, Versiune *v2);
 

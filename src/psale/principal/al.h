@@ -13,16 +13,12 @@
 
 #include <gtk/gtk.h>
 
-extern gboolean 
-al_este_placuta_conectata();
+extern gboolean al_este_placuta_conectata();
 
-extern gboolean 
-al_scrie_aplicatie(const gchar *caleFisHex);
+extern gboolean al_scrie_aplicatie(const gchar *caleFisHex);
 
-extern void
-al_citeste_eeprom(GtkListStore *lm);
+extern void al_citeste_eeprom(GtkListStore *lm);
 
-extern void 
-al_scrie_eeprom(GtkListStore *lm);
+extern void al_scrie_eeprom(GtkListStore *lm);
 
 #endif

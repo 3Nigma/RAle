@@ -14,37 +14,26 @@
 #include "sda.h"
 #include <gtk/gtk.h>
 
-extern gboolean 
-db_initializeaza();
+extern gboolean db_initializeaza();
+extern void db_curata();
 
-extern void 
-db_curata();
+extern const char *db_obtine_adresa_actualizare();
 
-extern const char *
-db_obtine_adresa_actualizare();
+extern Versiune *db_obtine_versiune_curenta();
 
-extern Versiune *
-db_obtine_versiune_curenta();
+extern gboolean db_obtine_este_prima_rulare();
 
-extern gboolean 
-db_obtine_este_prima_rulare();
+extern gboolean db_consuma_prima_rulare();
 
-extern gboolean
-db_consuma_prima_rulare();
+extern gboolean db_obtine_este_actualizare_automata();
 
-extern gboolean 
-db_obtine_este_actualizare_automata();
+extern gboolean db_seteaza_actualizare_automata();
 
-extern gboolean
-db_seteaza_actualizare_automata();
+extern gboolean db_seteaza_actualizare_manuala();
 
-extern gboolean
-db_seteaza_actualizare_manuala();
+extern int db_incarca_exemple_carte(GtkListStore *st, const gchar *limbajDorit);
 
-extern int 
-db_incarca_exemple_carte(GtkListStore *st, const gchar *limbajDorit);
+extern char *db_obtine_cod_complet(const gchar *titluLung, const gchar *limbajDorit);
 
-extern char *
-db_obtine_cod_complet(const gchar *titluLung, const gchar *limbajDorit);
-
+extern gboolean db_incarca_informatii_despre_versiuni(GSList **lst);
 #endif

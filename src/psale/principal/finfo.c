@@ -10,10 +10,12 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <stdlib.h>
+#include <string.h>
 #include <glib/gprintf.h>
 #include <gtk-2.0/gdk/gdk.h>
 #include <gtk-2.0/gtk/gtklabel.h>
 #include <gtk-2.0/gtk/gtkwidget.h>
+#include <glib-2.0/glib/gunicode.h>
 
 #include "sda.h"
 #include "fl.h"
@@ -31,8 +33,11 @@
 #define FINFO_ACTCONF_DLG_NU       1
 #define FINFO_ACTCONF_DLG_INREGULA 2
 
+static void frmInfo_sterge_element_din_listaDescriereVersiune(BDIntrareTabelModificare *bd_im);
 static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm);
 static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FInfoInstanta *fii);
+static void frmInfo_incarca_informatii_text_principal(GtkTextBuffer *txtb);
+static void frmInfo_adauga_informatii_despre_versiuni(GtkTextBuffer *txtb);
 static void frmInfo_incarca_imagine_aleatoare_formular(FInfoInstanta *fii);
 static void btIesire_clicked(GtkWidget *widget, FInfoInstanta *fii);
 static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActualizare stareNoua, gchar *argvPrint);
@@ -87,7 +92,7 @@ FInfoInstanta *finfo_initializeaza(GtkWindow *parinte) {
 }
 
 void finfo_curata(FInfoInstanta **fii) {
-    if (fii == NULL) return;
+    if (fii == NULL || (*fii) == NULL) return;
 
     if (GTK_IS_WIDGET((*fii)->frm)) {
         gtk_widget_destroy((*fii)->frm);
@@ -132,6 +137,95 @@ static gboolean frmInfo_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, 
     return evGestionat;
 }
 
+static void frmInfo_incarca_informatii_text_principal(GtkTextBuffer *txtb) {
+    g_assert(txtb != NULL);
+
+    GtkTextTag *etichFormatTitlu = NULL;
+    GtkTextIter pozSfarsitText;
+
+    etichFormatTitlu = gtk_text_buffer_create_tag(txtb, "textPrincipal_formatTitlu",
+            "weight", PANGO_WEIGHT_BOLD,
+            NULL);
+
+    gtk_text_buffer_get_end_iter(txtb, &pozSfarsitText);
+    gtk_text_buffer_insert_with_tags(txtb, &pozSfarsitText, PSALE_TEXT_DESPRE_TITLU, -1, etichFormatTitlu, NULL);
+
+    gtk_text_buffer_get_end_iter(txtb, &pozSfarsitText);
+    gtk_text_buffer_insert(txtb, &pozSfarsitText, PSALE_TEXT_DESPRE_CORP, -1);
+
+    /* adăugăm informațiile culese din BD despre versiunile trecute ale aplicației */
+    frmInfo_adauga_informatii_despre_versiuni(txtb);
+}
+
+static void frmInfo_adauga_informatii_despre_versiuni(GtkTextBuffer *txtb) {
+    g_assert(txtb != NULL);
+
+    GtkTextTag *etichFormatTitlu = NULL;
+    GtkTextTag *etichFormatVersiune = NULL;
+    GtkTextTag *etichFormatDetalii = NULL;
+    GtkTextIter pozSfarsitText;
+
+    /* alocăm etichetele de format */
+    etichFormatTitlu = gtk_text_buffer_create_tag(txtb, "detaliiVersiune_formatTitlu",
+            "weight", PANGO_WEIGHT_BOLD,
+            "size-set", TRUE,
+            "size-points", 13.0,
+            NULL);
+    etichFormatVersiune = gtk_text_buffer_create_tag(txtb, "detaliiVersiune_formatVersiune",
+            "weight", PANGO_WEIGHT_BOLD,
+            NULL);
+    etichFormatDetalii = gtk_text_buffer_create_tag(txtb, "detaliiVersiune_formatDetaliiVersiune",
+            "size-set", TRUE,
+            "size-points", 9.0,
+            NULL);
+
+    /* adăugăm titlul regiunii */
+    gchar *titluDescriereVersiuni = g_locale_to_utf8("\xe2\x9d\x80 Detalii Versiuni \xe2\x9d\x80\n", -1, NULL, NULL, NULL);
+    gtk_text_buffer_get_end_iter(txtb, &pozSfarsitText);
+    gtk_text_buffer_insert_with_tags(txtb, &pozSfarsitText, titluDescriereVersiuni, -1, etichFormatTitlu, NULL);
+    g_free(titluDescriereVersiuni);
+
+    /* obținem informații despre versiunile trecute */
+    GSList *lstDetaliiVersiuni = NULL;
+    GSList *ptElemLista = NULL;
+    BDIntrareTabelModificare *intr = NULL;
+    gchar *deschizatorDeRaportVers = g_locale_to_utf8(" \xe2\x87\xb4 ", -1, NULL, NULL, NULL);
+
+    if (db_incarca_informatii_despre_versiuni(&lstDetaliiVersiuni)) {
+        ptElemLista = lstDetaliiVersiuni;
+        while (ptElemLista != NULL) {
+            intr = (BDIntrareTabelModificare *) ptElemLista->data;
+
+            /* adăugăm un deschizător de versiune (săgeată), pentru a face rezultatul final mai plăcut */
+            gtk_text_buffer_get_end_iter(txtb, &pozSfarsitText);
+            gtk_text_buffer_insert(txtb, &pozSfarsitText, deschizatorDeRaportVers, -1);
+
+            /* adăugăm la text versiunea condensată */
+            gtk_text_buffer_get_end_iter(txtb, &pozSfarsitText);
+            gtk_text_buffer_insert_with_tags(txtb, &pozSfarsitText, sda_versiune_printf(&intr->vers), -1, etichFormatVersiune, NULL);
+
+            /* introducem un separator simplu */
+            gtk_text_buffer_get_end_iter(txtb, &pozSfarsitText);
+            gtk_text_buffer_insert(txtb, &pozSfarsitText, " : ", -1);
+
+            /* adăugăm la text descrierea asociată versiunii respective */
+            gtk_text_buffer_get_end_iter(txtb, &pozSfarsitText);
+            gtk_text_buffer_insert_with_tags(txtb, &pozSfarsitText, intr->detalii, -1, etichFormatDetalii, NULL);
+
+            /* + rând nou */
+            gtk_text_buffer_get_end_iter(txtb, &pozSfarsitText);
+            gtk_text_buffer_insert(txtb, &pozSfarsitText, "\n", -1);
+
+            ptElemLista = g_slist_next(ptElemLista);
+        }
+
+        g_slist_free_full(lstDetaliiVersiuni, (GDestroyNotify) (&frmInfo_sterge_element_din_listaDescriereVersiune));
+    } else {
+        g_warning("Nu am putut încărca descrierea versiunilor din baza de date!");
+    }
+
+}
+
 static void frmInfo_incarca_imagine_aleatoare_formular(FInfoInstanta *fii) {
     g_assert(fii != NULL);
 
@@ -147,6 +241,13 @@ static void frmInfo_incarca_imagine_aleatoare_formular(FInfoInstanta *fii) {
 
 static void btIesire_clicked(GtkWidget *widget, FInfoInstanta *fii) {
     gtk_widget_hide_all(fii->frm);
+}
+
+static void frmInfo_sterge_element_din_listaDescriereVersiune(BDIntrareTabelModificare *bd_im) {
+    if (bd_im == NULL) return;
+
+    g_free(bd_im->detalii);
+    g_free(bd_im);
 }
 
 static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
@@ -237,13 +338,16 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
 
     fii->txtInfoVersiuni = gtk_text_view_new();
     GtkTextBuffer *txtBuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(fii->txtInfoVersiuni));
+    GtkWidget *desfasuratorFereastraTxt = gtk_scrolled_window_new(NULL, NULL);
 
-    gtk_text_buffer_set_text(txtBuffer, PSALE_TEXT_DESPRE, -1);
+    frmInfo_incarca_informatii_text_principal(txtBuffer);
     gtk_widget_set_size_request(fii->txtInfoVersiuni, 450, 200);
     gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(fii->txtInfoVersiuni), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(fii->txtInfoVersiuni), GTK_WRAP_WORD);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(fii->txtInfoVersiuni), FALSE);
-    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), fii->txtInfoVersiuni, 1, 4, 1, 2);
+
+    gtk_container_add(GTK_CONTAINER(desfasuratorFereastraTxt), fii->txtInfoVersiuni);
+    gtk_table_attach_defaults(GTK_TABLE(cadruFrm), desfasuratorFereastraTxt, 1, 4, 1, 2);
 }
 
 static void frmInfo_seteaza_stare_actualizare(FInfoInstanta *fii, FIStareActualizare stareNoua, gchar *argvPrint) {
