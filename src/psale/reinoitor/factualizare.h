@@ -57,6 +57,7 @@ extern "C" {
         GtkWidget *baraProgres;
         GtkWidget *btAnuleaza;
         gboolean esteBtAnuleazaApasat;
+        gboolean actualizareAplicataCuSucces;
         AutomatonActualizare *masinaActualizanta;
         ParametriiRulareAplicatie *parametriInvocare;
     } FAInstanta;
@@ -64,7 +65,7 @@ extern "C" {
     extern FAInstanta *fa_initializeaza(ParametriiRulareAplicatie *pari);
     extern void fa_curata(FAInstanta **fai);
 
-    extern void fa_lanseaza_sesiune_actualizare(FAInstanta *fai);
+    extern gboolean fa_aplica_sesiune_actualizare(FAInstanta *fai);
 
 #ifdef	__cplusplus
 }

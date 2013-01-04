@@ -12,7 +12,7 @@
 
 #include "main.h"
 
-static void lanseazaPSAle();
+static void lanseazaPSAle(gboolean actualizatCuSucces);
 static void inregistreazaMesaj(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data);
 
 int main(int argc, char *argv[]) {
@@ -44,7 +44,8 @@ int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
     ParametriiRulareAplicatie *optiuniExterne = NULL;
-
+    gboolean pachetActualizatCuSucces = FALSE;
+    
     /* încărcăm eventualele informații venite din exterior (în parametrii dați prin linia de comandă) */
     if ((optiuniExterne = pa_incarca_parametrii(argc, argv)) != NULL) {
 
@@ -79,8 +80,8 @@ int main(int argc, char *argv[]) {
                     optiuniExterne->tipOp == ACTUALIZEAZA_DIRECT ||
                     optiuniExterne->tipOp == AFISEAZA) {
                 FAInstanta *fSesiuneActualizare = fa_initializeaza(optiuniExterne);
-
-                fa_lanseaza_sesiune_actualizare(fSesiuneActualizare);
+                
+                pachetActualizatCuSucces = fa_aplica_sesiune_actualizare(fSesiuneActualizare);
                 fa_curata(&fSesiuneActualizare);
             }
             db_curata();
@@ -89,7 +90,7 @@ int main(int argc, char *argv[]) {
         }
 
         if (optiuniExterne->tipOp != AFISEAZA) {
-            lanseazaPSAle();
+            lanseazaPSAle(pachetActualizatCuSucces);
         }
 
         pa_curata(&optiuniExterne);
@@ -102,7 +103,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-static void lanseazaPSAle() {
+static void lanseazaPSAle(gboolean actualizatCuSucces) {
 #ifdef G_OS_WIN32
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInformation;
@@ -112,7 +113,7 @@ static void lanseazaPSAle() {
 
     startupInfo.cb = sizeof (startupInfo);
 
-    if (!CreateProcess(NULL, RPS_CALE_PSALE, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation)) {
+    if (!CreateProcess(RPS_CALE_PSALE, (actualizatCuSucces ? "--proaspat-actualizata" : NULL), NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation)) {
         g_error("Nu am putut porni aplicația 'psAle'!");
     }
 #elif defined G_OS_UNIX
@@ -120,7 +121,7 @@ static void lanseazaPSAle() {
 
     if ((IdProcCopil = fork()) != 0) {
         /* suntem în firul copil */
-        if (execlp(RPS_CALE_PSALE, RPS_NUME_PSALE, NULL) == -1) {
+        if (execlp(RPS_CALE_PSALE, RPS_NUME_PSALE, (actualizatCuSucces ? "--proaspat-actualizata" : NULL), NULL) == -1) {
             g_error("Nu am putut porni aplicația 'psAle'! : %s", strerror(errno));
         }
     }

@@ -35,7 +35,8 @@ FAInstanta *fa_initializeaza(ParametriiRulareAplicatie *pari) {
         strucSesiuneAct->masinaActualizanta = g_new0(AutomatonActualizare, 1);
         strucSesiuneAct->parametriInvocare = pari;
         strucSesiuneAct->esteBtAnuleazaApasat = FALSE;
-
+        strucSesiuneAct->actualizareAplicataCuSucces = FALSE;
+        
         strucSesiuneAct->frm = gtk_window_new(GTK_WINDOW_TOPLEVEL);
         gtk_window_set_title(GTK_WINDOW(strucSesiuneAct->frm), "'[r]eînoitor' ~ psAle");
         gtk_window_set_position(GTK_WINDOW(strucSesiuneAct->frm), GTK_WIN_POS_CENTER);
@@ -85,12 +86,14 @@ void fa_curata(FAInstanta **fai) {
     (*fai) = NULL;
 }
 
-void fa_lanseaza_sesiune_actualizare(FAInstanta *fai) {
+gboolean fa_aplica_sesiune_actualizare(FAInstanta *fai) {
     g_assert(fai != NULL);
 
     g_timeout_add(FA_MS_INTRE_STARI, (GSourceFunc) (&fa_proceseaza_sesiune), fai);
     g_timeout_add(20, (GSourceFunc) (&fa_progres_animator), fai);
     gtk_main();
+    
+    return fai->actualizareAplicataCuSucces;
 }
 
 static void fa_progres_seteaza_stare(FAInstanta *fai, StareActualizare stareNoua) {
@@ -282,6 +285,8 @@ static gboolean fa_proceseaza_sesiune(FAInstanta *fai) {
         case FA_DL_APLICARE_ACTUALIZARE:
             if (fai->esteBtAnuleazaApasat == FALSE) {
                 if (dz_despacheteaza_pachet(fai->masinaActualizanta->date->adresaPachetLocal, DZ_CALE_DESPACHETARE)) {
+                    g_debug("Am aplicat cu succes versiunea țintă!");
+                    fai->actualizareAplicataCuSucces = TRUE;
                     fa_progres_seteaza_stare(fai, FA_DL_AM_ACTUALIZAT_LA_VERS_TINTA);
                 } else {
                     g_warning("Nu am putut aplica actualizarea obținută!");
