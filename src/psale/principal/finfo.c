@@ -12,9 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib/gprintf.h>
-#include <gtk-2.0/gdk/gdk.h>
-#include <gtk-2.0/gtk/gtklabel.h>
-#include <gtk-2.0/gtk/gtkwidget.h>
 #include <glib-2.0/glib/gunicode.h>
 
 #include "sda.h"
@@ -181,15 +178,15 @@ static void frmInfo_adauga_informatii_despre_versiuni(GtkTextBuffer *txtb) {
 
     /* adăugăm titlul regiunii */
     gchar *titluDescriereVersiuni = NULL;
-    
-    #ifdef G_OS_WIN32
-	/* se pare că windows nu suportă formatul UTF-8 pentru textbox-uri*/
-	titluDescriereVersiuni = g_locale_to_utf8("~ Detalii Versiuni ~\n", -1, NULL, NULL, NULL);
-	#elif G_OS_LINUX
-	/* linux nu are o astfel de problemă astfel încât putem folosi UTF-8 pentru a 'desena' elemente drăguțe */
-	titluDescriereVersiuni = g_locale_to_utf8("\xe2\x9d\x80 Detalii Versiuni \xe2\x9d\x80\n", -1, NULL, NULL, NULL);
-	#endif
-    
+
+#ifdef G_OS_WIN32
+    /* se pare că windows nu suportă formatul UTF-8 pentru textbox-uri*/
+    titluDescriereVersiuni = g_locale_to_utf8("~ Detalii Versiuni ~\n", -1, NULL, NULL, NULL);
+#elif defined G_OS_UNIX
+    /* linux nu are o astfel de problemă astfel încât putem folosi UTF-8 pentru a 'desena' elemente drăguțe */
+    titluDescriereVersiuni = g_locale_to_utf8("\xe2\x9d\x80 Detalii Versiuni \xe2\x9d\x80\n", -1, NULL, NULL, NULL);
+#endif
+
     gtk_text_buffer_get_end_iter(txtb, &pozSfarsitText);
     gtk_text_buffer_insert_with_tags(txtb, &pozSfarsitText, titluDescriereVersiuni, -1, etichFormatTitlu, NULL);
     g_free(titluDescriereVersiuni);
@@ -200,11 +197,11 @@ static void frmInfo_adauga_informatii_despre_versiuni(GtkTextBuffer *txtb) {
     BDIntrareTabelModificare *intr = NULL;
     gchar *deschizatorDeRaportVers = NULL;
 
-	#ifdef G_OS_WIN32
-	deschizatorDeRaportVers = g_locale_to_utf8(" * ", -1, NULL, NULL, NULL);
-	#elif G_OS_LINUX
-	deschizatorDeRaportVers = g_locale_to_utf8(" \xe2\x87\xb4 ", -1, NULL, NULL, NULL);
-	#endif
+#ifdef G_OS_WIN32
+    deschizatorDeRaportVers = g_locale_to_utf8(" * ", -1, NULL, NULL, NULL);
+#elif defined G_OS_UNIX
+    deschizatorDeRaportVers = g_locale_to_utf8(" \xe2\x87\xb4 ", -1, NULL, NULL, NULL);
+#endif
 
     if (db_incarca_informatii_despre_versiuni(&lstDetaliiVersiuni)) {
         ptElemLista = lstDetaliiVersiuni;
@@ -418,9 +415,9 @@ static void frmInfo_seteaza_stare_actualizare_fp(FInfoInstanta *fii, FIStareActu
 
 static gboolean frmInfo_la_click_uri_lblActualizare(GtkLabel *lbl, gchar *uri, FInfoInstanta *fii) {
     if (g_strcmp0(uri, FI_ACTUALIZARE_URI_PORNESTE) == 0) {
-        if(os_executa_functie_asincron(&frmInfo_cauta_actualizari, fii) == FALSE) {
-		    g_warning("Nu am putut creea firul căutător de actualizări!");
-		}
+        if (os_executa_functie_asincron(&frmInfo_cauta_actualizari, fii) == FALSE) {
+            g_warning("Nu am putut creea firul căutător de actualizări!");
+        }
     } else if (g_str_has_prefix(uri, FI_ACTUALIZARE_URI_ACTUALIZEAZA)) {
         GtkWidget *dlgIntrebareActualizare = NULL;
         gchar **elemInUri = NULL;
@@ -438,7 +435,7 @@ static gboolean frmInfo_la_click_uri_lblActualizare(GtkLabel *lbl, gchar *uri, F
                 NULL);
         gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareActualizare), FINFO_ACTCONF_DLG_DA);
         if (gtk_dialog_run(GTK_DIALOG(dlgIntrebareActualizare)) == FINFO_ACTCONF_DLG_DA) {
-            if((elemInUri = g_strsplit(uri, ":", 2)) == NULL ) {
+            if ((elemInUri = g_strsplit(uri, ":", 2)) == NULL) {
                 g_warning("Nu am putut extrage elementele esențiale din uri din cauza formatului invalid a acestuia!");
             } else if ((versTinta = sda_obtineVersiuneDinSir(elemInUri[1])) == NULL) {
                 g_warning("Nu am putut reconstitui versiunea țintă pentru actualizarea directă cerută!");

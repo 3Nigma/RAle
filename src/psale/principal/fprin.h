@@ -21,13 +21,9 @@ typedef struct {
   GSList *listaDlgCod;
 } FormularPrincipal;
 
-extern FormularPrincipal *
-fp_initializeaza_formular_principal();
+extern FormularPrincipal *fp_initializeaza_formular_principal(gboolean saActualizatProaspat);
+extern void fp_curata(FormularPrincipal *fp);
 
-extern void 
-fp_arata(FormularPrincipal *fp);
-
-extern void 
-fp_curata(FormularPrincipal *fp);
+extern void fp_arata(FormularPrincipal *fp);
 
 #endif

@@ -34,6 +34,7 @@ static void os_elibereaza_rezultat_consola(RezultatOpConsola **rez);
 static RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com);
 
 #ifdef G_OS_WIN32
+
 DWORD os_win_executa_com(HANDLE *hConsoleOutput, HANDLE *hConsoleInput, HANDLE *hConsoleError, gchar *command) {
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInformation;
@@ -107,7 +108,7 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
         /* golim conținutul fișierului standard de ieșire */
         rezConsola->stdOutBuff = g_new0(gchar, OS_BUCATA_CONS_BUFF);
         rezConsola->capacitateInStdOut += OS_BUCATA_CONS_BUFF;
-        while (ReadFile(opStdOutPipe[0], (LPVOID)(&rezConsola->stdOutBuff[rezConsola->octetiInStdOut]), 1, (LPDWORD)(&nrOctetiCititi), NULL)) {
+        while (ReadFile(opStdOutPipe[0], (LPVOID) (&rezConsola->stdOutBuff[rezConsola->octetiInStdOut]), 1, (LPDWORD) (&nrOctetiCititi), NULL)) {
             if (nrOctetiCititi == 0) {
                 break;
             }
@@ -128,7 +129,7 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
         /* golim conținutul fișierului standard de erori */
         rezConsola->stdErrBuff = g_new0(gchar, OS_BUCATA_CONS_BUFF);
         rezConsola->capacitateInStdErr += OS_BUCATA_CONS_BUFF;
-        while (ReadFile(opStdErrPipe[0], (LPVOID)(&rezConsola->stdErrBuff[rezConsola->octetiInStdErr]), 1, (LPDWORD)(&nrOctetiCititi), NULL)) {
+        while (ReadFile(opStdErrPipe[0], (LPVOID) (&rezConsola->stdErrBuff[rezConsola->octetiInStdErr]), 1, (LPDWORD) (&nrOctetiCititi), NULL)) {
             if (nrOctetiCititi == 0) {
                 break;
             }
@@ -226,24 +227,24 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
 
 gboolean os_executa_functie_asincron(gpointer fct, gpointer param) {
 #ifdef G_OS_WIN32 
-if(CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) (fct), (LPVOID) (param), 0, NULL) == NULL) {
-    g_warning("Nu am putut lansa în execuție funcția solicitată! Motiv : %ld", GetLastError());
-    
-    return FALSE;
-}
-#elif G_OS_LINUX
+    if (CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) (fct), (LPVOID) (param), 0, NULL) == NULL) {
+        g_warning("Nu am putut lansa în execuție funcția solicitată! Motiv : %ld", GetLastError());
+
+        return FALSE;
+    }
+#elif defined G_OS_UNIX
     GThread *firCautatorDeActualizari = NULL;
     GError *err = NULL;
 
     if ((firCautatorDeActualizari = g_thread_try_new("cautActualizari", (GThreadFunc) (fct), param, &err)) == NULL) {
         g_warning("Nu am putut lansa în execuție funcția dorită! Motiv : %s", err->message);
         g_error_free(err);
-        
+
         return FALSE;
     }
 #endif
 
-  return TRUE;
+    return TRUE;
 }
 
 unsigned long os_system(gchar *command) {
@@ -320,7 +321,7 @@ gboolean os_rpsale_forteaza_actualizare(Versiune *vers) {
 #elif defined G_OS_UNIX
     pid_t IdProcCopil;
     gchar optVersTinta[32];
-    
+
     g_sprintf(optVersTinta, "--versiune-server=%s", sda_versiune_printf(vers));
     if ((IdProcCopil = fork()) != 0) {
         /* suntem în firul copil */

@@ -14,6 +14,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <glib/gprintf.h>
 #include <gtk/gtk.h>
+#include <gtk-2.0/gtk/gtklabel.h>
 
 #ifdef G_OS_WIN32
 #include <windows.h>
@@ -32,6 +33,7 @@
 #endif
 
 static gboolean frmPrincipal_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FormularPrincipal *fp);
+static gboolean la_tic_ceas_afisare_proaspat_actualizat(GtkWidget *etichGazda);
 static void btIesire_clicked(GtkWidget *widget, FormularPrincipal *fp);
 
 static gboolean estePlacutaConectata;
@@ -117,9 +119,9 @@ static void btCartulie_click(GtkWidget *widget, FormularPrincipal *fp) {
 
 static void btInfo_click(GtkWidget *widget, FormularPrincipal *fp) {
     g_assert(fp != NULL);
-    
-    if(fp->infoAplicatie == NULL) {
-       fp->infoAplicatie = finfo_initializeaza(GTK_WINDOW(fp->frm));
+
+    if (fp->infoAplicatie == NULL) {
+        fp->infoAplicatie = finfo_initializeaza(GTK_WINDOW(fp->frm));
     }
 
     if (fp->infoAplicatie != NULL) {
@@ -258,7 +260,30 @@ static void btIesire_clicked(GtkWidget *widget, FormularPrincipal *fp) {
     gtk_widget_destroy(GTK_WIDGET(fp->frm));
 }
 
-FormularPrincipal *fp_initializeaza_formular_principal() {
+static gboolean la_tic_ceas_afisare_proaspat_actualizat(GtkWidget *etichGazda) {
+    g_assert(etichGazda != NULL);
+
+    gchar mesajDeAfisareDupaActualizare[256];
+    Versiune *versCurenta = NULL;
+    static int secundeRamaseDeAfisare = FPRIN_PACTUALIZAT_SEC_VIATA_ETICH;
+    
+    if(--secundeRamaseDeAfisare == 0) {
+        /* timpul a expirat, ascundem eticheta și oprim ceasul */
+        gtk_widget_hide(etichGazda);
+        
+        return FALSE;
+    }
+    if ((versCurenta = db_obtine_versiune_curenta()) != NULL) {
+        g_sprintf(mesajDeAfisareDupaActualizare, "<span font_weight='bold'>Ha haaa ... Am trecut <i>pare-se</i>\n  cu bine la versiunea %s!</span>  <span size='x-small'>(%d)</span>", 
+                sda_versiune_printf(versCurenta), secundeRamaseDeAfisare);
+        gtk_label_set_markup(GTK_LABEL(etichGazda), mesajDeAfisareDupaActualizare);
+        g_free(versCurenta);
+    }
+    
+    return TRUE;
+}
+
+FormularPrincipal *fp_initializeaza_formular_principal(gboolean saActualizatProaspat) {
     FormularPrincipal *fp = NULL;
     GtkWidget *cadruFormPrincipal = NULL;
     GtkWidget *frm = NULL;
@@ -294,6 +319,27 @@ FormularPrincipal *fp_initializeaza_formular_principal() {
     gtk_widget_set_events(cadruImgLogo, GDK_KEY_PRESS_MASK);
     gtk_container_add(GTK_CONTAINER(cadruImgLogo), imgLogo);
     gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), cadruImgLogo);
+
+    /* tratăm cazul în care aceasta este prima rulare după o actualizare realiată cu succes */
+    if (saActualizatProaspat) {
+        GtkWidget *lblProaspatActualizat = NULL;
+        GtkWidget *ebParinteLblPActualizat = NULL;
+        GdkColor fundalLblPActualiat;
+        
+        /* creem eticheta de 'actualizat cu succes' și o plasăm pe formularul principal, abonând-o la o funcție de actualizare
+         * pentru a o face vizibilă utilizatorilor un timp finit */
+        lblProaspatActualizat = gtk_label_new(NULL);
+        la_tic_ceas_afisare_proaspat_actualizat(lblProaspatActualizat);
+        g_timeout_add_seconds(1, (GSourceFunc)(&la_tic_ceas_afisare_proaspat_actualizat), lblProaspatActualizat);
+        gtk_misc_set_alignment(GTK_MISC(lblProaspatActualizat), 0.5f, 0.5f);
+        
+        /* încadrăm eticheta într-o cutie de evenimente (GtkEventBox) pentru a-i putea schimba culoarea de fundal */
+        ebParinteLblPActualizat = gtk_event_box_new();
+        gtk_container_add(GTK_CONTAINER(ebParinteLblPActualizat), lblProaspatActualizat);
+        gdk_color_parse(FPRIN_PACTUALIZAT_CULOARE_FUNDAL, &fundalLblPActualiat);
+        gtk_widget_modify_bg(ebParinteLblPActualizat, GTK_STATE_NORMAL, &fundalLblPActualiat);
+        gtk_container_add(GTK_CONTAINER(cadruFormPrincipal), ebParinteLblPActualizat);
+    }
 
     /* inițializăm meniul de selecție pentru programare brută */
     cmbxCodNou = gtk_combo_box_text_new();
@@ -366,8 +412,8 @@ void fp_arata(FormularPrincipal *fp) {
 }
 
 void fp_curata(FormularPrincipal *fp) {
-    if(fp == NULL) return;
-    
+    if (fp == NULL) return;
+
     /* curățăm valori locale */
     g_slist_free(fp->listaDlgCod);
     finfo_curata(&fp->infoAplicatie);

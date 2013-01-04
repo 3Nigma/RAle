@@ -16,39 +16,39 @@ static void lanseazaPSAle();
 static void inregistreazaMesaj(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data);
 
 int main(int argc, char *argv[]) {
-	FILE *fMesajAplicatie = NULL;
-	
-	/* redirecționăm toate mesajele de stare ale aplicației într-un fișier fizic */
-	if((fMesajAplicatie = fopen("mesaje_sesiune_" OS_NUME_RPSALE ".txt", "w")) != NULL) {
-	  g_log_set_handler ("", 
-	                     G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION, 
-	                     inregistreazaMesaj, fMesajAplicatie);
+    FILE *fMesajAplicatie = NULL;
+
+    /* redirecționăm toate mesajele de stare ale aplicației într-un fișier fizic */
+    if ((fMesajAplicatie = fopen("mesaje_sesiune_" OS_NUME_RPSALE ".txt", "w")) != NULL) {
+        g_log_set_handler("",
+                G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION,
+                inregistreazaMesaj, fMesajAplicatie);
     }
-	
-	/* pentru Windows, la operațiunile de actualizare, ascundeți consola și păstrați doar IG-ul, dar
-	 * doar dacă aplicația a fost lansată individual și nu dintr-o consolă părinte. */
-    #ifdef G_OS_WIN32
-		HWND consoleWnd;
-		DWORD dwProcessId;
-		
-		consoleWnd = GetConsoleWindow();
-		GetWindowThreadProcessId(consoleWnd, &dwProcessId);
-		if (GetCurrentProcessId() == dwProcessId) {
-		  g_debug("Aplicația a fost lansată din exterior, avându-se asociată o consolă unică.");
-          ShowWindow(consoleWnd, SW_HIDE);  
-		} else {
-		   g_debug("Aplicația a fost lansată din din cadrul altei console.");
-		}
-	#endif
-		
-	gtk_init(&argc, &argv);
+
+    /* pentru Windows, la operațiunile de actualizare, ascundeți consola și păstrați doar IG-ul, dar
+     * doar dacă aplicația a fost lansată individual și nu dintr-o consolă părinte. */
+#ifdef G_OS_WIN32
+    HWND consoleWnd;
+    DWORD dwProcessId;
+
+    consoleWnd = GetConsoleWindow();
+    GetWindowThreadProcessId(consoleWnd, &dwProcessId);
+    if (GetCurrentProcessId() == dwProcessId) {
+        g_debug("Aplicația a fost lansată din exterior, avându-se asociată o consolă unică.");
+        ShowWindow(consoleWnd, SW_HIDE);
+    } else {
+        g_debug("Aplicația a fost lansată din din cadrul altei console.");
+    }
+#endif
+
+    gtk_init(&argc, &argv);
 
     ParametriiRulareAplicatie *optiuniExterne = NULL;
 
     /* încărcăm eventualele informații venite din exterior (în parametrii dați prin linia de comandă) */
     if ((optiuniExterne = pa_incarca_parametrii(argc, argv)) != NULL) {
-		
-		
+
+
         if (db_initializeaza()) {
             if (db_obtine_este_prima_rulare() &&
                     optiuniExterne->tipOp == ACTUALIZEAZA_NORMAL) {
@@ -91,13 +91,13 @@ int main(int argc, char *argv[]) {
         if (optiuniExterne->tipOp != AFISEAZA) {
             lanseazaPSAle();
         }
-        
+
         pa_curata(&optiuniExterne);
     } else {
         g_warning("S-a dorit lansarea cu parametrii din linia de comandă, dar operația nu s-a putut finaliza pentru că au existat probleme la interpretarea parametrilor!");
     }
 
-	if(fMesajAplicatie != NULL) fclose(fMesajAplicatie);
+    if (fMesajAplicatie != NULL) fclose(fMesajAplicatie);
 
     return 0;
 }
@@ -128,46 +128,46 @@ static void lanseazaPSAle() {
 }
 
 static void inregistreazaMesaj(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data) {
-	g_assert(user_data != NULL);
-	
-	gchar *mesajDeAdaugat = NULL;
-	gchar tipMesaj[20];
-	FILE *fSesiuneMesaje = (FILE *)(user_data);
-	time_t timpIntroducere;
-	
-	if((mesajDeAdaugat = g_new0(gchar, strlen(message) + 5)) != NULL) {
-	  timpIntroducere = time(NULL);
-	  switch(log_level) {
-	  case G_LOG_FLAG_FATAL:
-	    g_sprintf(tipMesaj, "FATAL");
-	    break;
-	  case G_LOG_LEVEL_ERROR:
-	    g_sprintf(tipMesaj, "EROARE");
-	    break;
-	  case G_LOG_LEVEL_CRITICAL:
-	    g_sprintf(tipMesaj, "CRITIC");
-	    break;
-	  case G_LOG_LEVEL_WARNING:
-	    g_sprintf(tipMesaj, "ATENTIE");
-	    break;
-	  case G_LOG_LEVEL_MESSAGE:
-	    g_sprintf(tipMesaj, "MESAJ");
-	    break;
-	  case G_LOG_LEVEL_INFO:
-	    g_sprintf(tipMesaj, "INFO");
-	    break;
-	  case G_LOG_LEVEL_DEBUG:
-	    g_sprintf(tipMesaj, "ANALIZA");
-	    break;
-	  default:
-	    g_sprintf(tipMesaj, "TIP %d", log_level);
-	    break;
-	  }
+    g_assert(user_data != NULL);
 
-      fprintf(fSesiuneMesaje, "[%ld, %s] %s\n", timpIntroducere, tipMesaj, message);
-	  
-	  g_free(mesajDeAdaugat);
-	} else {
-	  fprintf(fSesiuneMesaje, "EROARE FATALĂ: Nu am putut aloca spațiul necesar pentru găzduirea mesajului de înregistrare!\n");
-	}
+    gchar *mesajDeAdaugat = NULL;
+    gchar tipMesaj[20];
+    FILE *fSesiuneMesaje = (FILE *) (user_data);
+    time_t timpIntroducere;
+
+    if ((mesajDeAdaugat = g_new0(gchar, strlen(message) + 5)) != NULL) {
+        timpIntroducere = time(NULL);
+        switch (log_level) {
+            case G_LOG_FLAG_FATAL:
+                g_sprintf(tipMesaj, "FATAL");
+                break;
+            case G_LOG_LEVEL_ERROR:
+                g_sprintf(tipMesaj, "EROARE");
+                break;
+            case G_LOG_LEVEL_CRITICAL:
+                g_sprintf(tipMesaj, "CRITIC");
+                break;
+            case G_LOG_LEVEL_WARNING:
+                g_sprintf(tipMesaj, "ATENTIE");
+                break;
+            case G_LOG_LEVEL_MESSAGE:
+                g_sprintf(tipMesaj, "MESAJ");
+                break;
+            case G_LOG_LEVEL_INFO:
+                g_sprintf(tipMesaj, "INFO");
+                break;
+            case G_LOG_LEVEL_DEBUG:
+                g_sprintf(tipMesaj, "ANALIZA");
+                break;
+            default:
+                g_sprintf(tipMesaj, "TIP %d", log_level);
+                break;
+        }
+
+        fprintf(fSesiuneMesaje, "[%ld, %s] %s\n", timpIntroducere, tipMesaj, message);
+
+        g_free(mesajDeAdaugat);
+    } else {
+        fprintf(fSesiuneMesaje, "EROARE FATALĂ: Nu am putut aloca spațiul necesar pentru găzduirea mesajului de înregistrare!\n");
+    }
 }

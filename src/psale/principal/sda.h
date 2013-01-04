@@ -31,7 +31,7 @@ extern "C" {
 #define DB_NUME_TABEL_MEDIA      "media"
 #define DB_NUME_TABEL_META       "meta"
 #define DB_NUME_TABEL_MODIFICARI "modificari"
-    
+
 #define OS_NUME_RPSALE "rpsale"
 #define OS_CALE_RPSALE "./"OS_NUME_RPSALE
 
@@ -41,6 +41,9 @@ extern "C" {
 #define DL_LUNGIME_MAX_URL            1024
 #define DL_LUNGIME_MAX_MESAJ_VERSIUNE 3000
 #define DL_CURL_TIMEOUT               5
+
+#define FPRIN_PACTUALIZAT_SEC_VIATA_ETICH  8
+#define FPRIN_PACTUALIZAT_CULOARE_FUNDAL   "#01DF3A"
 
     typedef struct {
         guint major;
@@ -57,7 +60,7 @@ extern "C" {
         Versiune vers;
         gchar *detalii;
     } BDIntrareTabelModificare;
-    
+
     extern Versiune *sda_obtineVersiuneDinSir(gchar *sir);
     extern gint sda_comparaVersiuni(Versiune *v1, Versiune *v2);
 
@@ -67,10 +70,9 @@ extern "C" {
     extern gchar *sda_versiune_printf(Versiune *vers);
     extern FILE *sda_fopen_mkdir(const char *caleFis, const char *mode);
     extern gboolean sda_este_cale_fisier_valida(const char *caleFis);
-    
+
 #ifdef	__cplusplus
 }
 #endif
 
 #endif	/* SDA_H */
-

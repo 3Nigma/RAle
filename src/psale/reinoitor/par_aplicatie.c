@@ -19,7 +19,7 @@ ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
     ParametriiRulareAplicatie *parAp = NULL;
     char optiune;
     int indexArgInStructura;
-    
+
     struct option opt_lungi_aplicatie[] = {
         {
             "tipul-operatiei", required_argument, NULL, 't'
@@ -42,7 +42,7 @@ ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
     parAp->tipOp = ACTUALIZEAZA_NORMAL;
     parAp->versServer = NULL;
     parAp->folsesteIG = TRUE;
-    
+
     while ((optiune = getopt_long(argc, argv, "t:v::fa", opt_lungi_aplicatie, &indexArgInStructura)) != -1) {
         switch (optiune) {
             case 't': /* tipul-operatiei */
@@ -68,24 +68,24 @@ ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
                 pa_afiseaza_meniu();
                 pa_curata(&parAp);
                 return NULL;
-                break;   
+                break;
             case '?': /* argumentul este necunoscut */
                 g_warning("Nu recunosc argumentul prezentat așa că îl ignor! Invocați aplicația cu arugmentul '--ajutor' pentru a afla combinațiile posibile.");
                 break;
         }
-        
-        if(optiune != '?') {
-		  g_debug("Am recunosct comanda '%s', subparam '%s'.", opt_lungi_aplicatie[indexArgInStructura].name,
-		                                                       (optarg == NULL ? "Nici unul" : optarg));
-		}
+
+        if (optiune != '?') {
+            g_debug("Am recunosct comanda '%s', subparam '%s'.", opt_lungi_aplicatie[indexArgInStructura].name,
+                    (optarg == NULL ? "Nici unul" : optarg));
+        }
     }
-    
+
     return parAp;
 }
 
 void pa_curata(ParametriiRulareAplicatie **pr) {
-    if(pr == NULL) return;
-    
+    if (pr == NULL) return;
+
     g_free((*pr)->versServer);
     g_free(*pr);
     (*pr) = NULL;
@@ -93,14 +93,14 @@ void pa_curata(ParametriiRulareAplicatie **pr) {
 
 void pa_afiseaza_meniu() {
     printf("Mod de folosire: \n"
-           OS_NUME_RPSALE " [--tipul-operatiei actualizeaza-direct [--fara-ig] --versiune-server <vers. țintă>]\n"
-           OS_NUME_RPSALE " [--tipul-operatiei afiseaza [--fara-ig] --versiune-server]\n"
-           OS_NUME_RPSALE " [--ajutor]\n"
-           "Unde:\n"
-           "<vers. țintă> : versiunea la care se dorește realizată actualizarea în formatul '%s'\n\n"
-           "Notă:\n"
-           "Invocarea aplicației fără niciun argument duce la încărcarea comportamentului implicit al acesteia care este 'dictat de preferințele "
-           "de actualizare (automată/manuală) alese de utilizator la prima rulare.\n", PSALE_FORMAT_VERSIUNE_PRINTF);
+            OS_NUME_RPSALE " [--tipul-operatiei actualizeaza-direct [--fara-ig] --versiune-server <vers. țintă>]\n"
+            OS_NUME_RPSALE " [--tipul-operatiei afiseaza [--fara-ig] --versiune-server]\n"
+            OS_NUME_RPSALE " [--ajutor]\n"
+            "Unde:\n"
+            "<vers. țintă> : versiunea la care se dorește realizată actualizarea în formatul '%s'\n\n"
+            "Notă:\n"
+            "Invocarea aplicației fără niciun argument duce la încărcarea comportamentului implicit al acesteia care este 'dictat de preferințele "
+            "de actualizare (automată/manuală) alese de utilizator la prima rulare.\n", PSALE_FORMAT_VERSIUNE_PRINTF);
 }
 
 static enum OperatieInstanta obtineTipulOp(gchar *sirTipOp) {
