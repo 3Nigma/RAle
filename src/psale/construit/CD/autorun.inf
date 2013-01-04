@@ -1,4 +1,4 @@
 [autorun]
 OPEN=instalator.exe
 ICON=instalator.exe,0
-LABEL=Pachetul psAle
+LABEL=psAle
