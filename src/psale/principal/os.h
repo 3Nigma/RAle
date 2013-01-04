@@ -28,6 +28,7 @@ extern DWORD
 os_win_executa_com_fara_redirectionari(gchar *command);
 #endif
 
+extern gboolean os_executa_functie_asincron(gpointer fct, gpointer param);
 extern unsigned long os_system(gchar *command);
 
 extern Versiune *os_rpsale_obtine_versiune_server();

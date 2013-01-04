@@ -34,7 +34,6 @@ static void os_elibereaza_rezultat_consola(RezultatOpConsola **rez);
 static RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com);
 
 #ifdef G_OS_WIN32
-
 DWORD os_win_executa_com(HANDLE *hConsoleOutput, HANDLE *hConsoleInput, HANDLE *hConsoleError, gchar *command) {
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInformation;
@@ -75,7 +74,7 @@ DWORD os_win_executa_com_fara_redirectionari(gchar *command) {
 #endif
 
 static void os_elibereaza_rezultat_consola(RezultatOpConsola **rez) {
-    if (rez == NULL) return;
+    if (*rez == NULL) return;
 
     if ((*rez)->stdOutBuff != NULL) g_free((*rez)->stdOutBuff);
     if ((*rez)->stdErrBuff != NULL) g_free((*rez)->stdErrBuff);
@@ -102,13 +101,13 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
     CreatePipe(&opStdOutPipe[0], &opStdOutPipe[1], &securityAttributes, 0);
     CreatePipe(&opStdErrPipe[0], &opStdErrPipe[1], &securityAttributes, 0);
 
-    if (os_win_executa_com(opStdOutPipe[1], NULL, opStdErrPipe[1], comanda) != 0) {
+    if (os_win_executa_com(opStdOutPipe[1], NULL, opStdErrPipe[1], com) == 0) {
         rezConsola = g_new0(RezultatOpConsola, 1);
 
         /* golim conținutul fișierului standard de ieșire */
         rezConsola->stdOutBuff = g_new0(gchar, OS_BUCATA_CONS_BUFF);
         rezConsola->capacitateInStdOut += OS_BUCATA_CONS_BUFF;
-        while (ReadFile(opStdOutPipe[0], rezConsola->stdOutBuff[rezConsola->octetiInStdOut], 1, &nrOctetiCititi, NULL)) {
+        while (ReadFile(opStdOutPipe[0], (LPVOID)(&rezConsola->stdOutBuff[rezConsola->octetiInStdOut]), 1, (LPDWORD)(&nrOctetiCititi), NULL)) {
             if (nrOctetiCititi == 0) {
                 break;
             }
@@ -129,7 +128,7 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
         /* golim conținutul fișierului standard de erori */
         rezConsola->stdErrBuff = g_new0(gchar, OS_BUCATA_CONS_BUFF);
         rezConsola->capacitateInStdErr += OS_BUCATA_CONS_BUFF;
-        while (ReadFile(opStdErrPipe[0], rezConsola->stdErrBuff[rezConsola->octetiInStdErr], 1, &nrOctetiCititi, NULL)) {
+        while (ReadFile(opStdErrPipe[0], (LPVOID)(&rezConsola->stdErrBuff[rezConsola->octetiInStdErr]), 1, (LPDWORD)(&nrOctetiCititi), NULL)) {
             if (nrOctetiCititi == 0) {
                 break;
             }
@@ -223,6 +222,28 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
 #endif
 
     return rezConsola;
+}
+
+gboolean os_executa_functie_asincron(gpointer fct, gpointer param) {
+#ifdef G_OS_WIN32 
+if(CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) (fct), (LPVOID) (param), 0, NULL) == NULL) {
+    g_warning("Nu am putut lansa în execuție funcția solicitată! Motiv : %ld", GetLastError());
+    
+    return FALSE;
+}
+#elif G_OS_LINUX
+    GThread *firCautatorDeActualizari = NULL;
+    GError *err = NULL;
+
+    if ((firCautatorDeActualizari = g_thread_try_new("cautActualizari", (GThreadFunc) (fct), param, &err)) == NULL) {
+        g_warning("Nu am putut lansa în execuție funcția dorită! Motiv : %s", err->message);
+        g_error_free(err);
+        
+        return FALSE;
+    }
+#endif
+
+  return TRUE;
 }
 
 unsigned long os_system(gchar *command) {

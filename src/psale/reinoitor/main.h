@@ -19,6 +19,14 @@ extern "C" {
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef G_OS_WIN32
+#if       _WIN32_WINNT < 0x0500
+  #undef  _WIN32_WINNT
+  #define _WIN32_WINNT   0x0500
+#endif  /* necesar pentru funcția 'GetConsoleWindow' */
+#include <windows.h>
+#endif
+
 #include "sda.h"
 #include "db.h"
 #include "par_aplicatie.h"
@@ -26,10 +34,6 @@ extern "C" {
 #include "factualizare.h"
 
 #include <errno.h>
-    
-#define RPS_NUME_PSALE "psale"
-#define RPS_CALE_PSALE "./"RPS_NUME_PSALE
-
 
 #ifdef	__cplusplus
 }

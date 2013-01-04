@@ -25,7 +25,7 @@ static int db_incarca_modificari_recurent(void *userArg, int nrOfCols, char **co
 static sqlite3 *db = NULL;
 
 gboolean db_initializeaza() {
-    if (sqlite3_open(PSALE_BD_NUME_FIS, &db)) {
+    if (sqlite3_open_v2(PSALE_BD_NUME_FIS, &db, SQLITE_OPEN_READWRITE, NULL) != SQLITE_OK) {
         g_warning("Nu pot deschide baza de date : %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         return FALSE;

@@ -30,10 +30,10 @@ TIPCONSTRUCTIE :=
 
 # --- Sfârșit zonă de variabile și început de zonă de rețete ---
 
-all : asigura_existenta_directoare $(DIR_CONSTRUIT)/$(CART_PDF_NAME) \
+all : asigura_existenta_directoare \
       $(DEPENDENTE_DIR_PRINCIPAL) $(DEPENDENTE_ADITIONALE)
 	@cd $(PRINCIPAL_DIR); make $(TIPCONSTRUCTIE)
-	@cd $(REINOITOR_DIR); make $(TIPCONSTRUCTIE)
+	@cd $(REINOITOR_DIR); make
 	cp $(PRINCIPAL_DIR)/$(PRIN_BIN_NAME) $(DIR_CONSTRUIT)/$(PRIN_BIN_NAME)
 	cp $(REINOITOR_DIR)/$(REIN_BIN_NAME) $(DIR_CONSTRUIT)/$(REIN_BIN_NAME)
 	@cd $(DIR_CONSTRUIT); make $(TIPCONSTRUCTIE)
@@ -41,6 +41,10 @@ all : asigura_existenta_directoare $(DIR_CONSTRUIT)/$(CART_PDF_NAME) \
 win : TIPCONSTRUCTIE := win
 win : LIBREOFF_NUME_BIN := soffice
 win : all
+
+linux : TIPCONSTRUCTIE :=
+linux : $(DIR_CONSTRUIT)/$(CART_PDF_NAME)
+linux : all
 
 # Rețetă de construire a cărțuliei
 $(DIR_CONSTRUIT)/$(CART_PDF_NAME) : $(DIR_CARTULIE_ODT)/$(CART_ODT_NAME)

@@ -35,6 +35,9 @@ extern "C" {
 #define OS_NUME_RPSALE "rpsale"
 #define OS_CALE_RPSALE "./"OS_NUME_RPSALE
 
+#define RPS_NUME_PSALE "psale"
+#define RPS_CALE_PSALE "./"RPS_NUME_PSALE
+
 #define DL_LUNGIME_MAX_URL            1024
 #define DL_LUNGIME_MAX_MESAJ_VERSIUNE 3000
 #define DL_CURL_TIMEOUT               5

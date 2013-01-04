@@ -18,7 +18,8 @@ static enum OperatieInstanta obtineTipulOp(gchar *sirTipOp);
 ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
     ParametriiRulareAplicatie *parAp = NULL;
     char optiune;
-
+    int indexArgInStructura;
+    
     struct option opt_lungi_aplicatie[] = {
         {
             "tipul-operatiei", required_argument, NULL, 't'
@@ -42,7 +43,7 @@ ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
     parAp->versServer = NULL;
     parAp->folsesteIG = TRUE;
     
-    while ((optiune = getopt_long(argc, argv, "t:v::fa", opt_lungi_aplicatie, NULL)) != -1) {
+    while ((optiune = getopt_long(argc, argv, "t:v::fa", opt_lungi_aplicatie, &indexArgInStructura)) != -1) {
         switch (optiune) {
             case 't': /* tipul-operatiei */
                 if ((parAp->tipOp = obtineTipulOp(optarg)) == INVALID) {
@@ -72,6 +73,11 @@ ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
                 g_warning("Nu recunosc argumentul prezentat așa că îl ignor! Invocați aplicația cu arugmentul '--ajutor' pentru a afla combinațiile posibile.");
                 break;
         }
+        
+        if(optiune != '?') {
+		  g_debug("Am recunosct comanda '%s', subparam '%s'.", opt_lungi_aplicatie[indexArgInStructura].name,
+		                                                       (optarg == NULL ? "Nici unul" : optarg));
+		}
     }
     
     return parAp;
@@ -86,15 +92,15 @@ void pa_curata(ParametriiRulareAplicatie **pr) {
 }
 
 void pa_afiseaza_meniu() {
-    g_print("Mod de folosire: \n"
-            OS_NUME_RPSALE " [--tipul-operatiei actualizeaza-direct [--fara-ig] --versiune-server <vers. țintă>]\n"
-            OS_NUME_RPSALE " [--tipul-operatiei afiseaza [--fara-ig] --versiune-server]\n"
-            OS_NUME_RPSALE " [--ajutor]\n"
-            "Unde:\n"
-            "<vers. țintă> : versiunea la care se dorește realizată actualizarea în formatul '%s'\n\n"
-            "Notă:\n"
-            "Invocarea aplicației fără niciun argument duce la încărcarea comportamentului implicit al acesteia care este 'dictat de preferințele "
-            "de actualizare (automată/manuală) alese de utilizator la prima rulare.\n", PSALE_FORMAT_VERSIUNE_PRINTF);
+    printf("Mod de folosire: \n"
+           OS_NUME_RPSALE " [--tipul-operatiei actualizeaza-direct [--fara-ig] --versiune-server <vers. țintă>]\n"
+           OS_NUME_RPSALE " [--tipul-operatiei afiseaza [--fara-ig] --versiune-server]\n"
+           OS_NUME_RPSALE " [--ajutor]\n"
+           "Unde:\n"
+           "<vers. țintă> : versiunea la care se dorește realizată actualizarea în formatul '%s'\n\n"
+           "Notă:\n"
+           "Invocarea aplicației fără niciun argument duce la încărcarea comportamentului implicit al acesteia care este 'dictat de preferințele "
+           "de actualizare (automată/manuală) alese de utilizator la prima rulare.\n", PSALE_FORMAT_VERSIUNE_PRINTF);
 }
 
 static enum OperatieInstanta obtineTipulOp(gchar *sirTipOp) {

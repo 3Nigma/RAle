@@ -10,6 +10,7 @@
 
 #include <gtk/gtk.h>
 #include <glib/gstdio.h>
+#include <string.h>
 
 #include "fprin.h"
 
@@ -20,8 +21,41 @@
   #define ACTUALIZATOR_NUME_AP "rpsale"
 #endif
 
-static gboolean
-incearca_actualizare_actualizator() {
+static gboolean incearca_actualizare_actualizator();
+static void inregistreazaMesaj(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data);
+
+int main(int argc, char *argv[]) {
+  FILE *fMesajAplicatie = NULL;
+	
+  /* redirecționăm toate mesajele de stare ale aplicației într-un fișier fizic */
+  if((fMesajAplicatie = fopen("mesaje_sesiune_" RPS_NUME_PSALE ".txt", "w")) != NULL) {
+   g_log_set_handler ("", 
+	                   G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION, 
+	                   inregistreazaMesaj, fMesajAplicatie);
+  }
+    
+  FormularPrincipal *fprin = NULL;
+
+  if(incearca_actualizare_actualizator()) {
+    g_debug("Am realizat cu succes înlocuirea actualizatorului cu o versiune mai nouă.");
+  }
+  
+  g_thread_init(NULL);
+  gdk_threads_init();
+  gtk_init (&argc, &argv);
+  
+  fprin = fp_initializeaza_formular_principal();
+  fp_arata(fprin);
+  
+  gdk_threads_enter();
+  gtk_main();
+  gdk_threads_leave();
+  fp_curata(fprin);
+  if(fMesajAplicatie != NULL) fclose(fMesajAplicatie);
+  return 0;
+}
+
+static gboolean incearca_actualizare_actualizator() {
   gboolean rezultatOp = FALSE;
   
   if(g_file_test(ACTUALIZATOR_NUME_ACTUALIZAT, G_FILE_TEST_EXISTS)) {
@@ -37,22 +71,47 @@ incearca_actualizare_actualizator() {
   return rezultatOp;
 }
 
-int main(int argc, char *argv[]) {
-  FormularPrincipal *fprin = NULL;
+static void inregistreazaMesaj(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data) {
+	g_assert(user_data != NULL);
+	
+	gchar *mesajDeAdaugat = NULL;
+	gchar tipMesaj[20];
+	FILE *fSesiuneMesaje = (FILE *)(user_data);
+	time_t timpIntroducere;
+	
+	if((mesajDeAdaugat = g_new0(gchar, strlen(message) + 5)) != NULL) {
+	  timpIntroducere = time(NULL);
+	  switch(log_level) {
+	  case G_LOG_FLAG_FATAL:
+	    g_sprintf(tipMesaj, "FATAL");
+	    break;
+	  case G_LOG_LEVEL_ERROR:
+	    g_sprintf(tipMesaj, "EROARE");
+	    break;
+	  case G_LOG_LEVEL_CRITICAL:
+	    g_sprintf(tipMesaj, "CRITIC");
+	    break;
+	  case G_LOG_LEVEL_WARNING:
+	    g_sprintf(tipMesaj, "ATENTIE");
+	    break;
+	  case G_LOG_LEVEL_MESSAGE:
+	    g_sprintf(tipMesaj, "MESAJ");
+	    break;
+	  case G_LOG_LEVEL_INFO:
+	    g_sprintf(tipMesaj, "INFO");
+	    break;
+	  case G_LOG_LEVEL_DEBUG:
+	    g_sprintf(tipMesaj, "ANALIZA");
+	    break;
+	  default:
+	    g_sprintf(tipMesaj, "TIP %d", log_level);
+	    break;
+	  }
 
-  if(incearca_actualizare_actualizator()) {
-    g_debug("Am realizat cu succes înlocuirea actualizatorului cu o versiune mai nouă.");
-  }
-  
-  gdk_threads_init();
-  gtk_init (&argc, &argv);
-  
-  fprin = fp_initializeaza_formular_principal();
-  fp_arata(fprin);
-  
-  gdk_threads_enter();
-  gtk_main();
-  gdk_threads_leave();
-  fp_curata(fprin);
-  return 0;
+      fprintf(fSesiuneMesaje, "[%ld, %s] %s\n", timpIntroducere, tipMesaj, message);
+	  
+	  g_free(mesajDeAdaugat);
+	} else {
+	  fprintf(fSesiuneMesaje, "EROARE FATALĂ: Nu am putut aloca spațiul necesar pentru găzduirea mesajului de înregistrare!\n");
+	}
 }
