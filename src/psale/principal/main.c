@@ -14,13 +14,6 @@
 
 #include "fprin.h"
 
-#define ACTUALIZATOR_NUME_ACTUALIZAT "rpsale.nou"
-#ifdef G_OS_WIN32
-#define ACTUALIZATOR_NUME_AP "rpsale.exe"
-#elif defined G_OS_UNIX
-#define ACTUALIZATOR_NUME_AP "rpsale"
-#endif
-
 static gboolean incearca_actualizare_actualizator();
 static void inregistreazaMesaj(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data);
 

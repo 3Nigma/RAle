@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     FILE *fMesajAplicatie = NULL;
 
     /* redirecționăm toate mesajele de stare ale aplicației într-un fișier fizic */
-    if ((fMesajAplicatie = fopen("mesaje_sesiune_" OS_NUME_RPSALE ".txt", "w")) != NULL) {
+    if ((fMesajAplicatie = fopen("mesaje_sesiune_" ACTUALIZATOR_NUME_AP ".txt", "w")) != NULL) {
         g_log_set_handler("",
                 G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION,
                 inregistreazaMesaj, fMesajAplicatie);
@@ -104,6 +104,17 @@ int main(int argc, char *argv[]) {
 }
 
 static void lanseazaPSAle(gboolean actualizatCuSucces) {
+	gchar argumenteAp[124];
+	
+	if(actualizatCuSucces == TRUE) {
+#ifdef G_OS_WIN32
+	  g_sprintf(argumenteAp, "\"%s\" --proaspat-actualizata", RPS_CALE_PSALE);
+#elif defined G_OS_UNIX
+	  g_sprintf(argumenteAp, "--proaspat-actualizata");
+#endif
+	} else {
+	  argumenteAp[0] = '\0';
+	}
 #ifdef G_OS_WIN32
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInformation;
@@ -113,16 +124,16 @@ static void lanseazaPSAle(gboolean actualizatCuSucces) {
 
     startupInfo.cb = sizeof (startupInfo);
 
-    if (!CreateProcess(RPS_CALE_PSALE, (actualizatCuSucces ? "--proaspat-actualizata" : NULL), NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation)) {
-        g_error("Nu am putut porni aplicația 'psAle'!");
+    if (CreateProcess(RPS_CALE_PSALE, argumenteAp, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &startupInfo, &processInformation) == 0) {
+        g_warning("Nu am putut porni aplicația 'psAle'! Motiv (GetLastError) : %ld", GetLastError());
     }
 #elif defined G_OS_UNIX
     pid_t IdProcCopil;
 
     if ((IdProcCopil = fork()) != 0) {
         /* suntem în firul copil */
-        if (execlp(RPS_CALE_PSALE, RPS_NUME_PSALE, (actualizatCuSucces ? "--proaspat-actualizata" : NULL), NULL) == -1) {
-            g_error("Nu am putut porni aplicația 'psAle'! : %s", strerror(errno));
+        if (execlp(RPS_CALE_PSALE, RPS_NUME_PSALE, argumenteAp, NULL) == -1) {
+            g_warning("Nu am putut porni aplicația 'psAle'! : %s", strerror(errno));
         }
     }
 #endif
