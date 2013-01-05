@@ -31,20 +31,17 @@ typedef struct {
   GtkWidget *lblStareConex, *lblStareDCod, *lblStareNSursa;
   BaraInfoCod bInfo;
   VizActiuni vActiuni;
+  gpointer parinteGazda;
   
-  void (*laDepistare_neprezentaPlacuta_recurenta)();
+  void (*laSchimbare_starePlacuta_recurenta)(gpointer, gboolean);
 } FormularCod;
 
-extern FormularCod *
-fc_initializeaza_fara_cod(Limbaj lmDorit);
+extern FormularCod *fc_initializeaza_fara_cod(gpointer parinteStructura, Limbaj lmDorit);
 
-extern FormularCod *
-fc_initializeaza_cu_exemplu(const gchar *titluScurt, const gchar *titluLung);
+extern FormularCod *fc_initializeaza_cu_exemplu(gpointer parinteStructura, const gchar *titluScurt, const gchar *titluLung);
 
-extern void 
-fc_actualizeaza_stare_placuta(GtkWidget *lblStare, gboolean online, gboolean primaRulare);
+extern void fc_actualizeaza_stare_placuta(GtkWidget *lblStare, gboolean online, gboolean primaRulare);
 
-extern void 
-fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil);
+extern void fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil);
 
 #endif

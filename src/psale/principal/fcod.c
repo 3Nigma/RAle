@@ -50,7 +50,7 @@
   "  return 0;\n" \
   "}\n"
 
-static FormularCod *fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, gboolean esteExemplu);
+static FormularCod *fc_initializeaza(gpointer parinteStructura, Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, gboolean esteExemplu);
 static void laModificareCod(GtkTextBuffer *textbuffer, FormularCod *fc);
 static gboolean laDezapasareTaste(GtkWidget *widget, GdkEventKey *ke, FormularCod *fc);
 
@@ -68,8 +68,7 @@ static gboolean este_sursa_modificata(FormularCod *fc);
 static GtkSourceLanguageManager *txtSrcLimbAsignor = NULL;
 static GtkSourceStyleSchemeManager *txtSrcStilAsignor = NULL;
 
-static GtkWidget *
-initializeaza_dialog_reluare_salvare(FormularCod *fc, TipDialogFisier df) {
+static GtkWidget *initializeaza_dialog_reluare_salvare(FormularCod *fc, TipDialogFisier df) {
     GtkWidget *dlgDeschideSursa = NULL;
     gchar titluDialog[64];
     GtkFileFilter *filtruFisSursa = NULL;
@@ -113,8 +112,7 @@ initializeaza_dialog_reluare_salvare(FormularCod *fc, TipDialogFisier df) {
     return dlgDeschideSursa;
 }
 
-static gchar *
-obtine_codul_sursa_curent(GtkTextView *txtView) {
+static gchar *obtine_codul_sursa_curent(GtkTextView *txtView) {
     GtkTextIter csStart;
     GtkTextIter csFinal;
     GtkTextBuffer *txtBuf = gtk_text_view_get_buffer(txtView);
@@ -125,16 +123,14 @@ obtine_codul_sursa_curent(GtkTextView *txtView) {
     return gtk_text_buffer_get_text(txtBuf, &csStart, &csFinal, FALSE);
 }
 
-static void
-seteaza_codul_sursa_curent(GtkTextView *txtView, const gchar *txt) {
+static void seteaza_codul_sursa_curent(GtkTextView *txtView, const gchar *txt) {
     GtkTextBuffer *codBuff = NULL;
 
     codBuff = gtk_text_view_get_buffer(txtView);
     gtk_text_buffer_set_text(codBuff, txt, strlen(txt));
 }
 
-static gchar *
-obtine_doar_nume_fisier(const gchar *numeFis) {
+static gchar *obtine_doar_nume_fisier(const gchar *numeFis) {
     GRegex *tiparNumeFis = NULL;
     GMatchInfo *rezultatTipar = NULL;
     gchar *nFisier = NULL;
@@ -155,8 +151,7 @@ obtine_doar_nume_fisier(const gchar *numeFis) {
     return nFisier;
 }
 
-static gchar *
-incarca_continut_din_fisier(const gchar *numeFis) {
+static gchar *incarca_continut_din_fisier(const gchar *numeFis) {
     gchar *continut = NULL;
     FILE *pFile = NULL;
     int fileSize = 0;
@@ -175,8 +170,7 @@ incarca_continut_din_fisier(const gchar *numeFis) {
     return continut;
 }
 
-static void
-salveaza_continut_in_fisier(const gchar *continut, const gchar *numeFisier) {
+static void salveaza_continut_in_fisier(const gchar *continut, const gchar *numeFisier) {
     FILE *pFile = NULL;
 
     pFile = fopen(numeFisier, "w");
@@ -184,8 +178,7 @@ salveaza_continut_in_fisier(const gchar *continut, const gchar *numeFisier) {
     fclose(pFile);
 }
 
-static void
-realizeaza_salvare_la_incheiere(FormularCod *fc) {
+static void realizeaza_salvare_la_incheiere(FormularCod *fc) {
     if (este_sursa_modificata(fc)) {
         /* există modificări curente.
          * Întreabă utilizatorul ce să facă cu ele */
@@ -206,15 +199,13 @@ realizeaza_salvare_la_incheiere(FormularCod *fc) {
     }
 }
 
-static gboolean
-frmCod_delev(GtkWidget *widget, GdkEvent *event, FormularCod *fc) {
+static gboolean frmCod_delev(GtkWidget *widget, GdkEvent *event, FormularCod *fc) {
     realizeaza_salvare_la_incheiere(fc);
 
     return FALSE;
 }
 
-static void
-btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
+static void btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
     /* Acțiunile ce trebuie realizate pentru trimiterea de cod spre plăcuță sunt următoarele :
        avr-gcc -Os -Wall -mmcu=attiny25 main.s -o main.o
        avr-objcopy -j .text -O ihex main.o main.hex 
@@ -278,7 +269,7 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
             }
         } else {
             /* asigură-te că, întradevăr, formularele de cod deschise știu că plăcuța nu este conectată */
-            if (fc->laDepistare_neprezentaPlacuta_recurenta != NULL) fc->laDepistare_neprezentaPlacuta_recurenta();
+            if (fc->laSchimbare_starePlacuta_recurenta != NULL) fc->laSchimbare_starePlacuta_recurenta(fc->parinteGazda, FALSE);
         }
 
         /* realizează o curățare generală a fișierelor implicate în proces */
@@ -294,8 +285,7 @@ btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
     remove(denFisSursa);
 }
 
-static void
-actualizeaza_stare_nume_sursa(GtkWidget *lbl, const gchar *numeSursa, gboolean esteExemplu, gboolean esteModificat) {
+static void actualizeaza_stare_nume_sursa(GtkWidget *lbl, const gchar *numeSursa, gboolean esteExemplu, gboolean esteModificat) {
     gchar formatNumeEticheta[256];
 
     /* actualizează stare nume */
@@ -310,8 +300,7 @@ actualizeaza_stare_nume_sursa(GtkWidget *lbl, const gchar *numeSursa, gboolean e
     actualizeaza_stare_nume_indicatii(lbl, esteExemplu, esteModificat);
 }
 
-static gboolean
-este_sursa_modificata(FormularCod *fc) {
+static gboolean este_sursa_modificata(FormularCod *fc) {
     const gchar *strStareCurentaText = gtk_label_get_text(GTK_LABEL(fc->lblStareNSursa));
     gboolean rezultatFct = FALSE;
 
@@ -322,8 +311,7 @@ este_sursa_modificata(FormularCod *fc) {
     return rezultatFct;
 }
 
-static void
-actualizeaza_stare_nume_indicatii(GtkWidget *lbl, gboolean esteExemplu, gboolean esteModificata) {
+static void actualizeaza_stare_nume_indicatii(GtkWidget *lbl, gboolean esteExemplu, gboolean esteModificata) {
     gchar textIndicatie[512];
 
     g_sprintf(textIndicatie, "Arată numele sursei curente.\n%s%s",
@@ -340,15 +328,13 @@ actualizeaza_stare_nume_indicatii(GtkWidget *lbl, gboolean esteExemplu, gboolean
     gtk_widget_set_tooltip_markup(lbl, textIndicatie);
 }
 
-static void
-laModificareCod(GtkTextBuffer *textbuffer, FormularCod *fc) {
+static void laModificareCod(GtkTextBuffer *textbuffer, FormularCod *fc) {
     if (este_sursa_modificata(fc) == FALSE) {
         actualizeaza_stare_nume_sursa(fc->lblStareNSursa, fc->numeSimpluAfisat, fc->esteExempluIncarcat, TRUE);
     }
 }
 
-static gboolean
-laDezapasareTaste(GtkWidget *widget, GdkEventKey *ke, FormularCod *fc) {
+static gboolean laDezapasareTaste(GtkWidget *widget, GdkEventKey *ke, FormularCod *fc) {
     gboolean keyHandled = FALSE;
 
     if ((ke->state & GDK_CONTROL_MASK) != 0) {
@@ -413,8 +399,7 @@ laDezapasareTaste(GtkWidget *widget, GdkEventKey *ke, FormularCod *fc) {
     return keyHandled;
 }
 
-static void
-btSalveazaLucrul_click(GtkWidget *bt, FormularCod *fc) {
+static void btSalveazaLucrul_click(GtkWidget *bt, FormularCod *fc) {
     GtkWidget *dlgSalveazaSursa = NULL;
 
     dlgSalveazaSursa = initializeaza_dialog_reluare_salvare(fc, SALVEAZA);
@@ -437,16 +422,14 @@ btSalveazaLucrul_click(GtkWidget *bt, FormularCod *fc) {
     gtk_widget_destroy(dlgSalveazaSursa);
 }
 
-static void
-btEEPROM_click(GtkWidget *bt, FormularCod *fc) {
+static void btEEPROM_click(GtkWidget *bt, FormularCod *fc) {
     FormularEEPROM *fe = NULL;
 
     fe = fme_initializeaza(GTK_WINDOW(fc->frm));
     fme_afiseaza(fe);
 }
 
-static void
-btReiaLucrul_click(GtkWidget *bt, FormularCod *fc) {
+static void btReiaLucrul_click(GtkWidget *bt, FormularCod *fc) {
     GtkWidget *dlgDeschideSursa = NULL;
 
     dlgDeschideSursa = initializeaza_dialog_reluare_salvare(fc, DESCHIDE);
@@ -472,15 +455,13 @@ btReiaLucrul_click(GtkWidget *bt, FormularCod *fc) {
     gtk_widget_destroy(dlgDeschideSursa);
 }
 
-static void
-btParasesteFrm_click(GtkWidget *bt, FormularCod *fc) {
+static void btParasesteFrm_click(GtkWidget *bt, FormularCod *fc) {
     realizeaza_salvare_la_incheiere(fc);
 
     gtk_widget_destroy(fc->frm);
 }
 
-static void
-btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
+static void btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
     GdkPixbuf *imgExpandatorPixBuf = NULL;
     GtkWidget *imgExpandatorActiuni = NULL;
 
@@ -503,8 +484,7 @@ btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {
     gtk_button_set_image(GTK_BUTTON(fc->btExpandator), imgExpandatorActiuni);
 }
 
-void
-fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
+void fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
     if (NULL != fc) {
         if (vizibil) gtk_widget_show_all(fc->frm);
         else gtk_widget_hide_all(fc->frm);
@@ -521,8 +501,7 @@ fc_modifica_vizibilitate(FormularCod *fc, gboolean vizibil) {
     }
 }
 
-static FormularCod *
-fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, gboolean esteExemplu) {
+static FormularCod *fc_initializeaza(gpointer parinteStructura, Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, gboolean esteExemplu) {
     FormularCod *deRet = NULL;
     GtkWidget *frm = NULL;
     GtkWidget *cadruFrm = NULL;
@@ -712,7 +691,8 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
     deRet->lblStareNSursa = lblStareNumeSursa;
     if (esteExemplu) deRet->vActiuni = VIZIBILE;
     else deRet->vActiuni = ASCUNSE;
-    deRet->laDepistare_neprezentaPlacuta_recurenta = NULL;
+    deRet->parinteGazda = parinteStructura;
+    deRet->laSchimbare_starePlacuta_recurenta = NULL;
 
     /* inițializăm bara de stare superioară */
     bic_initializeaza(&deRet->bInfo);
@@ -735,17 +715,15 @@ fc_initializeaza(Limbaj lmDorit, const char *codInitial, gchar *denumireSursa, g
     return deRet;
 }
 
-FormularCod *
-fc_initializeaza_fara_cod(Limbaj lmDorit) {
+FormularCod *fc_initializeaza_fara_cod(gpointer parinteStructura, Limbaj lmDorit) {
     FormularCod *dlgCodRezultat = NULL;
 
-    dlgCodRezultat = fc_initializeaza(lmDorit, "", "[Cod Nou]", FALSE);
+    dlgCodRezultat = fc_initializeaza(parinteStructura, lmDorit, "", "[Cod Nou]", FALSE);
 
     return dlgCodRezultat;
 }
 
-FormularCod *
-fc_initializeaza_cu_exemplu(const gchar *titluScurt, const gchar *titluLung) {
+FormularCod *fc_initializeaza_cu_exemplu(gpointer parinteStructura, const gchar *titluScurt, const gchar *titluLung) {
     gchar numeExempluAfisat[256];
     char *codCompletExemplu = NULL;
     FormularCod *dlgCodRezultat = NULL;
@@ -753,18 +731,17 @@ fc_initializeaza_cu_exemplu(const gchar *titluScurt, const gchar *titluLung) {
     g_sprintf(numeExempluAfisat, "%s", titluLung);
     if (g_str_has_suffix(titluScurt, "s")) {
         codCompletExemplu = db_obtine_cod_complet(titluLung, "s");
-        dlgCodRezultat = fc_initializeaza(ASM, codCompletExemplu, numeExempluAfisat, TRUE);
+        dlgCodRezultat = fc_initializeaza(parinteStructura, ASM, codCompletExemplu, numeExempluAfisat, TRUE);
     } else {
         codCompletExemplu = db_obtine_cod_complet(titluLung, "c");
-        dlgCodRezultat = fc_initializeaza(C, codCompletExemplu, numeExempluAfisat, TRUE);
+        dlgCodRezultat = fc_initializeaza(parinteStructura, C, codCompletExemplu, numeExempluAfisat, TRUE);
     }
 
     if (NULL != codCompletExemplu) free(codCompletExemplu);
     return dlgCodRezultat;
 }
 
-void
-fc_actualizeaza_stare_placuta(GtkWidget *lblStare, gboolean online, gboolean primaRulare) {
+void fc_actualizeaza_stare_placuta(GtkWidget *lblStare, gboolean online, gboolean primaRulare) {
     g_assert(GTK_IS_LABEL(lblStare));
 
     if (primaRulare) {

@@ -32,18 +32,19 @@ extern "C" {
 #define DB_NUME_TABEL_META       "meta"
 #define DB_NUME_TABEL_MODIFICARI "modificari"
 
+#define OS_NUME_RPSALE "rpsale"
 #ifdef G_OS_WIN32
-#define ACTUALIZATOR_NUME_AP "rpsale.exe"
+#define ACTUALIZATOR_NUME_AP OS_NUME_RPSALE ".exe"
 #elif defined G_OS_UNIX
-#define ACTUALIZATOR_NUME_AP "rpsale"
+#define ACTUALIZATOR_NUME_AP OS_NUME_RPSALE
 #endif
-#define OS_CALE_RPSALE "./"ACTUALIZATOR_NUME_AP
+#define OS_CALE_RPSALE "./" ACTUALIZATOR_NUME_AP
 
 #define RPS_NUME_PSALE "psale"
 #ifdef G_OS_WIN32
-#define RPS_CALE_PSALE "./"RPS_NUME_PSALE".exe"
+#define RPS_CALE_PSALE "./" RPS_NUME_PSALE".exe"
 #elif defined G_OS_UNIX
-#define RPS_CALE_PSALE "./"RPS_NUME_PSALE
+#define RPS_CALE_PSALE "./" RPS_NUME_PSALE
 #endif
 
 #define ACTUALIZATOR_NUME_ACTUALIZAT "rpsale.nou"

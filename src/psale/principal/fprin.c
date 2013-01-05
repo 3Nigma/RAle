@@ -26,23 +26,84 @@
 #include "vc.h"
 #include "fcod.h"
 #include "fprin.h"
+#include "os.h"
 
 #ifndef G_VALUE_INIT 
 /* îl introducem aici pentru compilarea sub windows. Se pare că GTK-ul de windows nu-l definiește */
 #define G_VALUE_INIT { 0, { { 0 } } }
 #endif
 
-static gboolean frmPrincipal_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FormularPrincipal *fp);
+static gboolean imgLogo_click(GtkWidget *widget, GdkEvent *event, gpointer user_data);
 static gboolean la_tic_ceas_afisare_proaspat_actualizat(GtkWidget *etichGazda);
+static void cmbxCodNou_selectat(GtkComboBox *widget, FormularPrincipal *fp);
+static void cmbxCodCarte_la_selectie(GtkComboBox *widget, FormularPrincipal *fp);
+static gboolean frmPrincipal_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FormularPrincipal *fp);
+static void btCartulie_click(GtkWidget *widget, FormularPrincipal *fp);
 static void btIesire_clicked(GtkWidget *widget, FormularPrincipal *fp);
+static void btInfo_click(GtkWidget *widget, FormularPrincipal *fp);
 
-static gboolean estePlacutaConectata;
+static gboolean frmPrincipal_delev(GtkWidget *widget, GdkEvent *event, gpointer data);
+static void frmPrincipal_destroy(GtkWidget *widget, gpointer data);
+
+static GtkWidget *creeaza_cmbxExemple();
+static void populeaza_cmbxExemple(GtkComboBox *cmbx, Limbaj lmb);
+
+static void incearca_pornirea_cautarii_placutei(FormularPrincipal *fp);
+static void starea_conexiunii_placutei_sa_schimbat(gpointer parinteFCod, gboolean placutaEsteConectata);
+static gboolean fprin_verifica_prezenta_placuta_la_tick(FormularPrincipal *fp);
+static gboolean fprin_este_placuta_conectata_asincron(FormularPrincipal *fp);
+
+static gboolean _estePlacutaConectata = FALSE;
+static gboolean functioneazaVerificatorulDePlacuta = FALSE;
+static guint _idTimeoutVerificatorPlacuta = 0;
 static Limbaj lmbCodExemple = ASM;
-static gboolean dlgCodForteazaActualizConex;
-static VizualizatorCartulie *vizAle;
+static VizualizatorCartulie *vizAle = NULL;
 
-static void placuta_sa_deconectat() {
-    dlgCodForteazaActualizConex = TRUE;
+static void incearca_pornirea_cautarii_placutei(FormularPrincipal *fp) {
+    /* dăm drumul la căutător doar dacă știm că plăcuța nu este conectată și că nu s-a mai ordonat începerea acestei secvențe de căutare */
+    if (FALSE == _estePlacutaConectata && FALSE == functioneazaVerificatorulDePlacuta) {
+        _idTimeoutVerificatorPlacuta = g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, 1, (GSourceFunc) (fprin_verifica_prezenta_placuta_la_tick), fp, NULL);
+        functioneazaVerificatorulDePlacuta = TRUE;
+    }
+}
+
+static void starea_conexiunii_placutei_sa_schimbat(gpointer parinteFCod, gboolean placutaEsteConectata) {
+    g_assert(parinteFCod != NULL);
+
+    FormularPrincipal *fp = (FormularPrincipal *) (parinteFCod);
+    GSList *elemFCod = fp->listaDlgCod;
+    FormularCod *fc = NULL;
+
+    _estePlacutaConectata = placutaEsteConectata;
+    while (NULL != elemFCod) {
+        fc = (FormularCod *) elemFCod->data;
+        if (GTK_IS_WIDGET(fc->frm) != FALSE) {
+            fc_actualizeaza_stare_placuta(fc->lblStareConex, _estePlacutaConectata, FALSE);
+        }
+        elemFCod = g_slist_next(elemFCod);
+    }
+    
+    /* dacă s-a pierdut conexiunea cu plăcuța, reîncepe căutarea ei */
+    incearca_pornirea_cautarii_placutei(fp);
+}
+
+static gboolean fprin_este_placuta_conectata_asincron(FormularPrincipal *fp) {
+    g_assert(fp != NULL);
+    
+    if(al_este_placuta_conectata() == TRUE) {
+        starea_conexiunii_placutei_sa_schimbat(fp, TRUE);
+        g_source_remove(_idTimeoutVerificatorPlacuta);
+        functioneazaVerificatorulDePlacuta = FALSE;
+    }
+    
+    return TRUE;
+}
+
+static gboolean fprin_verifica_prezenta_placuta_la_tick(FormularPrincipal *fp) {
+    os_executa_functie_asincron(fprin_este_placuta_conectata_asincron, fp);
+
+    /* dacă întoarcem FALSE, această funcție se elimină din ciclul de apeluri ale lui glib */
+    return !_estePlacutaConectata;
 }
 
 static gboolean imgLogo_click(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
@@ -62,19 +123,20 @@ static void cmbxCodNou_selectat(GtkComboBox *widget, FormularPrincipal *fp) {
 
         switch (gtk_combo_box_get_active(widget)) {
             case 1: /* ASM */
-                dlgCod = fc_initializeaza_fara_cod(ASM);
+                dlgCod = fc_initializeaza_fara_cod(fp, ASM);
                 break;
             case 2: /* C */
-                dlgCod = fc_initializeaza_fara_cod(C);
+                dlgCod = fc_initializeaza_fara_cod(fp, C);
                 break;
         }
-        dlgCod->laDepistare_neprezentaPlacuta_recurenta = &placuta_sa_deconectat;
+        dlgCod->laSchimbare_starePlacuta_recurenta = &starea_conexiunii_placutei_sa_schimbat;
         fp->listaDlgCod = g_slist_prepend(fp->listaDlgCod, dlgCod);
 
         /* repoziționăm textul afișat */
         gtk_combo_box_set_active(GTK_COMBO_BOX(widget), 0);
 
-        fc_actualizeaza_stare_placuta(dlgCod->lblStareConex, estePlacutaConectata, TRUE);
+        incearca_pornirea_cautarii_placutei(fp);
+        fc_actualizeaza_stare_placuta(dlgCod->lblStareConex, _estePlacutaConectata, TRUE);
         fc_modifica_vizibilitate(dlgCod, TRUE);
     }
 }
@@ -91,14 +153,15 @@ static void cmbxCodCarte_la_selectie(GtkComboBox *widget, FormularPrincipal *fp)
         gtk_tree_model_get(model, &iter, 0, &titluScurt, 1, &titluLung, -1);
 
         if (g_strcmp0(titluScurt, "") != 0) {
-            dlgCod = fc_initializeaza_cu_exemplu(titluScurt, titluLung);
-            dlgCod->laDepistare_neprezentaPlacuta_recurenta = &placuta_sa_deconectat;
+            dlgCod = fc_initializeaza_cu_exemplu(fp, titluScurt, titluLung);
+            dlgCod->laSchimbare_starePlacuta_recurenta = &starea_conexiunii_placutei_sa_schimbat;
             fp->listaDlgCod = g_slist_prepend(fp->listaDlgCod, dlgCod);
 
             /* repoziționăm textul afișat */
             gtk_combo_box_set_active(GTK_COMBO_BOX(widget), 0);
 
-            fc_actualizeaza_stare_placuta(dlgCod->lblStareConex, estePlacutaConectata, TRUE);
+            incearca_pornirea_cautarii_placutei(fp);
+            fc_actualizeaza_stare_placuta(dlgCod->lblStareConex, _estePlacutaConectata, TRUE);
             fc_modifica_vizibilitate(dlgCod, TRUE);
         }
     }
@@ -190,31 +253,6 @@ static void populeaza_cmbxExemple(GtkComboBox *cmbx, Limbaj lmb) {
     gtk_combo_box_set_active(cmbx, 0);
 }
 
-static gboolean la_interval_tick(FormularPrincipal *fp) {
-    gboolean stareConexCurenta;
-
-    if (dlgCodForteazaActualizConex ||
-            (estePlacutaConectata == FALSE && (stareConexCurenta = al_este_placuta_conectata()))) {
-        GSList *elemFCod = fp->listaDlgCod;
-        FormularCod *fc = NULL;
-
-        if (dlgCodForteazaActualizConex)
-            stareConexCurenta = al_este_placuta_conectata();
-        while (NULL != elemFCod) {
-            fc = (FormularCod *) elemFCod->data;
-            if (GTK_IS_WIDGET(fc->frm) != FALSE) {
-                fc_actualizeaza_stare_placuta(fc->lblStareConex, stareConexCurenta, FALSE);
-            }
-            elemFCod = g_slist_next(elemFCod);
-        }
-
-        estePlacutaConectata = stareConexCurenta;
-        dlgCodForteazaActualizConex = FALSE;
-    }
-
-    return TRUE;
-}
-
 static gboolean frmPrincipal_la_dezapasare_taste(GtkWidget *widget, GdkEventKey *ke, FormularPrincipal *fp) {
     gboolean evGestionat = FALSE;
 
@@ -266,20 +304,20 @@ static gboolean la_tic_ceas_afisare_proaspat_actualizat(GtkWidget *etichGazda) {
     gchar mesajDeAfisareDupaActualizare[256];
     Versiune *versCurenta = NULL;
     static int secundeRamaseDeAfisare = FPRIN_PACTUALIZAT_SEC_VIATA_ETICH;
-    
-    if(--secundeRamaseDeAfisare == 0) {
+
+    if (--secundeRamaseDeAfisare == 0) {
         /* timpul a expirat, ascundem eticheta și oprim ceasul */
         gtk_widget_hide(etichGazda);
-        
+
         return FALSE;
     }
     if ((versCurenta = db_obtine_versiune_curenta()) != NULL) {
-        g_sprintf(mesajDeAfisareDupaActualizare, "<span font_weight='bold'>Ha haaa ... Am trecut <i>pare-se</i>\n  cu bine la versiunea %s!</span>  <span size='x-small'>(%d)</span>", 
+        g_sprintf(mesajDeAfisareDupaActualizare, "<span font_weight='bold'>Ha haaa ... Am trecut <i>pare-se</i>\n  cu bine la versiunea %s!</span>  <span size='x-small'>(%d)</span>",
                 sda_versiune_printf(versCurenta), secundeRamaseDeAfisare);
         gtk_label_set_markup(GTK_LABEL(etichGazda), mesajDeAfisareDupaActualizare);
         g_free(versCurenta);
     }
-    
+
     return TRUE;
 }
 
@@ -325,14 +363,14 @@ FormularPrincipal *fp_initializeaza_formular_principal(gboolean saActualizatProa
         GtkWidget *lblProaspatActualizat = NULL;
         GtkWidget *ebParinteLblPActualizat = NULL;
         GdkColor fundalLblPActualiat;
-        
+
         /* creem eticheta de 'actualizat cu succes' și o plasăm pe formularul principal, abonând-o la o funcție de actualizare
          * pentru a o face vizibilă utilizatorilor un timp finit */
         lblProaspatActualizat = gtk_label_new(NULL);
         la_tic_ceas_afisare_proaspat_actualizat(lblProaspatActualizat);
-        g_timeout_add_seconds(1, (GSourceFunc)(&la_tic_ceas_afisare_proaspat_actualizat), lblProaspatActualizat);
+        g_timeout_add_seconds(1, (GSourceFunc) (&la_tic_ceas_afisare_proaspat_actualizat), lblProaspatActualizat);
         gtk_misc_set_alignment(GTK_MISC(lblProaspatActualizat), 0.5f, 0.5f);
-        
+
         /* încadrăm eticheta într-o cutie de evenimente (GtkEventBox) pentru a-i putea schimba culoarea de fundal */
         ebParinteLblPActualizat = gtk_event_box_new();
         gtk_container_add(GTK_CONTAINER(ebParinteLblPActualizat), lblProaspatActualizat);
@@ -396,11 +434,6 @@ FormularPrincipal *fp_initializeaza_formular_principal(gboolean saActualizatProa
     g_signal_connect(btCartulie, "clicked", G_CALLBACK(btCartulie_click), fp);
     g_signal_connect(btInfo, "clicked", G_CALLBACK(btInfo_click), fp);
     g_signal_connect(btIesire, "clicked", G_CALLBACK(btIesire_clicked), fp);
-
-    /* dăm drumul la tick-ul de interval */
-    estePlacutaConectata = FALSE;
-    dlgCodForteazaActualizConex = FALSE;
-    g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, 1, (GSourceFunc) (la_interval_tick), fp, NULL);
 
     return fp;
 }
