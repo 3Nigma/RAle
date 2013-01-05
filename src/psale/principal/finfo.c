@@ -358,6 +358,7 @@ static void incarca_info_general(FInfoInstanta *fii, GtkWidget *cadruFrm) {
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(fii->txtInfoVersiuni), GTK_WRAP_WORD);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(fii->txtInfoVersiuni), FALSE);
 
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(desfasuratorFereastraTxt), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_container_add(GTK_CONTAINER(desfasuratorFereastraTxt), fii->txtInfoVersiuni);
     gtk_table_attach_defaults(GTK_TABLE(cadruFrm), desfasuratorFereastraTxt, 1, 4, 1, 2);
 }
