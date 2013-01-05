@@ -435,6 +435,10 @@ FormularPrincipal *fp_initializeaza_formular_principal(gboolean saActualizatProa
     g_signal_connect(btInfo, "clicked", G_CALLBACK(btInfo_click), fp);
     g_signal_connect(btIesire, "clicked", G_CALLBACK(btIesire_clicked), fp);
 
+    /* pornim căutarea plăcuței încă de pe acum pentru a o avea cât mai devreme disponibilă atunci
+     * când se lansează în execuție un formular de cod ('fcod') */
+    incearca_pornirea_cautarii_placutei(fp);
+    
     return fp;
 }
 
