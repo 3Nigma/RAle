@@ -14,6 +14,7 @@
 !include Sections.nsh
 !include EnvVarUpdate.nsh
 !include WinVer.nsh
+!include x64.nsh
 
 Name "psAle"
 OutFile "CD/instalator.exe"
@@ -29,7 +30,7 @@ RequestExecutionLevel admin
 
 Page license
 Page components
-Page directory directorAles
+Page directory "" "" directorAles
 Page instfiles
 
 Section /o "-Driverele necesare aplicației" drvInstall_ID
@@ -37,14 +38,19 @@ Section /o "-Driverele necesare aplicației" drvInstall_ID
   
   MessageBox MB_OK|MB_ICONINFORMATION "Sunt pe cale să instalez driverele pentru plăcuță.$\n$\nÎnainte de a continua, asigurați-vă că plăcuța este conectată la calculator și apoi apăsați butonul 'Ok'." IDOK 0
   
-  ExecWait '"$EXEDIR\drivere\DPInst.exe" /sw /c /lm /sh' $R0
+  ${If} ${RunningX64}
+    ExecWait '"$EXEDIR\drivere\DPInst64.exe" /sw /c /lm /sh' $R0
+  ${Else}
+    ExecWait '"$EXEDIR\drivere\DPInst.exe" /sw /c /lm /sh' $R0
+  ${EndIf}
+
   DetailPrint "Rezultatul instalării driverelor: $R0"
  
   Pop $R0
 SectionEnd
 
 Section "Aplicația principală" psAleInstall_ID
-  DetailPrint "Instalez psAle ..."
+  DetailPrint "Instalez psAle în directorul $INSTDIR..."
   nsisunz::UnzipToLog "$EXEDIR\pachete\psAle.zip" "$INSTDIR"
  
   WriteRegStr HKLM "Software\tuScale\psAle" "CaleInstalare" "$INSTDIR"
@@ -169,6 +175,7 @@ Function un.onInit
 FunctionEnd
 
 Function directorAles
+  DetailPrint "Setez directorul de instalare pe $INSTDIR ..."
   SetOutPath $INSTDIR
 FunctionEnd
 

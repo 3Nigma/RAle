@@ -59,6 +59,7 @@ asigura_existenta_directoare :
 
 # Transportă în directorul construit alte fișiere necesare
 $(DIR_CONSTRUIT)/$(NUME_CERT_PEM) : $(REINOITOR_DIR)/$(NUME_CERT_PEM)
+.PHONY : $(DIR_CONSTRUIT)/$(SQLITEDB_NAME)
 $(DIR_CONSTRUIT)/$(SQLITEDB_NAME) : $(PRINCIPAL_DIR)/$(SQLITEDB_NAME)
 
 $(DEPENDENTE_ADITIONALE) :
@@ -76,5 +77,5 @@ clean :
 	@cd $(PRINCIPAL_DIR); make clean
 	@cd $(REINOITOR_DIR); make clean
 	@cd $(DIR_CONSTRUIT); make clean
-	@rm -f $(DEPENDENTE_ADITIONALE) $(DIR_CONSTRUIT)/$(CART_PDF_NAME)
+	# @rm -f $(DEPENDENTE_ADITIONALE) $(DIR_CONSTRUIT)/$(CART_PDF_NAME)
 	@rm -fr $(subst $(PRINCIPAL_DIR), $(DIR_CONSTRUIT), $(DEPENDENTE_DIR_PRINCIPAL))

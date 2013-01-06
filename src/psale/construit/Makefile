@@ -8,11 +8,14 @@
 
 include ../Makefile.defs
 
-PSALE_CALE_ARHIVA      := ./CD/pachete/psAle.zip
-COMPILATOR_CALE_ARHIVA := ./CD/pachete/compilator.zip
+PSALE_CALE_CD          := ./CD
+PSALE_IMAGINE_CD       := $(PSALE_CALE_CD)/psale_cd.iso
+PSALE_CALE_ARHIVA      := $(PSALE_CALE_CD)/pachete/psAle.zip
+COMPILATOR_CALE_ARHIVA := $(PSALE_CALE_CD)/pachete/compilator.zip
+REINOITOR_MANIFEST     := $(REIN_BIN_NAME).exe.manifest
 
 SUBDIRECTOARE_PSALE := ./limbaje/ ./stiluri/ ./media/ 
-PSALE_ALTE_DEP      := ./*.dll ./psale_icoana_ap.ico ./$(DIR_SURSE_MELE)/
+PSALE_ALTE_DEP      := ./*.dll ./psale_icoana_ap.ico ./$(DIR_SURSE_MELE)/ ./$(REINOITOR_MANIFEST)
 COMPILATOR_ALTE_DEP := 
 
 all : FISIERE_PACHET_PSALE := 
@@ -24,11 +27,16 @@ win : FISIERE_PACHET_PSALE := ./$(PRIN_BIN_NAME).exe ./$(REIN_BIN_NAME).exe \
       $(SUBDIRECTOARE_PSALE) $(PSALE_ALTE_DEP)
 win : FISIERE_PACHET_COMPILATOR := ./winavr
 win :
-	#Documentatia 7za se poate gasi in 'wtooluri/7-zip.chm'
+	# Legam manifest-ul de PE-ul binarului reinoitor
+	wtooluri/mt.exe -manifest $(REINOITOR_MANIFEST) -outputresource:"$(REIN_BIN_NAME).exe;#1"
+	# Documentatia 7za se poate gasi in 'wtooluri/7-zip.chm'
 	@wtooluri/7za.exe u $(PSALE_CALE_ARHIVA) $(FISIERE_PACHET_PSALE)
 	@wtooluri/7za.exe u $(COMPILATOR_CALE_ARHIVA) $(FISIERE_PACHET_COMPILATOR)
 	# Documentatie MakeNSIS se gaseste in User Manual-ul NSIS-ului
 	@makensis.exe //V1 $(NSIS_NUME_INST)
+	# Creem imaginea ISO a CD-ului
+	@rm -f $(PSALE_IMAGINE_CD)
+	@wtooluri/mkisofs.exe -quiet -r -R -J -l -L -o $(PSALE_IMAGINE_CD) $(PSALE_CALE_CD)
 	
 .PHONY : clean
 clean :
