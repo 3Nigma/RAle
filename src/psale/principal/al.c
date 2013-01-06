@@ -89,12 +89,12 @@ void al_citeste_eeprom(GtkListStore *lm) {
 
         tmpnam(hexRezultat);
 #ifdef G_OS_WIN32
-        g_sprintf(com, "%s -c usbtiny -p %s -U eeprom:r:\"%s\":h",
+        g_sprintf(com, "\"%s\" -c usbtiny -p %s -U eeprom:r:\"%s\":h",
                 al_obtine_cale_applicatie(),
                 mcus[indexMCUPrezent].avrdudePart,
                 hexRezultat);
 #elif defined G_OS_UNIX
-        g_sprintf(com, "sudo %s -c usbtiny -p %s -U eeprom:r:\"%s\":h",
+        g_sprintf(com, "sudo \"%s\" -c usbtiny -p %s -U eeprom:r:\"%s\":h 2>/dev/null",
                 al_obtine_cale_applicatie(),
                 mcus[indexMCUPrezent].avrdudePart,
                 hexRezultat);

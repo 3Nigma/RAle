@@ -248,6 +248,7 @@ gboolean os_executa_functie_asincron(gpointer fct, gpointer param) {
 }
 
 unsigned long os_system(gchar *command) {
+    g_debug("Execut următoarea comandă : %s", command);
 #ifdef G_OS_WIN32
     return os_win_executa_com_fara_redirectionari(command);
 #elif defined G_OS_UNIX
