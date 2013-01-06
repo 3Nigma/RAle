@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     FILE *fMesajAplicatie = NULL;
 
     /* redirecționăm toate mesajele de stare ale aplicației într-un fișier fizic */
-    if ((fMesajAplicatie = fopen("mesaje_sesiune_" ACTUALIZATOR_NUME_AP ".txt", "w")) != NULL) {
+    if ((fMesajAplicatie = fopen("mesaje_sesiune_" OS_NUME_RPSALE ".txt", "w")) != NULL) {
         g_log_set_handler("",
                 G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION,
                 inregistreazaMesaj, fMesajAplicatie);
