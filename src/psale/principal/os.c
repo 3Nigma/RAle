@@ -134,7 +134,7 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
                 break;
             }
 
-            rezConsola->octetiInStdOut++;
+            rezConsola->octetiInStdErr++;
 
             if (rezConsola->octetiInStdErr >= rezConsola->capacitateInStdErr) {
                 rezConsola->capacitateInStdErr += OS_BUCATA_CONS_BUFF;
@@ -355,7 +355,7 @@ void os_obtine_nume_fis_temporar(gchar *buff, gint buffLen) {
 #elif defined G_OS_UNIX
     g_sprintf(buff, "%s", tmpnam(NULL));
 #endif
-    g_debug("Am creeat fișierul temporal '%s'", buff);
+    g_debug("Am creat fișierul temporal '%s'", buff);
 }
 
 extern gchar *os_avrdude_obtine_cod_mcu_prezent(gchar *comanda) {
@@ -364,23 +364,22 @@ extern gchar *os_avrdude_obtine_cod_mcu_prezent(gchar *comanda) {
     GMatchInfo *containerPotriviri = NULL;
     RezultatOpConsola *rezOperatiunii = NULL;
 
-    tipar = g_regex_new("Device signature = ([\\w]+)", 0, 0, NULL);
-    codMCUGasit = g_new0(gchar, 10);
     if ((rezOperatiunii = os_executa_comanda_si_obtine_rezultat(comanda)) != NULL) {
+		tipar = g_regex_new("Device signature = ([\\w]+)", 0, 0, NULL);
         if (rezOperatiunii->octetiInStdErr != 0) {
             /* datorită modului de construcție a lui AvrDude (varsă rezultate bune pe stderr), aici ne așteptăm să citim rezultatele sale */
             g_regex_match(tipar, rezOperatiunii->stdErrBuff, 0, &containerPotriviri);
             if (g_match_info_matches(containerPotriviri)) {
+				codMCUGasit = g_new0(gchar, 10);
                 g_sprintf(codMCUGasit, "%s", g_match_info_fetch(containerPotriviri, 1));
             }
         }
+        g_regex_unref(tipar);
+        g_match_info_free(containerPotriviri);
+        os_elibereaza_rezultat_consola(&rezOperatiunii);
     } else {
         g_warning("S-a ivit o problemă la invocarea lui 'avrdude' : '%s'! Acțiunea a fost anulată ...", comanda);
     }
-
-    g_regex_unref(tipar);
-    g_match_info_free(containerPotriviri);
-    os_elibereaza_rezultat_consola(&rezOperatiunii);
 
     return codMCUGasit;
 }

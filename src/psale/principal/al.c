@@ -89,12 +89,12 @@ void al_citeste_eeprom(GtkListStore *lm) {
 
         tmpnam(hexRezultat);
 #ifdef G_OS_WIN32
-        g_sprintf(com, "\"%s\" -c usbtiny -p %s -U eeprom:r:\"%s\":h",
+        g_sprintf(com, "%s -c usbtiny -p %s -U eeprom:r:\"%s\":h",
                 al_obtine_cale_applicatie(),
                 mcus[indexMCUPrezent].avrdudePart,
                 hexRezultat);
 #elif defined G_OS_UNIX
-        g_sprintf(com, "sudo \"%s\" -c usbtiny -p %s -U eeprom:r:\"%s\":h 2>/dev/null",
+        g_sprintf(com, "sudo %s -c usbtiny -p %s -U eeprom:r:\"%s\":h 2>/dev/null",
                 al_obtine_cale_applicatie(),
                 mcus[indexMCUPrezent].avrdudePart,
                 hexRezultat);
@@ -226,16 +226,18 @@ static gint al_obtine_index_mcu() {
     g_sprintf(comAvrDude, "sudo %s -c usbtiny -p t25 -V",
             al_obtine_cale_applicatie());
 #endif
-    semnCompCitita = os_avrdude_obtine_cod_mcu_prezent(comAvrDude);
-    for (cnt = 0; cnt < sizeof (mcus) / sizeof (struct mcu); ++cnt) {
-        if (g_strcmp0(mcus[cnt].devSignature, semnCompCitita) == 0) {
-            indexMcu = cnt;
-            break;
-        }
+    if((semnCompCitita = os_avrdude_obtine_cod_mcu_prezent(comAvrDude)) != NULL) {
+	  g_debug("Am primit următoarea semnătură a creierașului : %s", semnCompCitita);
+      for (cnt = 0; cnt < sizeof (mcus) / sizeof (struct mcu); ++cnt) {
+          if (g_strcmp0(mcus[cnt].devSignature, semnCompCitita) == 0) {
+              indexMcu = cnt;
+              break;
+          }
+      }
+
+      g_free(semnCompCitita);
     }
-
-    g_free(semnCompCitita);
-
+    
     return indexMcu;
 }
 
