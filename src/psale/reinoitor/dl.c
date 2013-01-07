@@ -30,7 +30,9 @@ DLInstanta *dl_initializeaza(const char *adresa) {
 
             if ((deReturnat->resursaRetea = curl_easy_init()) != NULL) {
                 curl_easy_setopt(deReturnat->resursaRetea, CURLOPT_TIMEOUT, DL_CURL_TIMEOUT);
-
+				curl_easy_setopt(deReturnat->resursaRetea, CURLOPT_FOLLOWLOCATION, TRUE);
+				curl_easy_setopt(deReturnat->resursaRetea, CURLOPT_REFERER, OS_NUME_RPSALE);
+				
                 curl_easy_setopt(deReturnat->resursaRetea, CURLOPT_SSL_VERIFYPEER, TRUE);
                 curl_easy_setopt(deReturnat->resursaRetea, CURLOPT_CAINFO, "cacert.pem");
 

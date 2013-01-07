@@ -43,6 +43,14 @@ ParametriiRulareAplicatie *pa_incarca_parametrii(int argc, char *argv[]) {
     parAp->versServer = NULL;
     parAp->folsesteIG = TRUE;
 
+    /* înregistrăm starea argumentelor pentru analiză */
+	g_debug("La momentul interpretării argumentelor, acestea erau : ");
+	for (indexArgInStructura = 0; indexArgInStructura < argc; ++indexArgInStructura) {
+	  g_debug(("%s"), argv[indexArgInStructura]);  
+	}
+	g_debug("\n");
+	
+	/* procesăm argumentele aplicației */
     while ((optiune = getopt_long(argc, argv, "t:v::fa", opt_lungi_aplicatie, &indexArgInStructura)) != -1) {
         switch (optiune) {
             case 't': /* tipul-operatiei */
