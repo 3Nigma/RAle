@@ -273,6 +273,7 @@ static gboolean fa_proceseaza_sesiune(FAInstanta *fai) {
             if (fai->esteBtAnuleazaApasat == FALSE) {
                 if ((fai->masinaActualizanta->date->adresaPachetLocal = dl_descarca_actualizare_tinta_local(fai->masinaActualizanta->date)) != NULL) {
                     g_debug("Am descărcat cu succes arhiva versiunii țintă.");
+                    fa_reseteaza_procesarea_sesiunii(fai);
                     fa_progres_seteaza_stare(fai, FA_DL_APLICARE_ACTUALIZARE);
                 } else {
                     g_warning("Nu am putut descărca versiunea țintă.");
@@ -287,6 +288,7 @@ static gboolean fa_proceseaza_sesiune(FAInstanta *fai) {
                 if (dz_despacheteaza_pachet(fai->masinaActualizanta->date->adresaPachetLocal, DZ_CALE_DESPACHETARE)) {
                     g_debug("Am aplicat cu succes versiunea țintă!");
                     fai->actualizareAplicataCuSucces = TRUE;
+                    fa_reseteaza_procesarea_sesiunii(fai);
                     fa_progres_seteaza_stare(fai, FA_DL_AM_ACTUALIZAT_LA_VERS_TINTA);
                 } else {
                     g_warning("Nu am putut aplica actualizarea obținută!");

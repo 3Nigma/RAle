@@ -50,9 +50,11 @@ Section /o "-Driverele necesare aplicației" drvInstall_ID
 SectionEnd
 
 Section "Aplicația principală" psAleInstall_ID
-  DetailPrint "Instalez psAle în directorul $INSTDIR..."
-  nsisunz::UnzipToLog "$EXEDIR\pachete\psAle.zip" "$INSTDIR"
- 
+  DetailPrint "Instalez nucleul psAle în directorul $INSTDIR..."
+  nsisunz::UnzipToLog "$EXEDIR\pachete\nucleu_psAle.zip" "$INSTDIR"
+  DetailPrint "Instalez dependențele aplicației în același director..."
+  nsisunz::UnzipToLog "$EXEDIR\pachete\dependente.zip" "$INSTDIR"
+  
   WriteRegStr HKLM "Software\tuScale\psAle" "CaleInstalare" "$INSTDIR"
  
   Pop $0
