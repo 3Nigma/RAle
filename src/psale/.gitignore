@@ -1,5 +1,6 @@
 # Tipare de excludere normale
 construit/*.dll
+construit/*.txt
 construit/limbaje
 construit/media
 construit/stiluri
@@ -14,3 +15,4 @@ construit/CD/*
 
 # Tipare de excludere negate
 !construit/CD/autorun.inf
+!construit/wtooluri/*.exe
