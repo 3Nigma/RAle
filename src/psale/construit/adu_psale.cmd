@@ -118,7 +118,7 @@ goto :nu_descarca_compilatorul
 :descarca_compilator
 if not exist %dirTinta%\%numeArhivaCompilator% (
   echo Descarc compilatorul aplicatiei ...
-  curl --progress-bar --insecure --remote-name %adresaDependente%
+  curl --progress-bar --insecure --remote-name %adresaCompilator%
   mv %numeArhivaCompilator% %dirTinta%\%numeArhivaCompilator%
   echo Arhiva s-a descarcat cu succes ...
 ) else (
