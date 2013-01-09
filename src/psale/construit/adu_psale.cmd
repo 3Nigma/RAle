@@ -136,7 +136,7 @@ if /i {%raspunsIntrebare%}=={da} (goto :adauga_in_path)
 goto :nu_adauga_in_path
 
 :adauga_in_path
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_SZ /d "%path%;%cd%\%dirTinta%\%winavr%\bin"
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_SZ /d "%path%;%cd%\%dirTinta%\winavr\bin"
 
 :nu_adauga_in_path
 :nu_descarca_compilatorul
