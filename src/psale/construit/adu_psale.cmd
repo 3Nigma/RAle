@@ -30,7 +30,7 @@ set /p versDisponibile=<fisTempVersiuni
 
 :introduceti_versiunea_dorita
 echo Versiuni de nuclee stiute: 
-cat fisTempVersiuni
+type fisTempVersiuni
 echo.
 
 REM Regiunea variabilelor de configurare
@@ -76,7 +76,7 @@ REM aduc nucleul versiunii cerute
 if not exist %dirTinta%\%numeArhivaNucleu% (
   echo Descarc nucleul aplicatiei psAle v%versCurenta% ...
   curl --progress-bar --insecure --remote-name %adresaNucleu%
-  mv %numeArhivaNucleu% %dirTinta%\%numeArhivaNucleu%
+  move %numeArhivaNucleu% %dirTinta%\%numeArhivaNucleu%
   echo Arhiva s-a descarcat cu succes ...
 ) else (
   echo Nu descarc nucleul pentru ca el se pare ca exista deja!
@@ -97,7 +97,7 @@ goto :nu_descarca_dependente
 if not exist %dirTinta%\%numeArhivaDependente% (
   echo Descarc dependentele aplicatiei ...
   curl --progress-bar --insecure --remote-name %adresaDependente%
-  mv %numeArhivaDependente% %dirTinta%\%numeArhivaDependente%
+  move %numeArhivaDependente% %dirTinta%\%numeArhivaDependente%
   echo Arhiva s-a descarcat cu succes ...
 ) else (
   echo Nu descarc dependentele pentru ca pachetul se pare ca exista deja!
@@ -119,7 +119,7 @@ goto :nu_descarca_compilatorul
 if not exist %dirTinta%\%numeArhivaCompilator% (
   echo Descarc compilatorul aplicatiei ...
   curl --progress-bar --insecure --remote-name %adresaCompilator%
-  mv %numeArhivaCompilator% %dirTinta%\%numeArhivaCompilator%
+  move %numeArhivaCompilator% %dirTinta%\%numeArhivaCompilator%
   echo Arhiva s-a descarcat cu succes ...
 ) else (
   echo Nu descarc compilatorul pentru ca acesta se pare ca exista deja!
@@ -141,7 +141,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v P
 :nu_adauga_in_path
 :nu_descarca_compilatorul
 echo Curat arhivele folosite ...
-if exist %cd%\%dirTinta%\%numeArhivaNucleu%. del /F /Q %dirTinta%\%numeArhivaNucleu%.
+if exist %dirTinta%\%numeArhivaNucleu%. del /F /Q %dirTinta%\%numeArhivaNucleu%.
 if exist %dirTinta%\%numeArhivaDependente%. del /F /Q %dirTinta%\%numeArhivaDependente%.
 if exist %dirTinta%\%numeArhivaCompilator%. del /F /Q %dirTinta%\%numeArhivaCompilator%.
 
