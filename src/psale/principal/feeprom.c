@@ -10,6 +10,7 @@
 
 #include "feeprom.h"
 
+#include "sda.h"
 #include "fl.h"
 
 #include <gdk/gdkkeysyms.h>
@@ -179,32 +180,49 @@ laArataTooltip(GtkWidget  *widget,
                gboolean    keyboard_mode,
                GtkTooltip *indicatiiCelula,
                FormularEEPROM *fe) {
-  gint relBinX;
-  gint relBinY;
-  guint cellX;
-  guint cellY;
-  GtkTreePath *caleCelula;
-  gchar ttText[512];
-  
-  /* obține coordonate relative hover */
-  gtk_tree_view_convert_widget_to_bin_window_coords(GTK_TREE_VIEW(fe->tvEEPROM), x, y, &relBinX, &relBinY);
-  gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(fe->tvEEPROM), relBinX, relBinY, &caleCelula, NULL,
-                                NULL, NULL); /* cell_x, cell_y */
- 
-  if(tree_view_get_cell_from_pos(GTK_TREE_VIEW(fe->tvEEPROM), relBinX, relBinY, &cellX, &cellY) == TRUE) {
-	if(cellX > 0 ) {
-      g_sprintf(ttText, "<b>%s</b>0x%03x"/*\n<b>%s</b>%s\n<b>%s</b>%s"*/, 
-                        "Adresa: ", cellY * 16 + cellX - 1/*, 
-                        "Val. zecimala: ", "DE COMPLETAT", 
-                        "Val. binara: ", "DE COMPLETAT"*/);
-      gtk_tooltip_set_markup(indicatiiCelula, ttText);
-      gtk_tree_view_set_tooltip_cell(GTK_TREE_VIEW(fe->tvEEPROM), indicatiiCelula, caleCelula, NULL, NULL);
+    gint relBinX;
+    gint relBinY;
+    guint cellX;
+    guint cellY;
+    GtkTreePath *caleCelula = NULL;
+    GtkTreeIter iterCelule;
+    GtkTreeModel *modelTabelEEPROM = NULL;
+    gchar ttText[512];
+    gchar valCelulaBinara[34];
+    gchar valCelulaZecimala[10];
+    GValue valCelula = {0,};
     
-      return TRUE;
+    /* obține coordonate relative ale celulei la poziția curentă a cursorului mouse-ului */
+    gtk_tree_view_convert_widget_to_bin_window_coords(GTK_TREE_VIEW(fe->tvEEPROM), x, y, &relBinX, &relBinY);
+    gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(fe->tvEEPROM), relBinX, relBinY, &caleCelula, NULL,
+            NULL, NULL); /* cell_x, cell_y */
+
+    if (tree_view_get_cell_from_pos(GTK_TREE_VIEW(fe->tvEEPROM), relBinX, relBinY, &cellX, &cellY) == TRUE) {
+        if (cellX > 0) {
+            /* obține valoarea efectivă a celulei deasupra căreia ne aflăm */
+            modelTabelEEPROM = gtk_tree_view_get_model(GTK_TREE_VIEW(fe->tvEEPROM));
+            if (modelTabelEEPROM != NULL && gtk_tree_model_get_iter(modelTabelEEPROM, &iterCelule, caleCelula) == TRUE) {
+                gtk_tree_model_get_value(modelTabelEEPROM, &iterCelule, cellX, &valCelula);
+
+                /* leagă toate informațiile și înglobează-le în balon */
+                g_sprintf(ttText, "<b>%s</b>0x%03x\n<b>%s</b>%s\n<b>%s</b>%s",
+                        "Adresa: ", cellY * 16 + cellX - 1, 
+                        "Val. zecimala: ", sda_conv_sir_din_hex_in_zecimal(g_value_get_string(&valCelula), valCelulaZecimala), 
+                        "Val. binara: ", sda_conv_sir_din_hex_in_binar(g_value_get_string(&valCelula), valCelulaBinara));
+                gtk_tooltip_set_markup(indicatiiCelula, ttText);
+                gtk_tree_view_set_tooltip_cell(GTK_TREE_VIEW(fe->tvEEPROM), indicatiiCelula, caleCelula, NULL, NULL);
+
+                /* curățăm variabilele */
+                g_value_unset(&valCelula);
+                
+                return TRUE;
+            } else {
+                g_warning("Nu am putut obtine valoarea celulei (x:%d, y:%d).", cellX, cellY);
+            }
+        }
     }
-  }
-  
-  return FALSE;
+
+    return FALSE;
 }
 
 static gboolean 

@@ -81,7 +81,9 @@ extern "C" {
     extern gchar *sda_versiune_printf(Versiune *vers);
     extern FILE *sda_fopen_mkdir(const char *caleFis, const char *mode);
     extern gboolean sda_este_cale_fisier_valida(const char *caleFis);
-
+    
+    extern gchar *sda_conv_sir_din_hex_in_binar(const gchar *valHex, gchar *valRezultata);
+    extern gchar *sda_conv_sir_din_hex_in_zecimal(const gchar *valHex, gchar *valRezultata);
 #ifdef	__cplusplus
 }
 #endif

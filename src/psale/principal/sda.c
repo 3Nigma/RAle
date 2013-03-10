@@ -133,3 +133,82 @@ gboolean sda_este_cale_fisier_valida(const char *caleFis) {
             
     return caleFis[lungCale - 1] != '/' && caleFis[lungCale - 1] != '\\';
 }
+
+gchar *sda_conv_sir_din_hex_in_binar(const gchar *valHex, gchar *valRezultata) {
+    g_assert(valHex != NULL);
+    g_assert(valRezultata != NULL);
+    
+    gchar *grupSimbol = valRezultata;
+    gint cnt;
+    gint lungValHex = strlen(valHex);
+    
+    for(cnt = 0; cnt < lungValHex; ++cnt) {
+        switch(g_ascii_toupper(valHex[cnt])) {
+            case '0' :
+                grupSimbol = g_stpcpy(grupSimbol, "0000");
+                break;
+            case '1':
+                grupSimbol = g_stpcpy(grupSimbol, "0001");
+                break;
+            case '2':
+                grupSimbol = g_stpcpy(grupSimbol, "0010");
+                break;
+            case '3':
+                grupSimbol = g_stpcpy(grupSimbol, "0011");
+                break;
+            case '4':
+                grupSimbol = g_stpcpy(grupSimbol, "0100");
+                break;
+            case '5':
+                grupSimbol = g_stpcpy(grupSimbol, "0101");
+                break;
+            case '6':
+                grupSimbol = g_stpcpy(grupSimbol, "0110");
+                break;
+            case '7':
+                grupSimbol = g_stpcpy(grupSimbol, "0111");
+                break;
+            case '8':
+                grupSimbol = g_stpcpy(grupSimbol, "1000");
+                break;
+            case '9':
+                grupSimbol = g_stpcpy(grupSimbol, "1001");
+                break;
+            case 'A':
+                grupSimbol = g_stpcpy(grupSimbol, "1010");
+                break;
+            case 'B':
+                grupSimbol = g_stpcpy(grupSimbol, "1011");
+                break;
+            case 'C':
+                grupSimbol = g_stpcpy(grupSimbol, "1100");
+                break;
+            case 'D':
+                grupSimbol = g_stpcpy(grupSimbol, "1101");
+                break;
+            case 'E':
+                grupSimbol = g_stpcpy(grupSimbol, "1110");
+                break;
+            case 'F':
+                grupSimbol = g_stpcpy(grupSimbol, "1111");
+                break;
+            default:
+                g_debug("'sda_conv_sir_din_hex_in_binar' : Am dat de un caracter ce nu este in baza 16.");
+                break;
+        }
+    }
+    
+    return valRezultata;
+}
+
+gchar *sda_conv_sir_din_hex_in_zecimal(const gchar *valHex, gchar *valRezultata) {
+    g_assert(valHex != NULL);
+    g_assert(valRezultata != NULL);
+    
+    guint rezPartial;
+    
+    sscanf(valHex, "%x", &rezPartial);
+    g_sprintf(valRezultata, "%u", rezPartial);
+    
+    return valRezultata;
+}
