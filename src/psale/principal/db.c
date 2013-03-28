@@ -45,7 +45,7 @@ const char *db_obtine_adresa_actualizare() {
     sqlite3_stmt *af = NULL;
     sqlite3_value *rez = NULL;
 
-    if ((af = db_aplica_afirmatie("select LinkReinoire from " DB_NUME_TABEL_META)) != NULL) {
+    if ((af = db_aplica_afirmatie("select " DB_NUME_CAMP_LINK_ACTUALIZARE " from " DB_NUME_TABEL_META)) != NULL) {
         rez = sqlite3_column_value(af, 0);
         strcpy(adresaReinoire, (const char *) sqlite3_value_text(rez));
         sqlite3_finalize(af);

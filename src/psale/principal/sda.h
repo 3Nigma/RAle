@@ -32,6 +32,14 @@ extern "C" {
 #define DB_NUME_TABEL_META       "meta"
 #define DB_NUME_TABEL_MODIFICARI "modificari"
 
+#ifdef G_OS_WIN32
+#define DB_NUME_CAMP_LINK_ACTUALIZARE "LinkReinoireWin"
+#elif defined G_OS_UNIX
+#define DB_NUME_CAMP_LINK_ACTUALIZARE "LinkReinoireUnix"
+#else
+#error "Nu cunosc adresa de actualizare pentru sistemul de operare gazda!"
+#endif
+    
 #define OS_NUME_RPSALE "rpsale"
 #ifdef G_OS_WIN32
 #define ACTUALIZATOR_NUME_AP OS_NUME_RPSALE ".exe"
