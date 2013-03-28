@@ -404,19 +404,45 @@ static void btSalveazaLucrul_click(GtkWidget *bt, FormularCod *fc) {
 
     dlgSalveazaSursa = initializeaza_dialog_reluare_salvare(fc, SALVEAZA);
     if (gtk_dialog_run(GTK_DIALOG(dlgSalveazaSursa)) == GTK_RESPONSE_ACCEPT) {
-        gchar *caleSursa = NULL;
+        gchar *caleSursaUtilizator = NULL;
+        gchar *caleSursaProcesata = NULL;
         gchar *numeSimpluSursa = NULL;
 
-        caleSursa = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlgSalveazaSursa));
-        salveaza_continut_in_fisier(obtine_codul_sursa_curent(GTK_TEXT_VIEW(fc->txtVizCod)), caleSursa);
-        numeSimpluSursa = obtine_doar_nume_fisier(caleSursa);
+        caleSursaUtilizator = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlgSalveazaSursa));
+        /* verificăm extensia fișierului să fie corect setată. Dacă nu este, atunci o completăm noi. */
+        caleSursaProcesata = g_strnfill(strlen(caleSursaUtilizator) + 4, '\0');
+        switch(fc->lmFolosit) {
+            case C:
+                if(g_str_has_suffix(caleSursaUtilizator, ".c") == FALSE) {
+                    g_sprintf(caleSursaProcesata, "%s.c", caleSursaUtilizator);
+                } 
+                break;
+            case ASM:
+                if(g_str_has_suffix(caleSursaUtilizator, ".s") == FALSE) {
+                    g_sprintf(caleSursaProcesata, "%s.s", caleSursaUtilizator);
+                }
+                break;
+            default:
+                g_warning("Nu recunosc limbajul folosit la procesul de salvare a codului sursă!");
+                break;
+        }
+        if(strlen(caleSursaProcesata) == 0) {
+            /* fie utilizatorul a specificat extensia corectă în faza de alegere a numelui,
+               fie limbajul folosit nu este cunoscut. Încărcăm valoare implicită a fișierului destinație. */
+            g_stpcpy(caleSursaProcesata, caleSursaUtilizator);
+        }
+        salveaza_continut_in_fisier(obtine_codul_sursa_curent(GTK_TEXT_VIEW(fc->txtVizCod)), caleSursaProcesata);
 
+        /* actualizăm bara de informații a formularului de cod */
+        numeSimpluSursa = obtine_doar_nume_fisier(caleSursaUtilizator);
         fc->esteExempluIncarcat = FALSE;
         g_sprintf(fc->numeSimpluAfisat, "%s", numeSimpluSursa);
         actualizeaza_stare_nume_sursa(fc->lblStareNSursa, fc->numeSimpluAfisat, fc->esteExempluIncarcat, FALSE);
-        g_sprintf(fc->caleCurentaSursa, "%s", caleSursa);
+        g_sprintf(fc->caleCurentaSursa, "%s", caleSursaUtilizator);
 
-        g_free(caleSursa);
+        /* curățăm memoria locală */
+        g_free(caleSursaUtilizator);
+        g_free(caleSursaProcesata);
         g_free(numeSimpluSursa);
     }
     gtk_widget_destroy(dlgSalveazaSursa);
