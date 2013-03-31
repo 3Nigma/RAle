@@ -178,7 +178,10 @@ static void salveaza_continut_in_fisier(const gchar *continut, const gchar *nume
     fclose(pFile);
 }
 
-static void realizeaza_salvare_la_incheiere(FormularCod *fc) {
+static gboolean realizeaza_salvare_la_incheiere(FormularCod *fc) {
+    gboolean saInchidFormCod = TRUE;
+    gint raspunsLaDialog;
+    
     if (este_sursa_modificata(fc)) {
         /* există modificări curente.
          * Întreabă utilizatorul ce să facă cu ele */
@@ -190,19 +193,32 @@ static void realizeaza_salvare_la_incheiere(FormularCod *fc) {
         gtk_dialog_add_buttons(GTK_DIALOG(dlgIntrebareSalvare),
                 "Nu", GTK_RESPONSE_NO,
                 "Da", GTK_RESPONSE_YES,
+                "Anulează", GTK_RESPONSE_CANCEL,
                 NULL);
         gtk_dialog_set_default_response(GTK_DIALOG(dlgIntrebareSalvare), GTK_RESPONSE_YES);
-        if (gtk_dialog_run(GTK_DIALOG(dlgIntrebareSalvare)) == GTK_RESPONSE_YES) {
-            btSalveazaLucrul_click(NULL, fc);
+        raspunsLaDialog = gtk_dialog_run(GTK_DIALOG(dlgIntrebareSalvare));
+        switch(raspunsLaDialog) {
+            case GTK_RESPONSE_NO:
+                break;
+            case GTK_RESPONSE_YES:
+                btSalveazaLucrul_click(NULL, fc);
+                break;
+            case GTK_RESPONSE_CANCEL:
+                saInchidFormCod = FALSE;
+                break;
+            default:
+                break;
         }
         gtk_widget_destroy(dlgIntrebareSalvare);
     }
+    
+    return saInchidFormCod;
 }
 
 static gboolean frmCod_delev(GtkWidget *widget, GdkEvent *event, FormularCod *fc) {
-    realizeaza_salvare_la_incheiere(fc);
-
-    return FALSE;
+    gboolean saInchidFormularCod = !realizeaza_salvare_la_incheiere(fc);
+    
+    return saInchidFormularCod;
 }
 
 static void btIncarcaPeAle_click(GtkWidget *bt, FormularCod *fc) {
@@ -482,9 +498,9 @@ static void btReiaLucrul_click(GtkWidget *bt, FormularCod *fc) {
 }
 
 static void btParasesteFrm_click(GtkWidget *bt, FormularCod *fc) {
-    realizeaza_salvare_la_incheiere(fc);
-
-    gtk_widget_destroy(fc->frm);
+    if(realizeaza_salvare_la_incheiere(fc) == TRUE) {
+      gtk_widget_destroy(fc->frm);
+    }
 }
 
 static void btExpandatorActiuni_click(GtkWidget *bt, FormularCod *fc) {

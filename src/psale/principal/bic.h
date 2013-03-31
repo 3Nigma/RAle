@@ -28,23 +28,16 @@ typedef struct {
   void (*cereRepozitionareaCursorului)(GtkSourceBuffer *bcod, GtkSourceView *vcod, gint linieNoua);
 } BaraInfoCod;
 
-extern void 
-bic_initializeaza(BaraInfoCod *bicStructure);
+extern void bic_initializeaza(BaraInfoCod *bicStructure);
 
-extern void
-bic_ascunde(BaraInfoCod *bicStructure);
+extern void bic_ascunde(BaraInfoCod *bicStructure);
 
-extern void
-bic_arata(BaraInfoCod *bicStructure);
+extern void bic_arata(BaraInfoCod *bicStructure);
 
-extern void 
-bic_text_initializeaza(BaraInfoCod *bicStructure);
+extern void bic_text_initializeaza(BaraInfoCod *bicStructure);
 
-extern void 
-bic_text_adauga_linie(BaraInfoCod *bicStructure, const gchar *msg);
+extern void bic_text_adauga_linie(BaraInfoCod *bicStructure, const gchar *msg);
 
-extern gboolean 
-bic_text_contine_informatii_utile(BaraInfoCod *bicStructure);
-
+extern gboolean bic_text_contine_informatii_utile(BaraInfoCod *bicStructure);
 
 #endif
