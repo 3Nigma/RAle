@@ -15,12 +15,28 @@
 #define MAX_SHOWN_IBLINES_CNT          5
 #define LINE_PART_REFORMULATION_FORMAT "\n<b><a href=\"%s\" title=\"Sari la respectiva linie\">Linia %s</a></b>: "
 
-struct {
+static struct {
   const gchar *tiparGcc;
   const gchar *tiparInlocuire;
   gint nrParsariInlocuire;
 } InlocuiriMesajeGcc[] = {
-  /* TODO: adaugă formate și interpretări pentru mesaje GCC-ului aici */
+  {"\\): undefined reference to `([\\w]+)", "\nNu cunosc adresa '%s'.", 1},  /* [0] = referința lipsă */
+  {"Assembler messages", NULL, -1}, /* --- */
+  {"ld returned 1 exit status", NULL, -1}, /* --- */
+  {"\\.o: In function `", NULL, -1}, /* --- */
+  {"Warning: end of file not at end of a line", "\nVă rugăm adăugați o linie goală la sfârșitul codului dumneavoastră.", 0}, /* --- */
+  {"Warning: end of file in comment", "\nVă rugăm adăugați o linie goală la sfârșitul codului dumneavoastră.", 0}, /* --- */
+  {"([\\d]+): Error: junk at end of line, first unrecognized character is `(\\w)", LINE_PART_REFORMULATION_FORMAT "Sfârșitul liniei conține caractere necunoscute! Primul este '%s'.", 2}, /* [0] = nr. linie, [1] = primul caracter problematic */
+  {"([\\d]+): Error: number must be positive and less than ([\\d]+)", LINE_PART_REFORMULATION_FORMAT "Numărul trebuie să fie pozitiv și mai mic decât %s.", 2}, /* [0] = nr. linie, [1] = limita superioară a valorii */
+  {"([\\d]+): Error: unknown opcode `([\\w]+)", LINE_PART_REFORMULATION_FORMAT "Nu recunosc instrucțiunea '%s'.", 2}, /* [0] = nr. linie, [1] = cuvântul neînțeles */
+  {"([\\d]+): Error: unknown pseudo-op: `(.[\\w]+)", LINE_PART_REFORMULATION_FORMAT "Nu recunosc directiva '%s'.", 2}, /* [0] = nr. linie, [1] = directiva necunoscută */
+  {"([\\d]+): Error: garbage at end of line", LINE_PART_REFORMULATION_FORMAT "Linia se termină prin caractere invalide.", 1}, /* [0] = nr. linie */
+  {"([\\d]+): Error: register name or number from 0 to 31 required", LINE_PART_REFORMULATION_FORMAT "Registrul general nu este cunoscut! Alegeți unul din domeniul {0-31}.", 1}, /* [0] = nr. linie */
+  {"([\\d]+): Error: `(.)' required", LINE_PART_REFORMULATION_FORMAT "Necesită caracterul '%s'", 2}, /* [0] = nr. linie, [1] = caracterul ce lipsește */
+  {"([\\d]+): Error: constant value required", LINE_PART_REFORMULATION_FORMAT "Necesită o valoare constantă.", 1}, /* [0] = nr. linie */
+  {"([\\d]+): Error: pointer register (.) required", LINE_PART_REFORMULATION_FORMAT "Necesită registrul '%s'.", 2}, /* [0] = nr. linie, [1] = registrul ce lipsește */
+  {"([\\d]+): Error: missing operand", LINE_PART_REFORMULATION_FORMAT "Nu are operand.", 1}, /* [0] = nr. linie */
+  {"([\\d]+): Error: (.+)", LINE_PART_REFORMULATION_FORMAT "%s", 2}, /* nu am recunoscut mesajul curent, încearcă o procesare generică */
   {NULL, NULL, 0}
 };
 
@@ -28,8 +44,7 @@ static gchar *transformaMesajulCompilatorului(const gchar *textOriginal);
 static GMatchInfo *aplicaTiparPrezent(const gchar *txtTipar, const gchar *txtPropriu);
 static gboolean raspundeLaClickPeLinie(GtkLabel *lbl, gchar *uri, BaraInfoCod *bics);
 
-void 
-bic_initializeaza(BaraInfoCod *bicStructure) {
+void bic_initializeaza(BaraInfoCod *bicStructure) {
   if(bicStructure == NULL) return;
   
   GtkWidget *baraInfoContent = NULL;
@@ -48,23 +63,20 @@ bic_initializeaza(BaraInfoCod *bicStructure) {
   g_signal_connect(bicStructure->text, "activate-link", G_CALLBACK(raspundeLaClickPeLinie), bicStructure);
 }
 
-void
-bic_arata(BaraInfoCod *bicStructure) {
+void bic_arata(BaraInfoCod *bicStructure) {
   if(NULL == bicStructure) return;
   
   gtk_info_bar_set_message_type(GTK_INFO_BAR(bicStructure->wid), GTK_MESSAGE_WARNING);
   gtk_widget_show(bicStructure->wid);
 }
 
-void
-bic_ascunde(BaraInfoCod *bicStructure) {
+void bic_ascunde(BaraInfoCod *bicStructure) {
   if(bicStructure == NULL) return;
   
   gtk_widget_hide(bicStructure->wid);
 }
 
-void 
-bic_text_initializeaza(BaraInfoCod *bicStructure) {
+void bic_text_initializeaza(BaraInfoCod *bicStructure) {
   if(NULL == bicStructure) return;
   
   bicStructure->areLiniiUtile = FALSE;
@@ -72,8 +84,7 @@ bic_text_initializeaza(BaraInfoCod *bicStructure) {
   gtk_label_set_markup(GTK_LABEL(bicStructure->text), "<i>Am următoarele de raportat :</i>");
 }
 
-void 
-bic_text_adauga_linie(BaraInfoCod *bicStructure, const gchar *msg) {
+void bic_text_adauga_linie(BaraInfoCod *bicStructure, const gchar *msg) {
   if(NULL == bicStructure || NULL == msg) return;
   
   gchar *currentIBLblText = NULL;
@@ -97,111 +108,54 @@ bic_text_adauga_linie(BaraInfoCod *bicStructure, const gchar *msg) {
   g_free(reformulatedMessage);
 }
 
-gboolean 
-bic_text_contine_informatii_utile(BaraInfoCod *bicStructure) {
+gboolean bic_text_contine_informatii_utile(BaraInfoCod *bicStructure) {
   if(NULL == bicStructure) return FALSE;
   
   return bicStructure->areLiniiUtile;
 }
 
-static gchar *
-transformaMesajulCompilatorului(const gchar *textOriginal) {
+static gchar *transformaMesajulCompilatorului(const gchar *textOriginal) {
   gchar *textRezultat = NULL;
   GMatchInfo *infoTipar = NULL;
+  gint idStructuraTiparMesaj;
   
   textRezultat = g_new0(gchar, 256);
 
-  if(aplicaTiparPrezent("Assembler messages", textOriginal) != NULL ||
-     aplicaTiparPrezent("ld returned 1 exit status", textOriginal) != NULL ||
-     aplicaTiparPrezent("\\.o: In function `", textOriginal) != NULL ) {
-     /* ignorăm unele formate de mesaje */    
-  } else if((infoTipar = aplicaTiparPrezent("\\): undefined reference to `([\\w]+)",
-                                            textOriginal)) != NULL) {
-	  /* [0] = referința lipsă */
-	  g_snprintf(textRezultat, 256, "\nNu cunosc adresa '%s'.", 
-	             g_match_info_fetch(infoTipar, 1));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: junk at end of line, first unrecognized character is `(\\w)",
-                                            textOriginal)) != NULL) {
-	  /* [0] = nr. linie, [1] = primul caracter problematic */
-	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Sfârșitul liniei conține caractere necunoscute! Primul este '%s'.", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1),
-	             g_match_info_fetch(infoTipar, 2));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: number must be positive and less than ([\\d]+)",
-                                            textOriginal)) != NULL) {
-	  /* [0] = nr. linie, [1] = limita superioară a valorii */
-	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Numărul trebuie să fie pozitiv și mai mic decât %s.", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1), 
-	             g_match_info_fetch(infoTipar, 2));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: unknown opcode `([\\w]+)",
-                                            textOriginal)) != NULL) {
-	  /* [0] = nr. linie, [1] = cuvântul neînțeles */
-	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Nu recunosc instrucțiunea '%s'.", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1), 
-	             g_match_info_fetch(infoTipar, 2));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: unknown pseudo-op: `(.[\\w]+)",
-                                            textOriginal)) != NULL) {
-	  /* [0] = nr. linie, [1] = directiva necunoscută */
-	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Nu recunosc directiva '%s'.", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1), 
-	             g_match_info_fetch(infoTipar, 2));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: garbage at end of line",
-                                            textOriginal)) != NULL) {
-	  /* [0] = nr. linie */
-	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Linia se termină prin caractere invalide.", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: register name or number from 0 to 31 required",
-                                            textOriginal)) != NULL) {
-	  /* [0] = nr. linie */
-	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Registrul general nu este cunoscut! Alegeți unul din domeniul {0-31}.", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: `(.)' required",
-                                            textOriginal)) != NULL) {
-	  /* [0] = nr. linie, [1] = caracterul ce lipsește */
-	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Necesită caracterul '%s'", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1),
-	             g_match_info_fetch(infoTipar, 2));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: constant value required",
-                                            textOriginal)) != NULL) {
-	  /* [0] = nr. linie */
-	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Necesită o valoare constantă.", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: pointer register (.) required",
-                                            textOriginal)) != NULL) {
-	  /* [0] = nr. linie, [1] = registrul ce lipsește */
-	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Necesită registrul '%s'.", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1),
-	             g_match_info_fetch(infoTipar, 2));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: missing operand",
-                                            textOriginal)) != NULL) {
-	  /* [0] = nr. linie */
-	  g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "Nu are operand.", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1));
-	  g_match_info_free(infoTipar);
-  } else if((infoTipar = aplicaTiparPrezent("([\\d]+): Error: (.+)",
-                                            textOriginal)) != NULL) {
-    /* nu am recunoscut mesajul curent, încearcă o procesare generică */
-    g_snprintf(textRezultat, 256, LINE_PART_REFORMULATION_FORMAT "%s", 
-	             g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1),
-	             g_match_info_fetch(infoTipar, 2));
-  } else {
+  for (idStructuraTiparMesaj = 0; InlocuiriMesajeGcc[idStructuraTiparMesaj].tiparGcc != NULL; ++idStructuraTiparMesaj) {
+	if ((infoTipar = aplicaTiparPrezent(InlocuiriMesajeGcc[idStructuraTiparMesaj].tiparGcc, textOriginal)) != NULL) {
+      switch(InlocuiriMesajeGcc[idStructuraTiparMesaj].nrParsariInlocuire) {
+      case -1:
+	    break;
+	  case 0:
+		g_snprintf(textRezultat, 256, InlocuiriMesajeGcc[idStructuraTiparMesaj].tiparInlocuire);
+        break;
+      case 1:
+        g_snprintf(textRezultat, 256, InlocuiriMesajeGcc[idStructuraTiparMesaj].tiparInlocuire, 
+	               g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1));
+        break;
+      case 2:
+        g_snprintf(textRezultat, 256, InlocuiriMesajeGcc[idStructuraTiparMesaj].tiparInlocuire, 
+	               g_match_info_fetch(infoTipar, 1), g_match_info_fetch(infoTipar, 1),
+	               g_match_info_fetch(infoTipar, 2));
+        break;
+      default:
+        g_warning("Mesajul gcc are un număr negestionat de parametrii!");
+        break;
+      }
+      g_match_info_free(infoTipar);
+      break;
+	}
+  }
+
+  if(InlocuiriMesajeGcc[idStructuraTiparMesaj].tiparGcc == NULL) {
+    /* nu s-a potrivit niciun tipar în nici un fel. Întoarce textul inițial */
     g_snprintf(textRezultat, 256, "%s", textOriginal);
   }
-  
+ 
   return textRezultat;
 }
 
-static GMatchInfo *
-aplicaTiparPrezent(const gchar *txtTipar, const gchar *txtPropriu) {
+static GMatchInfo *aplicaTiparPrezent(const gchar *txtTipar, const gchar *txtPropriu) {
   GRegex *tipar = NULL;
   GMatchInfo *containerPotriviri = NULL;
 
@@ -217,8 +171,7 @@ aplicaTiparPrezent(const gchar *txtTipar, const gchar *txtPropriu) {
   return containerPotriviri;
 }
 
-static gboolean 
-raspundeLaClickPeLinie(GtkLabel *lbl, gchar *uri, BaraInfoCod *bics) {
+static gboolean raspundeLaClickPeLinie(GtkLabel *lbl, gchar *uri, BaraInfoCod *bics) {
   /* funcția este apelată atunci când utilizatorul dă click pe un mesaj ('Linie %d') din InfoBar 
    * 'uri' este numărul liniei la care face referire observația din InfoBar */
   gint64 nrLinie = 0;
