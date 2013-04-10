@@ -102,10 +102,11 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
     CreatePipe(&opStdOutPipe[0], &opStdOutPipe[1], &securityAttributes, 0);
     CreatePipe(&opStdErrPipe[0], &opStdErrPipe[1], &securityAttributes, 0);
 
-    if (os_win_executa_com(opStdOutPipe[1], NULL, opStdErrPipe[1], com) == 0) {
-        rezConsola = g_new0(RezultatOpConsola, 1);
+    os_win_executa_com(opStdOutPipe[1], NULL, opStdErrPipe[1], com);
+    rezConsola = g_new0(RezultatOpConsola, 1);
 
-        /* golim conținutul fișierului standard de ieșire */
+    if (NULL != opStdOutPipe[0] && NULL != opStdOutPipe[1]) {
+		/* golim conținutul fișierului standard de ieșire */
         rezConsola->stdOutBuff = g_new0(gchar, OS_BUCATA_CONS_BUFF);
         rezConsola->capacitateInStdOut += OS_BUCATA_CONS_BUFF;
         while (ReadFile(opStdOutPipe[0], (LPVOID) (&rezConsola->stdOutBuff[rezConsola->octetiInStdOut]), 1, (LPDWORD) (&nrOctetiCititi), NULL)) {
@@ -125,10 +126,12 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
         }
         CloseHandle(opStdOutPipe[0]);
         CloseHandle(opStdOutPipe[1]);
-
-        /* golim conținutul fișierului standard de erori */
-        rezConsola->stdErrBuff = g_new0(gchar, OS_BUCATA_CONS_BUFF);
-        rezConsola->capacitateInStdErr += OS_BUCATA_CONS_BUFF;
+    }
+    
+    if (NULL != opStdErrPipe[0] && NULL != opStdErrPipe[1]) {
+       /* golim conținutul fișierului standard de erori */
+       rezConsola->stdErrBuff = g_new0(gchar, OS_BUCATA_CONS_BUFF);
+       rezConsola->capacitateInStdErr += OS_BUCATA_CONS_BUFF;
         while (ReadFile(opStdErrPipe[0], (LPVOID) (&rezConsola->stdErrBuff[rezConsola->octetiInStdErr]), 1, (LPDWORD) (&nrOctetiCititi), NULL)) {
             if (nrOctetiCititi == 0) {
                 break;
@@ -144,7 +147,7 @@ RezultatOpConsola *os_executa_comanda_si_obtine_rezultat(gchar *com) {
         }
         CloseHandle(opStdErrPipe[0]);
         CloseHandle(opStdErrPipe[1]);
-    }
+    }    
 #elif defined G_OS_UNIX
     int stdOutFD[2];
     int stdErrFD[2];
