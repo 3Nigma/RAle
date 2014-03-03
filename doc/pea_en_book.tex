@@ -887,11 +887,17 @@ To find the decimal value of a hex number, you could accomplish this as a 2 step
 \end{enumerate}
 This method allows for a reverse --decimal to hex-- procedure as well.
 
-Do you see a problem here? Being an extension to the decimal symbols, this becomes a source of confusion. What is the diference between "56" expressed in  decimal and "56" expresed in the hex system? They are identical! To resolve this issue, there are 2 solutions: either subscript the value with its base symbol count: 2 for binary, 10 for decimal and 16 for hexadecimal. Thus, 110 in decimal becomes $110_{10}$, binary has it expressed as $110_2$, while the same number written in hexadecimal is $110_{16}$.
+Do you see a problem here? Being an extension to the decimal symbols, this becomes a source of confusion. For instance, what is the diference between "56" expressed in  decimal and "56" expresed in the hex system? They are identical the way they are written!
 
-If subscripting is not available, we have the alternative of a prefix notation: \textbf{0b} for binary, \textbf{0x} for hex and a no-prefix for the more general case of decimal representations. In this situation, 110 is considered to be in decimal format, 0x110 is a hex number and 0b110 is to be interpreted as a binary group. It's worth mentioning that we will be using this way of number representation when we will comunicate with the pAle board.
+To resolve this issue, we have 2 solutions. The first one is to subscript the value with its base symbol count: 2 for binary, 10 for decimal and 16 for hexadecimal. Thus, 110 in decimal becomes $110_{10}$, binary has it expressed as $110_2$, while the same number written in hexadecimal is $110_{16}$.
 
-Having this said, we have now the basis to carry on with another interesting topic in computer behavior. We will talk next about memories \ldots
+If subscripting is not available --which is the case when we write these values using a computer--, we have the alternative of a prefix notation: \textbf{0b} for binary, \textbf{0x} for hex and a no-prefix for the more general case of decimal representations. In this situation, 110 is considered to be in decimal format, 0x110 is a hex number and 0b110 is to be interpreted as a binary group. It's worth mentioning that we will be using this way of number representation when we will comunicate with the pAle board.
+
+Before we carry on, I think it's better to clarify the dimmension characteristic as well. We talked about groups of binary symbols having an arbitrary length $n$. In practice, due to hardware constrains, this value is fixed by the computer manufacturer. Traditionally and conventionally, $n$ was choosen to be 8, giving what is called "the atom of factual information", \textbf{a byte}. Also, computer people regard one binary symbol as being one \textbf{bit} of information.
+
+Of course, longer groups of binary symbols (bits) are possible, but they are, by convetion and implementation, a multiple of bytes.
+
+Having this said, I believe we have now the foundations to carry on with another interesting topic in computer behavior. We will talk next about memories \ldots
 
 \section{Here comes the memories}
 
