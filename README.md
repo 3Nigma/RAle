@@ -23,5 +23,7 @@ If you plan to build this package as a DIY challenge, note there are 3 elements 
 
 ## Other info ##
 >Main Author : **Victor ADĂSCĂLIȚEI**  
+
 >License         : [**Creative Commons License**] (http://creativecommons.org/) of type [BY-NC-SA] (http://creativecommons.org/licenses/by-nc-sa/3.0/en/) for the book (any language) and _psAle_, and [**CERN OHL v1.1**] (http://www.ohwr.org/projects/cernohl/wiki/) for the board. Since **PEA** is also using other *open source* libraries/projects, their respectful licenses will be indicated and mentioned on an individual basis.
+
 >Email           : admin@tuscale.ro
