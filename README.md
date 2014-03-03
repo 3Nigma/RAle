@@ -1,29 +1,29 @@
-## Vedere Generală ##
-<center>![Ansamblu RAle] (http://i48.tinypic.com/a3cvgg.png)</center>
+## General view ##
+<center>![PEA trio] (http://i48.tinypic.com/a3cvgg.png)</center>
+###^- Image pending for internationalization :-)###
 
-## Ce avem aici ? ##
-**RAle** ["*Romanian Ale*" pentru străini, iar "*Ale*", pentru noi] este un **pachet educațional complet**, **dezvoltat sub licență gratuită**, menit să-i învețe pe oricine dorește, chiar și pe școlari, tainele lucrului cu circuite electronice inteligente/programabile. _Licența gratuită_ permite oricui să folosească materialul proiectului în scopuri personale, necomerciale, **în mod gratuit** prin simpla păstrarea a informațiilor referitoare la autorul de drept intelectual al proiectului (vedeți tipul complet de licență folosit mai jos în pagină).  
+## What do we have here? ##
+**PEA** [Romanian for *Pachetul Educațional Ale*; *Ale Educational Package*, in English] is, like its name says, a **complete** and **free educational package** meant to teach anyone who desires (even high school pupils) the art of working with these marvelous feat of electrical engineering called *microcontrollers*. When I say **free** I truly mean it! You have no virutally restriction in using these materials (in parts or as a whole) for personal and non-commercial purposes. I only require that you acknowledge and maintain the informations regarding the true intellectual author of this project. Please check further down for a proper license association.
   
-Fiind un _pachet_ el este alcătuit din următoarele elemente:
-* o plăcuță electronică pe care se poate exersa noțiunile învățate
-* o cărțulie care învață cititorul cum să folosească plăcuța utilizând exemple simple și ușor de urmărit
-* o aplicație denumită _psAle_ prin care se poate comunica (_programa_ este termenul mai corect) plăcuța după cum dorește utilizatorul
+It's a package since it is composed of 3 important and interdependent elements:
+* a board -called _pAle_- onto which the learner can practice what he has learned
+* a book that teaches the reader how to use the board through carefully selected, easy to follow examples
+* a custom application -called _psAle_- through which the user applications can be transmited to the board
 
-Alături de **Ale** vom intra într-o lume a tuturor posibilităților și vom vedea, totodată, cum _funcționează_ viața noastră modernă.
+**PEA** was brought together, presented to you and motivated by the author's desire to prove his belief that this wonderful domain isn't as hard as it seems. This is true; either if you are a hobbyist, member of an electronics community or singing in a choir in a church. It does not matter! As long as the reader has the curiosity and is willing to make that extra step, **PEA is for you**!
 
-## Construirea pachetului ##
-Fiind alcătuit din trei elemente, vom necesita trei acțiuni pentru a transpune pachetul *Ale* din sfera virtuală în lumea reală și anume :
-* tipărirea cărțuliei dacă ea este dificilă de urmărit în format electronic (_aproximativ 200 de pagini_)
-* construirea plăcuței folosind **noțiuni de electronică** și *disponibilitatea unui programator inițial pentru a o configura*
-  * proiectul electric (fișierele *sch* și *brd*) îl puteți găsi [aici](RAle/tree/master/egl/v0.9)
-* construirea aplicației principale _psAle_ sau descărcarea unei versiuni gata construite *[în curând]*
+## Building the package ##
+If you plan to build this package as a DIY challenge, note there are 3 elements that can be brought to life:
+* you can print the book (cca. 230 pages, as of this writing) for a traditional, easy-to-read, experience. Or you can choose not to and use the available free ebook, saving some trees in the process!
+* you can build the PCB (Eagle *sch* and *brd* files can be found in the *egl* folder). This will require some electrical engineering knowledge as well as an initial AVR programmer for configuring the board
+* you can either build _psAle_ or download a binary version *[coming soon]*
 
-**Dacă aceste etape vi se par dificil de urmat și/sau implementat, mai există posibilitatea achiziționării, prin plata unei sume modice, a unui _pachet complet construit_ de pe saitul www.tuscale.ro .**
+## I want to participate ##
+**Super!** and I'm honored! Please write to me at admin@tuscale.ro and we will take it from there!
 
-## Vreau să particip ##
-**Fantastic!** Contactează-ne la adresa admin@tuscale.ro și vedem de unde pornim!
+## Other info ##
+>Main Author : **Victor ADĂSCĂLIȚEI**  
 
-## Informații adiționale ##
->Autor principal : **Victor ADĂSCĂLIȚEI**  
->Licență         : [**Creative Commons License**] (http://creativecommons.org/) de tip [BY-NC-SA] (http://creativecommons.org/licenses/by-nc-sa/3.0/ro/) pentru cărțulie și aplicația _psAle_, iar [**CERN OHL v1.1**] (http://www.ohwr.org/projects/cernohl/wiki/) pentru plăcuță. Datorită faptului că **Ale** utilizează și înglobează și alte librării/proiecte *open source*, licențele proiectelor respective vor fi menționate la momentul oportun.  
->Email           : admin@tuscale.ro  
+>License         : [**Creative Commons License**] (http://creativecommons.org/) of type [BY-NC-SA] (http://creativecommons.org/licenses/by-nc-sa/3.0/en/) for the book (any language) and _psAle_, and [**CERN OHL v1.1**] (http://www.ohwr.org/projects/cernohl/wiki/) for the board. Since **PEA** is also using other *open source* libraries/projects, their respectful licenses will be indicated and mentioned on an individual basis.
+
+>Email           : admin@tuscale.ro
