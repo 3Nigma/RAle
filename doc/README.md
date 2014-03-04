@@ -1,36 +1,34 @@
-## O primă vedere ##
-![Colaj Conținut Cărțulie v0.9](http://i50.tinypic.com/24doaag.png)
+## A first look ##
+![Book collage](http://i50.tinypic.com/24doaag.png)
+###^- Image pending for internationalization :-)###
 
-## O privire în ansamblu ##
-Cel mai important fișier din acest director îl reprezintă cărțulia în format electronic care acompaniază atât plăcuța, cât și aplicația _psAle_. În **pachetul fizic**, ea apare în aceste două moduri din două motive :
-* Există oameni cărora mai degrabă le place să asimileze informații dintr-un **document fizic**, tangibil, scris *așa cum*
-* Există și oameni care nu au nici o problemă cu citirea materialelor în format electronic, ba chiar o favorizează față de alternativa clasică.
+## Going deeper ##
+The most important files from this folder are the electronic books themselves. As of this moment, there is a complete Romanian version and an, in-progress, English version.
 
-În funcție de cititor, metoda aleasă rămâne la liberul său arbitru. Totuși, se pot găsic căteva indicații : 
-* Materialul scris permite posibilitatea **luării de notițe**, acțiune frecventă atunci când se învață serios ceva nou.
-* Materialul fizic prezintă o legătură directă cu informația aplicându-se foarte bine proverbul românesc *Ce-i în mână nu-i minciună!*. Acest factor poate de asemenea să stimuleze interesul cititorului pentru conținut.
-* Materialul electronic poate fi navigat mai ușor și prezintă avantajul de a fi mai strâns corelat cu aplicația mai ales la capitolul de exemple.
+These materials were thought of as a key learning material through which knowledge gets passed around. This knowledge is then used to operate the PEA application control the _pAle_ board.
 
-Totuși, nu trebuie să pierdem din vedere faptul că mai important decât modalitatea de a parcurge cărțulia o reprezintă chiar **conținutul ei**. În acest sens, **documentul cuprinde câteva zeci de pagini** (peste 150 la ultima numărătoare) și este structurat în trei părți :
-* Începem cu o introducere în lumea calculatoarelor în general și a micro-creierașelor în particular,
-* Continuăm cu o serie de exemple interesante (*__multe__ exemple!*) de dificultate *crescendo* ce se pot imediat aplica pe plăcuță prin aplicația *psAle* *și* 
-* Încheiem cu o serie de indicații referitoare la posibilele căi de urmat în viitor.
+You can have it printed or use it as it is. It's your choice! Maybe using it in a electronic format you are more environmental-friendly (which I highly recommend) while having it physical, you can have a better interaction with the material (taking side notes, and so on) ... in the end, it doesn't matter and it's all a matter of personal taste.
 
-Finalul real al manuscrisului îl constituie o serie de pagini adiționale care vin în sprijinul cititorului. Ele pot fi mai degrabă considerate un fel de *notițe cu indicații utile*, dacă vreți.
+Having this said, let's look at the structure of this written material. In this sense, it's a rather big book (more then 230 pages, as of this writing) structured in 3 parts :
+* We start of with a historical and functional introduction to computers and microcontrollers
+* We then move on and get to tackle a collection of progressively difficult examples (*__many__ examples!*) deployable on the _pAle_ board
+* We end our journey by giving some future directions to follow
 
-## Cum pot deschide documentul ##
-Cărțulia a fost inițial concepută pe editorul **gratuit** și online de documente oferit de [Google](www.google.com). Din motive de funcționalitate, editorul fiind unul funcțional, dar incomplet pentru nevoile manuscrisului, s-a trecut la completarea și corectarea conținutului pe o aplicație locală **tot gratuită** de tip office. Pentru aceasta s-a ales [*LibreOffice Writter de versiune 3 (v3.5.4.2, mai precis)*](http://ro.libreoffice.org/).  
-Deși acest document se poate deschide și cu alte editoare, pentru a beneficia de o compatibilitate maximă atunci când discutăm atât despre editarea, dar mai ales de vizualizarea conținutului, **vă recomand** să folosiți editorul invocat mai sus. _Pe lângă faptul că nu vă costă nimic, chiar este bun!_
+The document truly ends with a series of additional pages that assist the reader's saga, providing solution variants to proposed exercises, aiding in the installation and operation of _psAle_, etc.
 
-## Noțiuni de legalitate ##
-Materialul este pus **gratuit** la dispoziția publicului sub o licență [Creative Commons License](http://creativecommons.org/) de tip !['BY - NC - SA' Logo](http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png). Acest lucru este precizat și în document în sine undeva încă din primele sale pagini.  
-Pe scurt, această licență vă dă dreptul să :
-* Folosiți materialul gratuit,
-* Să utilizați documentul în scopuri personale, necomerciale *și*
-* Dacă modificați conținutul, lucru ce aveți permisiunea să o faceți, trebuie să licențiați modificarea dumneavoastră sub aceeași licență ca cea utilizată de cărțulie.
+## How can I open the book? ##
+The book was first written in my native language (Romanian) and was done using Google's drive editor. Later, due to lack of functionality, I ported the text to a free word editor, namely [*version 3.5.4.2 of 'LibreOffice Writter'*](http://ro.libreoffice.org/).  
+The, more recent and updated, English version of the book was written using a proper typesetting -LaTeX- language in an editor called [Texmaker](http://www.xm1math.net/texmaker/).
 
-De asemenea, trebuie să recunoașteți autorul de drept legal și intelectual asupra conținutului integral prezent în acest manuscris.  
-Pentru mai multe detalii **în română** accesați cu încredere [pagina organizației](http://creativecommons.org/licenses/by-nc-sa/3.0/ro/).
+## Legalities ##
+The PEA book (any language) is made available **for free** to the general public under a [Creative Commons License](http://creativecommons.org/) of type !['BY - NC - SA' Logo](http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png). This is also specified in the documents themselves.  
+In short, this type of license allows you to:
+* Use this material for free
+* Use these documents for personal, non-profit reasons
+* You are allowed to modify the content if you desire but any such action must be licensed using the same license type and the original author must be recognized and specified inside the new knowledge realm
 
-## Aveți o idee despre conținut ? ##
-*Super!* Ne-ar face mare plăcere să o auzim! Fie că este vorba de o corectare, de o îmbunătățire sau pur și simplu vreți să ne lăsați o impresie despre manuscris, transmiteți-ni-o pe următoarea adresă de email : admin@tuscale.ro . Dacă vom avea contribuitori, vom avea grijă să-i menționăm într-o secțiune specială din cărțulie!
+For more informations regarding this license type, check out [this page](http://creativecommons.org/licenses/by-nc-sa/3.0/en/).
+
+## Do you have any suggestions regarding this content? ##
+*Wonderful!* I would love to hear them!  
+Either it's a correction, an improvement or you just want to express a feeling regarding what you have read, **JUST WRITE ME**! You know my address (admin@tuscale.ro). I appreciate each and every comment, especially if it leads to content improvements! Of course, your integrated feedback will guarantee, apart from my gratitude, your name mentioning in a special region inside the book!
