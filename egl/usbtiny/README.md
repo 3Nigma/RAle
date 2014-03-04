@@ -1,22 +1,22 @@
-## Ce avem noi aici ? ##
-<center>![Info Conținut Director Curent](http://i45.tinypic.com/2434u3p.png)</center>
+## What do we have here ? ##
+<center>![Content of current folder](http://i45.tinypic.com/2434u3p.png)</center>
 
-## De unde până unde ? ##
-În acest director se găsesc fișierele electrice (circuitul logic - *sch* și amplasarea fizică a componentelor - *brd*) a proiectului [USBTinyISP versiune 2.0](http://www.ladyada.net/make/usbtinyisp/index.html).  
-De pe saitul producătorului aflăm următoarele lucruri despre circuit :
+## Going into some details ##
+This folder contains the [eCAD](http://en.wikipedia.org/wiki/Electronic_design_automation) files -both schematic *.sch* and layout *.brd*- of the [USBTinyISP](http://www.ladyada.net/make/usbtinyisp/index.html) programmer **version 2.0**.  
+From the developer's site, we find out the following about this circuit:
 
-* Este un programator *open-source/hardware* pentru microcontrollere de tip [*AVR*](http://en.wikipedia.org/wiki/Atmel_AVR) cu interfață de control de tip USB,
-* Gândit ca și soluție **ieftină și rapidă** de programare a circuitelor inteligente de tip *AVR*,
-* Spre deosebire de alte programatoare, nu necesită alimentare separată! Toată puterea de care are nevoie programatorul o extrage direct din legătura USB cu gazda. Mai mult, datorită consumului său redus, rămâne suficientă putere pentru a alimenta circuitul programat dacă acest lucru se dorește,
-* Dispune de o viteză mare de scriere (max. 1Kb/s) și citire (maximum 2Kb/s) având capacitatea de a accesa circuite cu interfață de programare serială ([*ISP*](http://en.wikipedia.org/wiki/In-System_Programming)) ce dispun de până la 64KiloOcteți memorie de program,
-* Are 2 LED-uri indicatoare: unul pentru a semnala faptul că legătura USB a fost stabilită și unul pentru a arăta progresul acțiunii curente,
-* Are suport pentru sistemul de operare Linux și Windows ([*drivere*](http://en.wikipedia.org/wiki/Device_driver)) și aplicație gratuită ([*avrdude*](http://www.nongnu.org/avrdude/)) de transfer a programului conceput din calculator pe microcontroller-ul programat,
-* Codul său sursă (poartă denumirea de [*firmware*](http://en.wikipedia.org/wiki/Firmware)) este distribuit sub o licență de tip *open-source*, mai specific de tip [*GPL*](http://www.gnu.org/copyleft/gpl.html), iar design-ul plăcuței fizice vine sub licență [*Creative Commons Lincense : BY - SA*](http://creativecommons.org/),
-* Este un circuit ideal de construit de către studenți și/sau hobby-iști.
+* It is an open-source hardware programmer for [*AVR*](http://en.wikipedia.org/wiki/Atmel_AVR) microcontrollers
+* It is conceived as a *cheap and efficient* USB programmer for *AVR*s
+* Unlike other programmers, it doesn't require a separate power supply! Its power comes directly from the host's USB interface. Better still, thanks to its low power footprint, it can also be used to supply the targeted microcontroller circuit
+* It has a writing speed of max. 1Kb/s and a reading speed of max. 2Kb/s, being able to program [*ISP*](http://en.wikipedia.org/wiki/In-System_Programming) devices that have up to 64K of program memory
+* It comes with 2 status LEDs: one that shows that the USB link is working and another one that shows any current upload/download progress
+* It is both supported by Linux and Windows OSes ([*driver*](http://en.wikipedia.org/wiki/Device_driver)) and free supporting application ([*avrdude*](http://www.nongnu.org/avrdude/))
+* Its [*firmware*](http://en.wikipedia.org/wiki/Firmware) is made available under an *open-source* license of [*GPL*](http://www.gnu.org/copyleft/gpl.html) type, while the board design is distributed under the [*Creative Commons Lincense : BY - SA*](http://creativecommons.org/)
+* Its a perfect circuit to be built by students and/or hobbyists alike
 
-Toate aceste caracteristici au făcut din programatorul *USBTinyISP* candidatul ideal pe postul de modul central al plăcuței Ale.  
-**Fără acest programator, plăcuța și chiar cărțulia ar fi literalmente inutile!** 
+All these features have made the *USBTinyISP* programmer a perfect candidate for the central module of _pAle_.
+**The board could not be made possible without this programmer,** that's for sure! 
 
-### O mică notă de subsol ###
-Mulțumesc celor de la **ladyada** că au făcut public proiectul *USBTinyISP*, proiect inițial conceput de către [*Dick Streefland*](http://dicks.home.xs4all.nl/)!  
-Pagina originală a proiectului o găsiți [aici](http://dicks.home.xs4all.nl/avr/usbtiny/).
+### A small footnote ###
+I thank the guys and gals from [**ladyada**](http://www.ladyada.net) for making *USBTinyISP* public and available. [*Dick Streefland*](http://dicks.home.xs4all.nl/) is the main author of this wonderful programmer!  
+You can find the original project page [here](http://dicks.home.xs4all.nl/avr/usbtiny/).
