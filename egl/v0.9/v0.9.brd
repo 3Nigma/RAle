@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.1">
+<eagle version="6.3">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -8,7 +8,7 @@
 </settings>
 <grid distance="0.07" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="mm"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="no" active="yes"/>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
 <layer number="3" name="Route3" color="4" fill="3" visible="no" active="yes"/>
 <layer number="4" name="Route4" color="1" fill="4" visible="no" active="yes"/>
@@ -77,10 +77,7 @@
 <wire x1="100" y1="0" x2="100" y2="100" width="0" layer="20"/>
 <wire x1="100" y1="100" x2="0" y2="100" width="0" layer="20"/>
 <wire x1="0" y1="100" x2="0" y2="0" width="0" layer="20"/>
-<text x="84.97" y="31.28" size="2.54" layer="21" font="vector" ratio="16">Rev. 5</text>
 <text x="61.08" y="34.52" size="3.81" layer="21" font="vector" ratio="16">ALE v0.9</text>
-<text x="63.36" y="24.5" size="2.54" layer="21" font="vector" ratio="16">Tip licenta:</text>
-<text x="72.01" y="21.02" size="2.1844" layer="21" font="vector" ratio="17">CERN OHL v1.1</text>
 <text x="52.36" y="44.38" size="3.81" layer="21" font="vector" ratio="14">www.tuscale.ro</text>
 <circle x="14.91" y="34.57" radius="0.51865" width="1.27" layer="21"/>
 <rectangle x1="33.565" y1="39.235" x2="34.265" y2="39.305" layer="21"/>
@@ -360,6 +357,42 @@
 <rectangle x1="36.785" y1="49.455" x2="38.675" y2="49.525" layer="21"/>
 <rectangle x1="37.065" y1="49.525" x2="38.465" y2="49.595" layer="21"/>
 <rectangle x1="37.485" y1="49.595" x2="38.185" y2="49.665" layer="21"/>
+<polygon width="0.4" layer="21">
+<vertex x="83.985475" y="18.524165625" curve="9.499967"/>
+<vertex x="84.491596875" y="18.784834375"/>
+<vertex x="85.74830625" y="17.759946875"/>
+<vertex x="86.610053125" y="18.62169375"/>
+<vertex x="85.585165625" y="19.878403125" curve="18.999995"/>
+<vertex x="86.019396875" y="20.92673125"/>
+<vertex x="87.63273125" y="21.090653125"/>
+<vertex x="87.63273125" y="22.309346875"/>
+<vertex x="86.019396875" y="22.47326875" curve="18.999995"/>
+<vertex x="85.585165625" y="23.521596875"/>
+<vertex x="86.610053125" y="24.77830625"/>
+<vertex x="85.74830625" y="25.640053125"/>
+<vertex x="84.491596875" y="24.615165625" curve="18.999995"/>
+<vertex x="83.44326875" y="25.049396875"/>
+<vertex x="83.279346875" y="26.66273125"/>
+<vertex x="82.060653125" y="26.66273125"/>
+<vertex x="81.89673125" y="25.049396875" curve="18.999995"/>
+<vertex x="80.848403125" y="24.615165625"/>
+<vertex x="79.59169375" y="25.640053125"/>
+<vertex x="78.729946875" y="24.77830625"/>
+<vertex x="79.754834375" y="23.521596875" curve="18.999995"/>
+<vertex x="79.320603125" y="22.47326875"/>
+<vertex x="77.70726875" y="22.309346875"/>
+<vertex x="77.70726875" y="21.090653125"/>
+<vertex x="79.320603125" y="20.92673125" curve="18.999995"/>
+<vertex x="79.754834375" y="19.878403125"/>
+<vertex x="78.729946875" y="18.62169375"/>
+<vertex x="79.59169375" y="17.759946875"/>
+<vertex x="80.848403125" y="18.784834375" curve="9.499967"/>
+<vertex x="81.354525" y="18.524165625"/>
+<vertex x="82.07205625" y="20.2564375" curve="-67.500005"/>
+<vertex x="81.1075" y="21.7" curve="-247.49998"/>
+<vertex x="83.26794375" y="20.2564375"/>
+</polygon>
+<text x="84.56" y="31.15" size="2.54" layer="21" font="vector" ratio="20">Rev. 6</text>
 </plain>
 <libraries>
 <library name="rcl">
@@ -944,7 +977,7 @@ Source: http://optoelectronics.perkinelmer.com/content/Datasheets/DTS_Photocells
 <class number="0" name="default" width="0" drill="0">
 </class>
 </classes>
-<designrules>
+<designrules name="default">
 <description language="de">&lt;b&gt;EAGLE Design Rules&lt;/b&gt;
 &lt;p&gt;
 Die Standard-Design-Rules sind so gewählt, dass sie für 

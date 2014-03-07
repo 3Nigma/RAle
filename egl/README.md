@@ -13,6 +13,6 @@ In **v0.9**, which is short for '*pAle version 0.9*', you will find both the ele
 
 ## Legal issues ##
 * *USBTinyISP* is made available under a flavor of [*Creative Commons License*](http://creativecommons.org/): *BY - SA*. For more details, you are advised to navigate to the [project's homepage](http://www.ladyada.net/make/usbtinyisp/).
-* *pAle* PCB is made available under the [*CERN OHL v1.1*](http://www.ohwr.org/projects/cernohl/wiki/) license. For more details, you are advised to navigate to its folder's content.
+* *pAle* PCB is made available under the [*OSHWA*](http://www.oshwa.org/definition/) license. For more details, you are advised to navigate to its folder's content.
 
 All the circuit files present in these folders can be opened with [Eagle Cadsoft](http://www.cadsoftusa.com/)'s *free* software version.
