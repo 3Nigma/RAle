@@ -1,5 +1,5 @@
 ## A first look ##
-The PEA board (known as _pAle_) has the following, internal, modular composition:
+The PEA board (known as _pAle_) is a 10x10cm, single-sided (with a few vias), PCB that has the following, internal, modular composition:
 <center>![Modular composition of pAle](http://i62.tinypic.com/hs4xvk.png)</center>
 
 ## Now that you are curious ##
