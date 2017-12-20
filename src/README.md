@@ -1,8 +1,8 @@
 ## Let's start with an image ... ##
 ![Module <-> source code integration](http://i50.tinypic.com/2u8z61w.png)
-###^- Image pending for internationalization :-)###
+### ^- Image pending for internationalization :-) ###
 
-## ... and continue with some explanations ...##
+## ... and continue with some explanations ... ##
 This folder contains 3 working modules:
 * _psAle_ : the main software used for interacting with the board
 * _dafus_ : _pAle_ programmer firmware
