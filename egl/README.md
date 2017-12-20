@@ -1,5 +1,5 @@
 ## What do we have here? ##
-<center>![Content of 'RAle/eagle'](http://i49.tinypic.com/ejygbn.png)</center>
+<center>![Content of 'RAle/eagle'](http://oi49.tinypic.com/ejygbn.jpg)</center>
 
 ## A little bit more details ##
 On this level you will find 2 folders :
