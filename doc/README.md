@@ -1,6 +1,6 @@
 ## A first look ##
 ![Book collage](http://i50.tinypic.com/24doaag.png)
-###^- Image pending for internationalization :-)###
+### ^- Image pending for internationalization :-)###
 
 ## Going deeper ##
 The most important files from this folder are the electronic books themselves. As of this moment, there is a complete Romanian version and an, in-progress, English version.
