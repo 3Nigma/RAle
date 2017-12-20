@@ -1,8 +1,8 @@
 ## General view ##
-![PEA trio opening] (http://i57.tinypic.com/qoxd2b.png)
+![PEA trio opening](http://i57.tinypic.com/qoxd2b.png)
 
 ## What do we have here? ##
-**PEA** [Romanian for *__P__achetul __E__ducațional __A__le*; *Ale Educational Package*, in English] is, like its name says, a **complete** and **free educational package** meant to teach anyone who desires (even high school pupils) the art of working with these marvelous feat of electrical engineering called *microcontrollers*. When I say **free** I truly mean it! You have no virutally restriction in using these materials (in parts or as a whole) for personal and non-commercial purposes. I only require that you acknowledge and maintain the informations regarding the true intellectual author of this project. Please check further down for a proper license association.
+**PEA** [Romanian for *Pachetul Educațional Ale*; *Ale Educational Package*, in English] is, like its name says, a **complete** and **free educational package** meant to teach anyone who desires (even high school pupils) the art of working with these marvelous feat of electrical engineering called *microcontrollers*. When I say **free** I truly mean it! You have no virutally restriction in using these materials (in parts or as a whole) for personal and non-commercial purposes. I only require that you acknowledge and maintain the informations regarding the true intellectual author of this project. Please check further down for a proper license association.
   
 It's a package since it is composed of 3 important and interdependent elements:
 * a board -called _pAle_- onto which the learner can practice what he has learned
@@ -13,18 +13,23 @@ It's a package since it is composed of 3 important and interdependent elements:
 
 ## More Pics ##
 Here are a couple of real-world images that might help in a better understanding of what we are working on here. Take it as a sort of eye-candy, if you will. **Be advised that, because of the continuous improvements carried out, these images may not fully reflect the project's current state! Nevertheless, they are a good aproximation of it ...**
-###A full PEA package###
-![PEA package content] (http://i59.tinypic.com/x0oe90.jpg)
-###Companion CD###
-![PEA CD] (http://i57.tinypic.com/2rr2iiw.jpg)
-###psAle's Code Form (needs internationalizing)###
-![psAle's code form run view] (http://i57.tinypic.com/5czud1.png)
-###PEA's board top view###
-![pAle Front view] (http://i62.tinypic.com/f9e7hd.jpg)
-###PEA's board back view###
-![pAle Back view] (http://i60.tinypic.com/vurcz.jpg)
-###pAle running its default program###
-[![pAle fresh firmware clip] (http://i60.tinypic.com/2lvbz0z.gif)] (https://www.youtube.com/watch?v=pp1ma8frFmw)  
+### A full PEA package ###
+![PEA package content](http://i59.tinypic.com/x0oe90.jpg)
+
+### Companion CD ###
+![PEA CD](http://i57.tinypic.com/2rr2iiw.jpg)
+
+### psAle's Code Form (needs internationalizing) ###
+![psAle's code form run view](http://i57.tinypic.com/5czud1.png)
+
+### PEA's board top view ###
+![pAle Front view](http://i62.tinypic.com/f9e7hd.jpg)
+
+### PEA's board back view ###
+![pAle Back view](http://i60.tinypic.com/vurcz.jpg)
+
+### pAle running its default program ###
+[![pAle fresh firmware clip](http://i60.tinypic.com/2lvbz0z.gif)](https://www.youtube.com/watch?v=pp1ma8frFmw)
 _(please click it for a better quality, Youtube version)_
 
 ## Building the package ##
